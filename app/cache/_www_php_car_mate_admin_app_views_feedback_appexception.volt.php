@@ -19,6 +19,25 @@
         <h4 class="widgettitle">异常信息</h4>
         <div class="widgetcontent nopadding">
             <div class="row-fluid">
+                <div id="exception_grid_tb">
+                    <div class="row-fluid">
+                        <div class="span3">
+                            <span class="label">用户ID</span>
+                            <input type="text" name="user_id"/>
+                        </div>
+                        <div class="span3">
+                            <span class="label">用户姓名</span>
+                            <input type="text" name="uname"/>
+                        </div>
+                        <div class="span3">
+                            <span class="label">电话</span>
+                            <input type="text" name="phone"/>
+                        </div>
+                        <div class="span2">
+                            <button id="exception_search_btn" class="btn btn-primary pull-left"><i class="iconfa-search"></i>查找</button>
+                        </div>
+                    </div>
+                </div>
                 <div id="exception_grid"></div>
             </div>
         </div>
@@ -63,6 +82,7 @@
             pageSize:10,///（每页记录数）
             pageNumber:1,///（当前页码）
             //pageList:[50,100,150,200],
+            toolbar: '#exception_grid_tb',
             columns:[[
                 {field:'provinceName', title:'省份', width:'5%', align:'center'},
                 {field:'userId', title:'用户ID', width:'15%', align:'center'},
@@ -118,6 +138,16 @@
                     });
                 }
             });
+        });
+
+        //查找按钮点击事件
+        $('#exception_search_btn').click(function(event){
+            var criteria = {};
+            criteria.user_id = $('#exception_grid_tb [name="user_id"]').val();
+            criteria.uname = $('#exception_grid_tb [name="uname"]').val();
+            criteria.phone = $('#exception_grid_tb [name="phone"]').val();
+
+            exception_grid.datagrid('load', {criteria: criteria});
         });
 
 

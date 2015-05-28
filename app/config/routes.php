@@ -730,6 +730,108 @@ $router->mount($province);
  * 系统
  */
 
+//开屏广告管理页面
+$router->addGet('/welcomeAdvList', array(
+    'controller' => 'welcomepage',
+    'action' => 'welcomeAdvList'
+));
+
+//获取开屏广告列表
+$router->add('/welcomeAdvList.json', array(
+    'controller' => 'welcomepage',
+    'action' => 'getWelcomeAdvList'
+));
+
+//获取开屏广告图片
+$router->addGet('/welcomeAdvPic/{id:\d+}', array(
+    'controller' => 'welcomepage',
+    'action' => 'getAdvPic'
+));
+
+//添加开屏广告
+$router->addPost('/welcomeAdv.json', array(
+    'controller' => 'welcomepage',
+    'action' => 'addWelcomeAdv'
+));
+
+//删除开屏广告
+$router->addDelete('/welcomeAdv/{id:\d+}.json', array(
+    'controller' => 'welcomepage',
+    'action' => 'delWelcomeAdv'
+));
+
+//更新开屏广告
+$router->addPut('/welcomeAdv.json', array(
+    'controller' => 'welcomepage',
+    'action' => 'updateWelcomeAdv'
+));
+
+//弃用开屏广告
+$router->addPut('/welcomeAdvDisable/{id:\d+}.json', array(
+    'controller' => 'welcomepage',
+    'action' => 'welcomeAdvDisable'
+));
+
+//使用开屏广告
+$router->addPut('/welcomeAdvEnable/{id:\d+}.json', array(
+    'controller' => 'welcomepage',
+    'action' => 'welcomeAdvEnable'
+));
+
+//公告管理页面
+$router->addGet('/noticeManage', array(
+    'controller' => 'notice',
+    'action' => 'noticeManage'
+));
+
+//公告管理页面
+$router->addGet('/noticeManage', array(
+    'controller' => 'notice',
+    'action' => 'noticeManage'
+));
+
+//添加公告
+$router->addPost('/notice.json', array(
+    'controller' => 'notice',
+    'action' => 'addNotice'
+));
+
+//删除公告
+$router->addDelete('/notice/{id:\d+}.json', array(
+    'controller' => 'notice',
+    'action' => 'delNotice'
+));
+
+//更新公告
+$router->addPut('/notice.json', array(
+    'controller' => 'notice',
+    'action' => 'updateNotice'
+));
+
+//使用公告
+$router->addPut('/noticeEnable/{id:\d+}.json', array(
+    'controller' => 'notice',
+    'action' => 'noticeEnable'
+));
+
+//弃用公告
+$router->addPut('/noticeDisable/{id:\d+}.json', array(
+    'controller' => 'notice',
+    'action' => 'noticeDisable'
+));
+
+//公告首页推广
+$router->addPut('/noticeExtend/{id:\d+}.json', array(
+    'controller' => 'notice',
+    'action' => 'noticeExtend'
+));
+
+//公告取消首页推广
+$router->addPut('/noticeUnextend/{id:\d+}.json', array(
+    'controller' => 'notice',
+    'action' => 'noticeUnextend'
+));
+
 //异常信息页面
 $router->addGet('/appException', array(
     'controller' => 'feedback',

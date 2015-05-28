@@ -234,10 +234,10 @@
                 <li class="dropdown"><a href=""><span  class="iconfa-signal"></span>系统</a>
                     <ul>
                         {% if 'welAdv' in auth %}
-                        <li class="dropdown"><a href="">开屏广告管理</a></li>
+                        <li class="dropdown"><a href="/welcomeAdvList">开屏广告管理</a></li>
                         {% endif %}
                         {% if 'notice' in auth %}
-                        <li class="dropdown"><a href="">公告管理</a></li>
+                        <li class="dropdown"><a href="/noticeManage">公告管理</a></li>
                         {% endif %}
                         {% if 'oilPrice' in auth %}
                         <li class="dropdown"><a href="">油价管理</a></li>

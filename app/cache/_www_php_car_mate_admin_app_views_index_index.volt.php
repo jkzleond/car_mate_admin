@@ -250,10 +250,10 @@
                 <li class="dropdown"><a href=""><span  class="iconfa-signal"></span>系统</a>
                     <ul>
                         <?php if ($this->isIncluded('welAdv', $auth)) { ?>
-                        <li class="dropdown"><a href="">开屏广告管理</a></li>
+                        <li class="dropdown"><a href="/welcomeAdvList">开屏广告管理</a></li>
                         <?php } ?>
                         <?php if ($this->isIncluded('notice', $auth)) { ?>
-                        <li class="dropdown"><a href="">公告管理</a></li>
+                        <li class="dropdown"><a href="/noticeManage">公告管理</a></li>
                         <?php } ?>
                         <?php if ($this->isIncluded('oilPrice', $auth)) { ?>
                         <li class="dropdown"><a href="">油价管理</a></li>

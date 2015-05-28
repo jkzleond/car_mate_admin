@@ -143,7 +143,7 @@
                 }
                 data.rows = pass_rows;
                 data.count = pass_rows.length;
-                return data;;
+                return data;
             },
             toolbar: [{
                 text: '添加',
@@ -214,8 +214,8 @@
                     if(!value) return;
 
                     var now = Date.now();
-                    var time = value.replace(/\s+/g, '/');
-                    time = time.replace(/:\d+(AM|PM)/, ' $1');
+
+                    var time = CarMate.utils.date.mssqlToJs(value);
 
                     var order_time = Date.parse(time);
                     if(!value || order_time < now)

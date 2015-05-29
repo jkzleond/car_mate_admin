@@ -3,7 +3,7 @@
 return new \Phalcon\Config(array(
     'database' => array(
         'adapter'     => 'Twm\Db\Adapter\Pdo\Mssql',
-        'host'        => '116.55.248.76:31433',
+        'host'        => '*.*.*.*:31433',
         'username'    => 'sa_iamis',
         'password'    => 'pl0871iamis',
         'dbname'      => 'IAMisDB',

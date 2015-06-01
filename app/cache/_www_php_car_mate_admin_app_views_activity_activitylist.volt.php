@@ -40,6 +40,21 @@
                             </select>
                         </div>
                     </div>
+                    <div class="row-fluid">
+                        <div class="span6">
+                            <span class="label">图片</span>
+                            <input id="activity_pic_file" type="file" name="picf" value="" accept="image/jpeg, image/png, image/gif" />
+                        </div>
+                        <div class="span2">
+                            <img id="activity_img" name="pic_data" src="" />
+                        </div>
+                    </div>
+                    <div class="row-fluid">
+                        <div class="span12">
+                            <span class="label">内容</span>
+                            <textarea name="contents" style="width:60%; height:200px"></textarea>
+                        </div>
+                    </div>
                     <div class="row-fluid hidden-none" id="activity_award">
                         <div class="span5">
                             <label class="label">抽奖开始时间</label>
@@ -269,8 +284,8 @@
         $('#activity_cu_window').dialog({
             title: '活动添加',
             iconCls: 'icon-plus',
-            width: '80%',
-            height: 550,
+            width: 1100,
+            height: 500,
             closed: true,
             shadow: false,
             modal: true,
@@ -315,6 +330,14 @@
                             pay_types.push($(n).val());
                         });
 
+                        var pic_data = null;
+                        if($('#activity_pic_file').val())
+                        {
+                            pic_data = $('#activity_img').attr('src').match(/base64,(.*)/)[1];
+                        }
+
+                        var contents = $('#activity_cu_window [name="contents"]').val();
+
                         var deposit = $('#activity_cu_window [name="deposit"]').val();
                         var url = $('#activity_cu_window [name="url"]').val();
                         var auto_start = $('#activity_cu_window [name="auto_start"]').val();
@@ -353,6 +376,10 @@
                         activity.set('award_end', award_end);
                         activity.set('need_pay', need_pay);
                         activity.set('pay_types', pay_types);
+
+                        activity.set('pic_data', pic_data);
+                        activity.set('contents', contents);
+
                         activity.set('deposit', deposit);
                         activity.set('url', url);
                         activity.set('auto_start', auto_start);
@@ -500,6 +527,10 @@
                     $('#activity_cu_form :checkbox').change();
                     $('.activity-state').hide();
                     $('#activity_cu_form .sel-add').remove();
+
+                    $('#activity_pic_file').val('');
+                    $('#activity_img').attr('src', '').hide();
+                    $('#activity_cu_form [name="contents"]').val('');
 
                     //设置窗口状态,并打开
                     $('#activity_cu_window').data('state', 'create');
@@ -712,6 +743,18 @@
             }
         });
 
+        //活动图片选择框改变事件
+        $('#activity_pic_file').change(function(event){
+            var file = this.files[0];
+
+            var reader = new FileReader();
+            reader.addEventListener('load', function(event){
+                var src = event.target.result;
+                $('#activity_img').attr('src', src).fadeIn();
+            });
+            reader.readAsDataURL(file);
+        });
+
         //编辑按钮点击事件
         $(document).on('click', '.activity-update-btn', function(event){
 
@@ -729,6 +772,11 @@
 
             $('#activity_cu_form [name="type_id"]').val(row.typeId);
             $('#activity_cu_form [name="type_id"]').change();
+
+            $('#activity_pic_file').val('');
+            $('#activity_img').attr('src', 'data:image/png;base64,' + row.picData).show();
+            $('#activity_cu_form [name="contents"]').val(row.contents);
+
 
             var astime = CarMate.utils.date.mssqlToJs(row.awardStart);
             var aetime = CarMate.utils.date.mssqlToJs(row.awardEnd);

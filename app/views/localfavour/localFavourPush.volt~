@@ -23,27 +23,27 @@
                         <div class="span2">
                             <span class="label">分类</span>
                             <select name="type_id" class="input-small">
-                                <?php foreach ($local_favour_types as $type) { ?>
-                                <option value="<?php echo $type->id; ?>"><?php echo $type->typeName; ?></option>
-                                <?php } ?>
+                                {% for type in local_favour_types %}
+                                <option value="{{ type.id }}">{{ type.typeName }}</option>
+                                {% endfor%}
                             </select>
                         </div>
                         <div class="span4">
                             <span class="label">选择省市</span>
                             <select name="province_id" class="input-small">
-                                <?php foreach ($province_list as $province) { ?>
-                                <?php if ($current_province_id == $province->id) { ?>
-                                <option value="<?php echo $province->id; ?>" selected><?php echo $province->name; ?></option>
-                                <?php } else { ?>
-                                <option value="<?php echo $province->id; ?>"><?php echo $province->name; ?></option>
-                                <?php } ?>
-                                <?php } ?>
+                                {% for province in province_list %}
+                                {% if current_province_id == province.id %}
+                                <option value="{{ province.id }}" selected>{{ province.name }}</option>
+                                {% else %}
+                                <option value="{{ province.id }}">{{ province.name }}</option>
+                                {% endif%}
+                                {% endfor%}
                             </select>
                             <span>省</span>
                             <select name="city_id" class="input-small">
-                                <?php foreach ($city_list as $city) { ?>
-                                <option value="<?php echo $city->id; ?>"><?php echo $city->name; ?></option>
-                                <?php } ?>
+                                {% for city in city_list %}
+                                <option value="{{ city.id }}">{{ city.name }}</option>
+                                {% endfor%}
                             </select>
                             <span>市</span>
                         </div>
@@ -102,10 +102,10 @@
         var editor = CKEDITOR.replace( 'local_favour_editor', {
             enterMode: CKEDITOR.ENTER_P,
             height: 270,
-            removePlugins : 'save'
-            //filebrowserImageUploadUrl : 'ckUploadImage?command=QuickUpload&type=Images'
+            removePlugins : 'save',
+            filebrowserImageUploadUrl : 'ckUploadImage?command=QuickUpload&type=Images'
         });
-        var finder_path = "<?php echo $this->url->get('/js/ckfinder/'); ?>";
+        var finder_path = "{{ url('/js/ckfinder/') }}";
         //集成ckfinder
         CKFinder.setupCKEditor(editor, finder_path);
 
@@ -181,7 +181,7 @@
                 {field:'pic_id',title:'图片',width:15,align:'center', formatter: function(value, row, index){
                     if(value)
                     {
-                        var pic_url = "<?php echo $this->url->get('/localFavourPic/'); ?>" + value;
+                        var pic_url = "{{ url('/localFavourPic/') }}" + value;
                         return '<img src="' + pic_url + '" style="width:80px;height:80px" />';
                     }
                     else
@@ -537,7 +537,7 @@
 
             if(local_favour.pic_id)
             {
-                $('#thumbnail').attr('src', "<?php echo $this->url->get('/localFavourPic/'); ?>" + local_favour.pic_id ).fadeIn(1000);
+                $('#thumbnail').attr('src', "{{ url('/localFavourPic/') }}" + local_favour.pic_id ).fadeIn(1000);
             }
 
             //写入ckeditor内容

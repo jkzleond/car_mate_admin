@@ -149,6 +149,7 @@
                         var opt = notice_cu_dialog.dialog('options');
                         opt.title = '公告添加';
                         opt.iconCls = 'icon-plus';
+                        opt.buttons[0].text = '添加';
                         notice_cu_dialog.data('state', 'create');
                         notice_cu_dialog.dialog(opt).dialog('open').dialog('center');
                     }
@@ -368,6 +369,7 @@
             var opt = notice_cu_dialog.dialog('options');
             opt.title = '公告编辑';
             opt.iconCls = 'icon-edit';
+            opt.buttons[0].text = '编辑';
             notice_cu_dialog.data('state', 'update');
             notice_cu_dialog.dialog(opt).dialog('open').dialog('center');
         });

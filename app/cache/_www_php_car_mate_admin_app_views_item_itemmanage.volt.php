@@ -199,9 +199,10 @@
         var item_contents_editor = CKEDITOR.replace( 'item_contents_editor', {
             enterMode: CKEDITOR.ENTER_P,
             height: 400,
-            removePlugins : 'save'
+            removePlugins : 'save',
+            filebrowserImageUploadUrl : 'ckUploadImage?command=QuickUpload&type=Images'
         });
-        var finder_path = "{{ url('/js/ckfinder/') }}";
+        var finder_path = "<?php echo $this->url->get('/js/ckfinder/'); ?>";
         //集成ckfinder
         CKFinder.setupCKEditor(item_contents_editor, finder_path);
 

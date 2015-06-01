@@ -78,7 +78,10 @@ class ActivityController extends ControllerBase
         $pay_types = isset($data['pay_types']) ? implode(', ', $data['pay_types']) : null;
         $group_column = $data['group_column'];
 
-        $success = Activity::addActivity($name, $place, $url, $start_date, $end_date, $auto_start, $info, $option, $type_id, $need_check_in, $need_notice, $award_start, $award_end, $need_pay, $deposit, $pay_types, $group_column);
+        $pic_data = isset($data['pic_data']) ? $data['pic_data'] : null;
+        $contents = isset($data['contents']) ? $data['contents'] : null;
+
+        $success = Activity::addActivity($name, $place, $url, $start_date, $end_date, $auto_start, $info, $option, $type_id, $need_check_in, $need_notice, $award_start, $award_end, $need_pay, $deposit, $pay_types, $group_column, $pic_data, $contents);
 
         if(isset($data['info']) && in_array('select', $data['info']) && $success)
         {
@@ -94,7 +97,7 @@ class ActivityController extends ControllerBase
         {
             $id = $success;
             $url = 'http://116.55.248.76:8080/car/userInfo.do?userid={loginname}&aid='.$id;
-            Activity::updateActivity($id, null, null, $url);
+            Activity::updateActivity($id, null, null, null, null, $url);
         }
 
         $success = $success !== false ? true : false;
@@ -131,6 +134,8 @@ class ActivityController extends ControllerBase
         {
             $id = isset($data['id']) ? $data['id'] : null;
             $name = isset($data['name']) ? $data['name'] : null;
+            $pic_data = isset($data['pic_data']) ? $data['pic_data'] : null;
+            $contents = isset($data['contents']) ? $data['contents'] : null;
             $place = isset($data['place']) ? $data['place'] : null;
             $url = isset($data['url']) ? $data['url'] : null;
             $auto_start = isset($data['auto_start']) ? $data['auto_start'] : null;
@@ -150,7 +155,7 @@ class ActivityController extends ControllerBase
             $pay_types = isset($data['pay_types']) ? implode(', ',$data['pay_types']) : null;
             $group_column = isset($data['group_column']) ? $data['group_column'] : null;
 
-            $rst = Activity::updateActivity($id, $name, $place, $url, $auto_start, $start_date, $end_date, $state, $info, $option, $type_id, $need_check_in, $award_start, $award_end, $award_state, $need_pay, $deposit, $need_notice, $pay_types, $group_column);
+            $rst = Activity::updateActivity($id, $name, $pic_data, $contents, $place, $url, $auto_start, $start_date, $end_date, $state, $info, $option, $type_id, $need_check_in, $award_start, $award_end, $award_state, $need_pay, $deposit, $need_notice, $pay_types, $group_column);
 
             //更新ActivitySelect
             if(isset($data['info']) && in_array('select', $data['info']))

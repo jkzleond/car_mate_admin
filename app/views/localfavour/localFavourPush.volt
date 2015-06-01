@@ -102,8 +102,8 @@
         var editor = CKEDITOR.replace( 'local_favour_editor', {
             enterMode: CKEDITOR.ENTER_P,
             height: 270,
-            removePlugins : 'save',
-            filebrowserImageUploadUrl : 'ckUploadImage?command=QuickUpload&type=Images'
+            removePlugins : 'save'
+            //filebrowserImageUploadUrl : 'ckUploadImage?command=QuickUpload&type=Images'
         });
         var finder_path = "{{ url('/js/ckfinder/') }}";
         //集成ckfinder

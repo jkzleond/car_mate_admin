@@ -73,8 +73,7 @@
         var notice_contents_editor = CKEDITOR.replace( 'notice_contents_editor', {
             enterMode: CKEDITOR.ENTER_P,
             height: 400,
-            removePlugins : 'save',
-            filebrowserImageUploadUrl : 'ckUploadImage?command=QuickUpload&type=Images'
+            removePlugins : 'save'
         });
         var finder_path = "{{ url('/js/ckfinder/') }}";
         //集成ckfinder

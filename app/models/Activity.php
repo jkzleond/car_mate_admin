@@ -97,7 +97,7 @@ SQL;
           group by aid
         )
 
-		select rownum,a.id,a.name,place,ISNULL(url,0) url,a.createDate,startDate,endDate,
+		select rownum,a.id,a.name,a.picData,a.contents,place,ISNULL(url,0) url,a.createDate,startDate,endDate,
 		autoStart,a.state,isnull(u.num,0) num,isnull(u.gainNum,0) gainNum,
 		[option],needCheckIn,t.name as typeName, t.id as typeId, a.awardStart, a.awardEnd, a.awardState,
 		a.infos, a.[option], a.needPay, a.needNotice, a.deposit, a.payTypes, a.groupColumn,
@@ -410,9 +410,11 @@ SQL;
      * @param $deposit
      * @param $pay_types
      * @param $group_column
+     * @param $pic_data
+     * @param $contents
      * @return bool|int
      */
-    public static function addActivity($name, $place, $url, $start_date, $end_date, $auto_start, $info, $option, $type_id, $need_check_in, $need_notice, $award_start=null, $award_end=null, $need_pay, $deposit, $pay_types, $group_column)
+    public static function addActivity($name, $place, $url, $start_date, $end_date, $auto_start, $info, $option, $type_id, $need_check_in, $need_notice, $award_start=null, $award_end=null, $need_pay, $deposit, $pay_types, $group_column, $pic_data, $contents)
     {
 
         $award_start = $award_start ? $award_start : date('Y-m-d H:i:s');
@@ -428,8 +430,8 @@ SQL;
         $sql = <<<SQL
         insert into Activity([name], place, url, createDate, startDate, endDate,
 		state, autoStart, infos, [option], [type], needCheckIn, needNotice, awardStart, awardEnd, awardState,
-		needPay, deposit, payTypes,groupColumn)
-		values ( :name, :place, :url, getdate(), :start_date,:end_date, 0, :auto_start, :info, :option, :type_id, :need_check_in, :need_notice,:award_start, :award_end, :award_state, :need_pay, :deposit , :pay_types,:group_column)
+		needPay, deposit, payTypes,groupColumn,picData,contents)
+		values ( :name, :place, :url, getdate(), :start_date,:end_date, 0, :auto_start, :info, :option, :type_id, :need_check_in, :need_notice,:award_start, :award_end, :award_state, :need_pay, :deposit , :pay_types,:group_column, :pic_data, :contents)
 SQL;
         $bind = array(
             'name' => $name,
@@ -449,7 +451,9 @@ SQL;
             'need_pay' => $need_pay,
             'deposit' => $deposit,
             'pay_types' => $pay_types,
-            'group_column' => $group_column
+            'group_column' => $group_column,
+            'pic_data' => $pic_data,
+            'contents' => $contents
         );
         
         $success = self::nativeExecute($sql, $bind);
@@ -473,6 +477,8 @@ SQL;
      * 更新活动
      * @param $id
      * @param null $name
+     * @param null $pic_data
+     * @param null $contents
      * @param null $place
      * @param null $url
      * @param null $auto_start
@@ -493,7 +499,7 @@ SQL;
      * @param null $group_column
      * @return bool
      */
-    public static function updateActivity($id, $name=null, $place=null, $url=null, $auto_start=null, $start_date=null, $end_date=null, $state=null, $info=null, $option=null, $type_id=null, $need_check_in=null, $award_start=null, $award_end=null, $award_state=null, $need_pay=null, $deposit=null, $need_notice=null, $pay_types=null, $group_column=null)
+    public static function updateActivity($id, $name=null, $pic_data=null, $contents=null, $place=null, $url=null, $auto_start=null, $start_date=null, $end_date=null, $state=null, $info=null, $option=null, $type_id=null, $need_check_in=null, $award_start=null, $award_end=null, $award_state=null, $need_pay=null, $deposit=null, $need_notice=null, $pay_types=null, $group_column=null)
     {
 
         $sql = 'update Activity set %s where id = :id';
@@ -505,6 +511,18 @@ SQL;
         {
             $field_str .= '[name] = :name, ';
             $bind['name'] = $name;
+        }
+
+        if($pic_data)
+        {
+            $field_str .= 'picData = :pic_data, ';
+            $bind['pic_data'] = $pic_data;
+        }
+
+        if($contents)
+        {
+            $field_str .= 'contents = :contents, ';
+            $bind['contents'] = $contents;
         }
 
         if($place)

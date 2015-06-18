@@ -73,7 +73,154 @@ class EmuController extends ControllerBase
         echo $res;
     }
 
-    private function _doGet($url, $headers=null, $cookies='')
+    public function gzwfAction()
+    {
+
+        if($this->request->isGet())
+        {
+//            $this->view->disable();
+            $code_xml_str = $this->_doGet('http://localhost:8090/index.php?mod=GuiZhou&act=checkCode');
+//            echo $code_xml_str;
+            $code_xml = simplexml_load_string($code_xml_str);
+            $return_code = $code_xml->return;
+            if($return_code == '00')
+            {
+                $client = $code_xml->param->client;
+                $code_img = $code_xml->param->validateCode;
+                $this->view->setVars(array(
+                    'client' => $client,
+                    'img_data' => $code_img
+                ));
+            }
+        }
+        else if($this->request->isPost())
+        {
+            $this->view->disable();
+
+            $post = $this->request->getPost();
+
+            $data = '';
+            foreach($post as $key => $value)
+            {
+                $data .= $key.'='.$value.'&';
+            }
+
+            $res = $this->_doPost('http://localhost:8090/index.php?mod=GuiZhou&act=query', $data);
+            echo $res;
+        }
+
+    }
+
+    //安徽
+    public function anhuiAction()
+    {
+        if($this->request->isGet())
+        {
+//            $this->view->disable();
+            $code_xml_str = $this->_doGet('http://116.55.248.76:8090/weifa/index.php?mod=AnHui&act=checkCode');
+
+            $code_xml = simplexml_load_string($code_xml_str);
+            $return_code = $code_xml->return;
+            if($return_code == '00')
+            {
+                $client = $code_xml->param->client;
+                $code_img = $code_xml->param->validateCode;
+                $this->view->setVars(array(
+                    'client' => $client,
+                    'img_data' => $code_img
+                ));
+            }
+        }
+        else if($this->request->isPost())
+        {
+            $this->view->disable();
+
+            $post = $this->request->getPost();
+
+            $data = '';
+            foreach($post as $key => $value)
+            {
+                $data .= $key.'='.$value.'&';
+            }
+
+            $res = $this->_doPost('http://116.55.248.76:8090/weifa/index.php?mod=AnHui&act=query', $data);
+            echo $res;
+        }
+    }
+
+    public function cwwdAction()
+    {
+        if($this->request->isGet())
+        {
+//            $this->view->disable();
+            $code_xml_str = $this->_doGet('http://116.55.248.76:8090/weifa/index.php?mod=CWDDD&act=checkCode');
+
+            $code_xml = simplexml_load_string($code_xml_str);
+            $return_code = $code_xml->return;
+            if($return_code == '00')
+            {
+                $client = $code_xml->param->client;
+                $code_img = $code_xml->param->validateCode;
+                $this->view->setVars(array(
+                    'client' => $client,
+                    'img_data' => $code_img
+                ));
+            }
+        }
+        else if($this->request->isPost())
+        {
+            $this->view->disable();
+
+            $post = $this->request->getPost();
+
+            $data = '';
+            foreach($post as $key => $value)
+            {
+                $data .= $key.'='.$value.'&';
+            }
+
+            $res = $this->_doPost('http://116.55.248.76:8090/weifa/index.php?mod=CWDDD&act=query', $data);
+            echo $res;
+        }
+    }
+
+    public function hlzAction()
+    {
+        if($this->request->isGet())
+        {
+//            $this->view->disable();
+            $code_xml_str = $this->_doGet('http://localhost:8090/index.php?mod=HeiLongJiang&act=checkCode');
+
+            $code_xml = simplexml_load_string($code_xml_str);
+            $return_code = $code_xml->return;
+            if($return_code == '00')
+            {
+                $client = $code_xml->param->client;
+                $code_img = $code_xml->param->validateCode;
+                $this->view->setVars(array(
+                    'client' => $client,
+                    'img_data' => $code_img
+                ));
+            }
+        }
+        else if($this->request->isPost())
+        {
+            $this->view->disable();
+
+            $post = $this->request->getPost();
+
+            $data = '';
+            foreach($post as $key => $value)
+            {
+                $data .= $key.'='.$value.'&';
+            }
+
+            $res = $this->_doPost('http://localhost:8090/index.php?mod=HeiLongJiang&act=query', $data);
+            echo $res;
+        }
+    }
+
+    private function _doGet($url, $headers=array(), $cookies='')
     {
         $ch = curl_init();
         curl_setopt_array($ch, array(

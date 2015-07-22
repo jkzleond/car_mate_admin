@@ -108,7 +108,7 @@ class LocalfavourController extends ControllerBase
         $files = $this->request->getUploadedFiles();
 
         $pic = $files[0];
-        $tmp_path = __DIR__.'/../../public/temp/'.$pic->getName().'.'.$pic->getExtension();
+        $tmp_path = __DIR__.'/../../public/temp/'.basename($pic->getTempName()).'.'.$pic->getExtension();
         $success = $pic->moveTo($tmp_path);
 
         $this->view->setVar('data', array(
@@ -176,8 +176,14 @@ class LocalfavourController extends ControllerBase
                 $pic_data_str = file_get_contents($tmp_path);
 
                 $pic_data = base64_encode($pic_data_str);
-
-                LocalFavour::updateLocalFavourPic($pic_id, $id, null, $pic_data);
+                if($pic_id)
+                {
+                    LocalFavour::updateLocalFavourPic($pic_id, $id, null, $pic_data);
+                }
+                else
+                {
+                    LocalFavour::addLocalFavourPic($id, null, $pic_data);
+                }
             }
 
         }

@@ -52,7 +52,23 @@
                     <div class="row-fluid">
                         <div class="span12">
                             <span class="label">内容</span>
-                            <textarea name="contents" style="width:60%; height:200px"></textarea>
+                            <textarea id="activity_contents_editor" name="contents" style="width:60%; height:200px"></textarea>
+                        </div>
+                    </div>
+                    <div class="row-fluid" style="margin-top: 10px">
+                        <div class="span5">
+                            <label class="label">报名开始时间</label>
+                            <input name="sign_start" id="activity_sign_start" class="datetimebox" type="text" />
+                        </div>
+                        <div class="span5">
+                            <label class="label">报名结束时间</label>
+                            <input name="sign_end" id="activity_sign_end" class="datetimebox" type="text" />
+                        </div>
+                    </div>
+                    <div class="row-fluid hidden-none" id="activity_trip_line">
+                        <div class="span12">
+                            <span class="label">行程线路</span>
+                            <textarea name="trip_line" class="input-large span8"></textarea>
                         </div>
                     </div>
                     <div class="row-fluid hidden-none" id="activity_award">
@@ -81,12 +97,25 @@
                                 <option value="1">是</option>
                             </select>
                         </div>
-                        <div class="span6 hidden-none pay" style="display: none">
-                            <label class="label">付款金额：</label>
-                            <input type="text" name="deposit" value="0" tag="付款金额"/>
-                        </div>
                     </div>
+                    <div class="row-fluid hidden-none pay" >
+                        <fieldset class="well well-small">
+                            <legend>付款金额</legend>
+                            <div class="row-fluid">
+                                <label class="label">付款金额(老本活动用)：</label>
+                                <input type="text" name="deposit" value="0" tag="付款金额">
+                            </div>
+                            <div class="row-fluid">
+                                <div class="span4">
+                                    <label class="label">付款项目：</label>
+                                    <button id="activity_add_pay_item"><i class="iconfa-plus"></i>添加</button>
+                                </div>
+                                <div id="activity_pay_item_container" class="span8">
 
+                                </div>
+                            </div>
+                        </fieldset>
+                    </div>
                     <div class="row-fluid hidden-none pay" style="display: none">
                         <fieldset class="well well-small">
                             <legend>付款方式</legend>
@@ -279,13 +308,24 @@
          * 控件相关
          */
 
+        //创建ckeditor
+        var editor = CKEDITOR.replace( 'activity_contents_editor', {
+            enterMode: CKEDITOR.ENTER_P,
+            height: 270,
+            removePlugins : 'save'
+            //filebrowserImageUploadUrl : 'ckUploadImage?command=QuickUpload&type=Images'
+        });
+        var finder_path = "{{ url('/js/ckfinder/') }}";
+        //集成ckfinder
+        CKFinder.setupCKEditor(editor, finder_path);
+
         /******窗口*********/
         //活动添加窗口
         $('#activity_cu_window').dialog({
             title: '活动添加',
             iconCls: 'icon-plus',
             width: 1100,
-            height: 500,
+            height: 600,
             closed: true,
             shadow: false,
             modal: true,
@@ -295,6 +335,7 @@
                     text: '添加',
                     iconCls: 'icon-ok',
                     handler: function(){
+
                         var waiting = $(this).data('waiting');
                         if(waiting) return;
 
@@ -304,7 +345,7 @@
                         var is_all_valid = true;
 
                         $('.required').each(function(i, n){
-                            var is_valid = $(this).validatebox('isValid')
+                            var is_valid = $(this).validatebox('isValid');
                             is_all_valid = is_all_valid && is_valid;
                         });
 
@@ -325,6 +366,25 @@
                         var award_end = $('#activity_cu_window [name="award_end"]').val();
                         var need_pay = $('#activity_cu_window [name="need_pay"]').val();
 
+                        var pay_items = [];
+
+                        if(need_pay != false)
+                        {
+                            $('#activity_cu_window .activity-pay-item').each(function(i, n){
+
+                                var pay_item = {};
+                                pay_item.name = $(n).find('[name="pay_item_name"]').val();
+                                pay_item.price = $(n).find('[name="pay_item_price"]').val();
+
+                                if(win_state == 'update')
+                                {
+                                    pay_item.id = $(n).find('[name="pay_item_id"]').val();
+                                }
+
+                                pay_items.push(pay_item);
+                            });
+                        }
+
                         var pay_types = [];
                         $('#activity_cu_window [name="pay_type"]:checked').each(function(i, n){
                             pay_types.push($(n).val());
@@ -336,7 +396,7 @@
                             pic_data = $('#activity_img').attr('src').match(/base64,(.*)/)[1];
                         }
 
-                        var contents = $('#activity_cu_window [name="contents"]').val();
+                        var contents = editor.getData(); //$('#activity_cu_window [name="contents"]').val();
 
                         var deposit = $('#activity_cu_window [name="deposit"]').val();
                         var url = $('#activity_cu_window [name="url"]').val();
@@ -344,6 +404,9 @@
                         var group_column = $('#activity_cu_window [name="group_column"]').val();
                         var _start_date = $('#activity_cu_window [name="start_date"]').val();
                         var _end_date = $('#activity_cu_window [name="end_date"]').val();
+                        var sign_start_date = sign_start.datetimebox('getValue');
+                        var sign_end_date = sign_end.datetimebox('getValue');
+                        var trip_line = $('#activity_cu_window [name="trip_line"]').val();
                         var need_check_in = $('#activity_cu_window [name="need_check_in"]').val();
                         var need_notice = $('#activity_cu_window [name="need_notice"]').val();
                         var state = $('#activity_cu_window [name="state"]').val();
@@ -375,6 +438,7 @@
                         activity.set('award_start', award_start);
                         activity.set('award_end', award_end);
                         activity.set('need_pay', need_pay);
+                        activity.set('pay_items', pay_items); //付款项目
                         activity.set('pay_types', pay_types);
 
                         activity.set('pic_data', pic_data);
@@ -386,6 +450,9 @@
                         activity.set('group_column', group_column);
                         activity.set('start_date', _start_date);
                         activity.set('end_date', _end_date);
+                        activity.set('sign_start_date', sign_start_date);
+                        activity.set('sign_end_date', sign_end_date);
+                        activity.set('trip_line', trip_line);
                         activity.set('need_check_in', need_check_in);
                         activity.set('need_notice', need_notice);
                         activity.set('state', state);
@@ -503,13 +570,27 @@
 
                 var rows = data.rows;
 
-                var id = null;
+                var cur_row = {};
+
                 for(var i = 0; i < rows.length; i++)
                 {
                     var row = rows[i];
-                    if(row.id == id) continue;
-                    id = row.id;
-                    pass_rows.push(row);
+
+                    if(cur_row.id != row.id)
+                    {
+                        cur_row = row;
+                        cur_row.pay_items = [];
+                        pass_rows.push(cur_row);
+                    }
+
+                    if(row.pay_item_id)
+                    {
+                        cur_row.pay_items.push({
+                            id: row.pay_item_id,
+                            name: row.pay_item_name,
+                            price: row.pay_item_price
+                        });
+                    }
                 }
                 data.rows = pass_rows;
                 data.count = pass_rows.length;
@@ -525,12 +606,17 @@
                     $('#activity_cu_form select').change();
                     $('#activity_cu_form :checkbox:checked').attr('checked', false);
                     $('#activity_cu_form :checkbox').change();
+
+                    $('#activity_pay_item_container').empty();
+
                     $('.activity-state').hide();
                     $('#activity_cu_form .sel-add').remove();
 
                     $('#activity_pic_file').val('');
                     $('#activity_img').attr('src', '').hide();
-                    $('#activity_cu_form [name="contents"]').val('');
+                    editor.setData('');
+
+                    $('#activity_cu_form [name="trip_line"]').val('');
 
                     //设置窗口状态,并打开
                     $('#activity_cu_window').data('state', 'create');
@@ -692,6 +778,10 @@
 
         var award_start = $('#activity_cu_form [name="award_start"]').datetimebox({editable: false});
         var award_end = $('#activity_cu_form [name="award_end"]').datetimebox({editable: false});
+
+        var sign_start = $('#activity_cu_form [name="sign_start"]').datetimebox({editable: false});
+        var sign_end = $('#activity_cu_form [name="sign_end"]').datetimebox({editable: false});
+
         var start_date = $('#activity_cu_form [name="start_date"]').datetimebox({
             editable: false,
             required: true,
@@ -709,13 +799,15 @@
 
         //活动类型select change 事件
         $('#activity_type').change(function(event){
+            $('#activity_award').hide(500);
+            $('#activity_trip_line').hide(500);
             if($(this).val() == '2')
             {
                 $('#activity_award').show(500);
             }
-            else
+            else if($(this).val() == '3')
             {
-                $('#activity_award').hide(500);
+                $('#activity_trip_line').show(500);
             }
         });
 
@@ -729,6 +821,40 @@
             {
                 $('.pay').hide(500);
             }
+        });
+
+        //添加付款项目按钮点击事件
+        $('#activity_add_pay_item').click(function(event){
+            var item_tpl = '<div class="row-fluid activity-pay-item">' +
+                                '<div class="span5">' +
+                                    '<lable class="label">款项名称</lable>' +
+                                    '<input type="text" name="pay_item_name" class="input-medium"/>' +
+                                '</div>' +
+                                '<div class="span5">' +
+                                    '<lable class="label">款项金额</lable>' +
+                                    '<input type="text" name="pay_item_price" class="input-medium"/>' +
+                                '</div>' +
+                                '<div class="span1">' +
+                                    '<button class="activity-remove-pay-item"><i class="iconfa-remove"></i></button>' +
+                                '</div>' +
+                            '</div>';
+
+            var $item = $(item_tpl);
+            $('#activity_pay_item_container').append($item);
+            $item.find('[name="pay_item_price"]').numberbox({
+                precision: 2,
+                groupSeparator: ','
+            });
+
+            return false;
+        });
+
+        //删除付款项目按钮点击事件
+        $(document).on('click', '.activity-remove-pay-item', function(){
+
+            $(this).parents('.activity-pay-item').remove();
+
+            return false;
         });
 
         //[下拉列表]复选框 change 事件
@@ -775,7 +901,18 @@
 
             $('#activity_pic_file').val('');
             $('#activity_img').attr('src', 'data:image/png;base64,' + row.picData).show();
-            $('#activity_cu_form [name="contents"]').val(row.contents);
+            editor.setData(row.contents); //$('#activity_cu_form [name="contents"]').val(row.contents);
+
+            $('#activity_cu_form [name="trip_line"]').text(row.tripLine || '');
+
+            var sstime = row.signStartDate ? CarMate.utils.date.mssqlToJs(row.signStartDate) : '';
+            var setime = row.signEndDate ? CarMate.utils.date.mssqlToJs(row.signEndDate) : '';
+
+            sstime = sstime ? CarMate.utils.date('Y-m-d H:i:s', sstime) : '';
+            setime = setime ? CarMate.utils.date('Y-m-d H:i:s', setime) : '';
+
+            sign_start.datetimebox('setValue', sstime);
+            sign_end.datetimebox('setValue', setime);
 
 
             var astime = CarMate.utils.date.mssqlToJs(row.awardStart);
@@ -786,6 +923,41 @@
 
             $('#activity_cu_form [name="need_pay"]').val(row.needPay);
             $('#activity_cu_form [name="need_pay"]').change();
+
+            $('#activity_pay_item_container').empty();
+
+            var len = row.pay_items.length;
+
+            var pay_item_tpl = '<div class="row-fluid activity-pay-item">' +
+                '<div class="span5">' +
+                '<lable class="label">款项名称</lable>' +
+                    '<input type="hidden" name="pay_item_id" value="<:id>"/>' +
+                '<input type="text" name="pay_item_name" class="input-medium" value="<:name>"/>' +
+                '</div>' +
+                '<div class="span5">' +
+                '<lable class="label">款项金额</lable>' +
+                '<input type="text" name="pay_item_price" class="input-medium" value="<:price>"/>' +
+                '</div>' +
+                '<div class="span1">' +
+                '<button class="activity-remove-pay-item"><i class="iconfa-remove"></i></button>' +
+                '</div>' +
+                '</div>';
+
+            for(var i = 0; i < len; i++)
+            {
+                var pay_item = row.pay_items[i];
+                var item_html = pay_item_tpl.replace(/<:([^<:>]*)>/g, function($0, $1, match_pos){
+                    return pay_item[$1];
+                });
+                $('#activity_pay_item_container').append(item_html);
+            }
+
+            $('#activity_pay_item_container [name="pay_item_price"]').numberbox({
+                precision: 2,
+                groupSeparator: ','
+            });
+
+
             var pay_types = row.payTypes ? row.payTypes.split(', ') : [];
 
             $('#activity_cu_window [name="pay_type"]').each(function(i, n){
@@ -1017,5 +1189,6 @@
         $(document).off('click', '.activity-detail-btn');
         $(document).off('click', '.check-user-view');
         $(document).off('click', '.pay-user-view');
+        $(document).off('click', '.activity-remove-pay-item');
     }
 </script>

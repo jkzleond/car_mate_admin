@@ -173,16 +173,16 @@ SQL;
 
     /**
      * 添加本地惠图片
-     * @param $pic_id
+     * @param $pid
      * @param $pic_title
      * @param $pic_data
      */
-    public static function addLocalFavourPic($pic_id, $pic_title, $pic_data)
+    public static function addLocalFavourPic($pid, $pic_title, $pic_data)
     {
-        $sql = 'insert into dbo.LocalFavourPic(pId,picTitle,picData) values(:pic_id, :pic_title, :pic_data)';
+        $sql = 'insert into dbo.LocalFavourPic(pId,picTitle,picData) values(:pid, :pic_title, :pic_data)';
 
         self::nativeExecute($sql, array(
-            'pic_id' => $pic_id,
+            'pid' => $pid,
             'pic_title' => $pic_title,
             'pic_data' => $pic_data
             ));

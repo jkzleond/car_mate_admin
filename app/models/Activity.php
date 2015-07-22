@@ -98,9 +98,10 @@ SQL;
         )
 
 		select rownum,a.id,a.name,a.picData,a.contents,place,ISNULL(url,0) url,a.createDate,startDate,endDate,
-		autoStart,a.state,isnull(u.num,0) num,isnull(u.gainNum,0) gainNum,
+		signStartDate, signEndDate, tripLine, autoStart, a.state, isnull(u.num,0) num, isnull(u.gainNum,0) gainNum,
 		[option],needCheckIn,t.name as typeName, t.id as typeId, a.awardStart, a.awardEnd, a.awardState,
 		a.infos, a.[option], a.needPay, a.needNotice, a.deposit, a.payTypes, a.groupColumn,
+		g.id as pay_item_id, g.name as pay_item_name, g.price as pay_item_price,
 		s.name as sname, s.optionList, s.shortNames, s.depositList
 		from ACT_CTE a
 		left join (
@@ -109,6 +110,8 @@ SQL;
 			group by aid
 		) u on u.aid = a.id
 		left join ActivityType t on t.id = a.type
+		left join Hui_ActivityToGoods a2g on a2g.activity_id = a.id
+		left join Hui_Goods g on g.id = a2g.goods_id
 		left join AS_CTE s on s.aid = a.id
 		where ISNULL(a.abandon, 0) != 1 %s
 SQL;
@@ -153,7 +156,7 @@ SQL;
           group by aid
         )
 
-		select rownum,a.id,a.name,place,ISNULL(url,0) url,a.createDate,startDate,endDate,
+		select a_cte.rownum,a.id,a.name,place,ISNULL(url,0) url,a.createDate,startDate,endDate,
 		autoStart,a.state,isnull(u.num,0) num,isnull(u.gainNum,0) gainNum,
 		[option],needCheckIn,t.name as typeName, t.id as typeId, a.awardStart, a.awardEnd, a.awardState,
 		a.infos, a.[option], a.needPay, a.needNotice, a.deposit, a.payTypes, a.groupColumn,
@@ -398,6 +401,9 @@ SQL;
      * @param $url
      * @param $start_date
      * @param $end_date
+     * @param $sign_start_date
+     * @param $sign_end_date
+     * @param $trip_line
      * @param $auto_start
      * @param $info
      * @param $option
@@ -414,7 +420,7 @@ SQL;
      * @param $contents
      * @return bool|int
      */
-    public static function addActivity($name, $place, $url, $start_date, $end_date, $auto_start, $info, $option, $type_id, $need_check_in, $need_notice, $award_start=null, $award_end=null, $need_pay, $deposit, $pay_types, $group_column, $pic_data, $contents)
+    public static function addActivity($name, $place, $url, $start_date, $end_date, $sign_start_date, $sign_end_date, $trip_line, $auto_start, $info, $option, $type_id, $need_check_in, $need_notice, $award_start=null, $award_end=null, $need_pay, $deposit, $pay_types, $group_column, $pic_data, $contents)
     {
 
         $award_start = $award_start ? $award_start : date('Y-m-d H:i:s');
@@ -428,10 +434,10 @@ SQL;
         }
 
         $sql = <<<SQL
-        insert into Activity([name], place, url, createDate, startDate, endDate,
+        insert into Activity([name], place, url, createDate, startDate, endDate, signStartDate, signEndDate, tripLine,
 		state, autoStart, infos, [option], [type], needCheckIn, needNotice, awardStart, awardEnd, awardState,
 		needPay, deposit, payTypes,groupColumn,picData,contents)
-		values ( :name, :place, :url, getdate(), :start_date,:end_date, 0, :auto_start, :info, :option, :type_id, :need_check_in, :need_notice,:award_start, :award_end, :award_state, :need_pay, :deposit , :pay_types,:group_column, :pic_data, :contents)
+		values ( :name, :place, :url, getdate(), :start_date,:end_date, :sign_start_date, :sign_end_date, :trip_line, 0, :auto_start, :info, :option, :type_id, :need_check_in, :need_notice,:award_start, :award_end, :award_state, :need_pay, :deposit , :pay_types,:group_column, :pic_data, :contents)
 SQL;
         $bind = array(
             'name' => $name,
@@ -439,6 +445,9 @@ SQL;
             'url' => $url,
             'start_date' => $start_date,
             'end_date' => $end_date,
+            'sign_start_date' => $sign_start_date,
+            'sign_end_date' => $sign_end_date,
+            'trip_line' => $trip_line,
             'auto_start' => $auto_start,
             'info' => $info,
             'option' => $option,
@@ -484,6 +493,9 @@ SQL;
      * @param null $auto_start
      * @param null $start_date
      * @param null $end_date
+     * @param null $sign_start_date
+     * @param null $sign_end_date
+     * @param null $trip_line
      * @param null $state
      * @param null $info
      * @param null $option
@@ -499,7 +511,7 @@ SQL;
      * @param null $group_column
      * @return bool
      */
-    public static function updateActivity($id, $name=null, $pic_data=null, $contents=null, $place=null, $url=null, $auto_start=null, $start_date=null, $end_date=null, $state=null, $info=null, $option=null, $type_id=null, $need_check_in=null, $award_start=null, $award_end=null, $award_state=null, $need_pay=null, $deposit=null, $need_notice=null, $pay_types=null, $group_column=null)
+    public static function updateActivity($id, $name=null, $pic_data=null, $contents=null, $place=null, $url=null, $auto_start=null, $start_date=null, $end_date=null, $sign_start_date=null, $sign_end_date=null, $trip_line=null, $state=null, $info=null, $option=null, $type_id=null, $need_check_in=null, $award_start=null, $award_end=null, $award_state=null, $need_pay=null, $deposit=null, $need_notice=null, $pay_types=null, $group_column=null)
     {
 
         $sql = 'update Activity set %s where id = :id';
@@ -553,6 +565,24 @@ SQL;
         {
             $field_str .= 'endDate = :end_date, ';
             $bind['end_date'] = $end_date;
+        }
+
+        if($sign_start_date)
+        {
+            $field_str .= 'signStartDate = :sign_start_date, ';
+            $bind['sign_start_date'] = $sign_start_date;
+        }
+
+        if($sign_end_date)
+        {
+            $field_str .= 'signEndDate = :sign_end_date, ';
+            $bind['sign_end_date'] = $sign_end_date;
+        }
+
+        if($trip_line)
+        {
+            $field_str .= 'tripLine = :trip_line, ';
+            $bind['trip_line'] = $trip_line;
         }
 
         if($state || $state === 0 || $state === '0')
@@ -637,6 +667,115 @@ SQL;
 
         $sql = sprintf($sql, $field_str);
 
+        //echo $sql.PHP_EOL;
+        //print_r($bind);
+
+        return self::nativeExecute($sql, $bind);
+    }
+
+    /**
+     * 添加付款项目
+     * @param $aid 活动id
+     * @param array $pay_items 付款项目
+     * @return bool
+     */
+    public static function addPayItems($aid, array $pay_items)
+    {
+
+        $connection = self::_getConnection();
+        $connection->begin();
+
+        $add_goods_sql = 'insert into Hui_Goods ( [name], price, type_id ) values (:name, :price, 1)';
+
+        $add_a2g_sql = 'insert into Hui_ActivityToGoods (activity_id, goods_id) values (:aid, :goods_id) ';
+
+        foreach($pay_items as $index => $pay_item)
+        {
+            $goods_bind = array();
+
+            $goods_bind['name'] = $pay_item['name'];
+            $goods_bind['price'] = $pay_item['price'];
+
+            $add_goods_success = self::nativeExecute($add_goods_sql, $goods_bind);
+            if(!$add_goods_success)
+            {
+                $connection->rollback();
+                return false;
+            }
+
+            $new_goods_id =  $connection->lastInsertId();
+
+            $a2g_bind = array(
+                'aid' => $aid,
+                'goods_id' => $new_goods_id
+            );
+
+            $add_a2g_success = self::nativeExecute($add_a2g_sql, $a2g_bind);
+            if(!$add_a2g_success)
+            {
+                $connection->rollback();
+                return false;
+            }
+        }
+
+        return $connection->commit();
+    }
+
+    /**
+     * 删除付款项目(仅删除活动与付款项的关联)
+     * @param $aid
+     * @param array $pay_item_ids
+     * @return bool
+     */
+    public static function delPayItems($aid, array $pay_item_ids = null)
+    {
+        $pay_item_condition = '';
+        $bind = array(
+            'aid' => $aid
+        );
+
+        if(!empty($pay_item_ids))
+        {
+            foreach($pay_item_ids as $index => $pay_item_id)
+            {
+                $id_param = 'id'.$index;
+                $pay_item_condition .= ":$id_param, ";
+                $bind[$id_param] = $pay_item_id;
+            }
+
+            $pay_item_condition = 'and goods_id in ('.rtrim($pay_item_condition, ', ').')';
+        }
+
+        $sql = "delete from Hui_ActivityToGoods where activity_id = :aid $pay_item_condition";
+        return self::nativeExecute($sql, $bind);
+    }
+
+    /**
+     * 删除某活动指定id以外的付款项
+     * @param $aid
+     * @param array $but_pay_item_ids
+     * @return bool
+     */
+    public static function delPayItemsButIds($aid, array $but_pay_item_ids = null)
+    {
+        $pay_item_condition = '';
+        $bind = array(
+            'aid' => $aid
+        );
+
+        if(!empty($but_pay_item_ids))
+        {
+            foreach($but_pay_item_ids as $index => $pay_item_id)
+            {
+                $id_param = 'id'.$index;
+                $pay_item_condition .= ":$id_param, ";
+                $bind[$id_param] = $pay_item_id;
+            }
+
+            $pay_item_condition = 'and goods_id not in ('.rtrim($pay_item_condition, ', ').')';
+        }
+
+        $sql = "delete from Hui_ActivityToGoods where activity_id = :aid $pay_item_condition";
         return self::nativeExecute($sql, $bind);
     }
 

@@ -220,6 +220,24 @@ class EmuController extends ControllerBase
         }
     }
 
+    public function wfdjAction()
+    {
+        $pay_items_json = '{"IllegalInfo":[{"first":"213","hphm":"123","wfjfs":"3","fkje":"150"}]}';
+    
+        $pay_items_json = base64_encode($pay_items_json);
+
+        $data = "userId=jkzleond@163.com&payType=alipay&illegalInfo=$pay_items_json&orderType=illegal";
+        $res = $this->_doPost('http://116.55.248.76/cyh/index.php?Mode=OrderPay&Action=genOrder', $data);
+        echo $res;
+    }
+    
+    public function alipayNofityAction()
+    {
+        $data = 'discount=0.00&payment_type=1&subject=车友惠违章代缴(含服务费)&trade_no=2015063000001000780059423448&buyer_email=morixing@hotmail.com&gmt_create=2015-06-30 10:23:28&notify_type=trade_status_sync&quantity=1&out_trade_no=2015063010222586760&seller_id=2088811107159562&notify_time=2015-06-30 13:47:28&body=每条违章代缴需要负20元代办手续费&trade_status=TRADE_SUCCESS&is_total_fee_adjust=N&total_fee=0.01&gmt_payment=2015-06-30 10:23:30&seller_email=sale@yn122.net&price=0.01&buyer_id=2088002165370789&notify_id=4e967a60ad7d106927dcf484d20c735d6c&use_coupon=N&sign_type=RSA&sign=KnkbIyXsq9um/V0ikFK1anQECHvrfLnhkOMCV0A%2BkTIUVZJryPH1nveCOgi2yadkuUHnqzAJLdEIwQ0O0Ssu50XDKzjBQJLAM4Aw%2bLMMKFTtoTn07DjfeZoHLE6Fff8kvfkFtq4RFPfRugNN4ijzP%2BShxVdk1WjyZBEronEE1Y8=';
+        $res = $this->_doPost('http://116.55.248.76/cyh/alipay/notify_url.php', $data);
+        echo $res;
+    }
+
     private function _doGet($url, $headers=array(), $cookies='')
     {
         $ch = curl_init();
@@ -250,7 +268,7 @@ class EmuController extends ControllerBase
             CURLOPT_COOKIE => $cookies
         ));
         $result =  curl_exec($ch);
-        curl_close($ch);
+        curl_close($ch);spl_autoload_extensions();
         return $result;
     }
 

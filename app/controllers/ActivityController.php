@@ -65,6 +65,9 @@ class ActivityController extends ControllerBase
         $url = $data['url'];
         $start_date = $data['start_date'];
         $end_date = $data['end_date'];
+        $sign_start_date = isset($data['sign_start_date']) ? $data['sign_start_date'] : null;
+        $sign_end_date = isset($data['sign_end_date']) ? $data['sign_end_date'] : null;
+        $trip_line = isset($data['trip_line']) ? $data['trip_line'] : null;
         $auto_start = $data['auto_start'];
         $info = isset($data['info']) ? implode(', ', $data['info']) : null;
         $option = isset($data['option']) ? $data['option'] : null;
@@ -74,6 +77,8 @@ class ActivityController extends ControllerBase
         $award_start = $data['award_start'];
         $award_end = $data['award_end'];
         $need_pay = $data['need_pay'];
+        $pay_items = isset($data['pay_items']) ? $data['pay_items'] : null;
+
         $deposit = $data['deposit'];
         $pay_types = isset($data['pay_types']) ? implode(', ', $data['pay_types']) : null;
         $group_column = $data['group_column'];
@@ -81,11 +86,17 @@ class ActivityController extends ControllerBase
         $pic_data = isset($data['pic_data']) ? $data['pic_data'] : null;
         $contents = isset($data['contents']) ? $data['contents'] : null;
 
-        $success = Activity::addActivity($name, $place, $url, $start_date, $end_date, $auto_start, $info, $option, $type_id, $need_check_in, $need_notice, $award_start, $award_end, $need_pay, $deposit, $pay_types, $group_column, $pic_data, $contents);
+        $success = Activity::addActivity($name, $place, $url, $start_date, $end_date, $sign_start_date, $sign_end_date, $trip_line, $auto_start, $info, $option, $type_id, $need_check_in, $need_notice, $award_start, $award_end, $need_pay, $deposit, $pay_types, $group_column, $pic_data, $contents);
+
+        $aid = $success;
+
+        if($need_pay and !empty($pay_items) and $aid)
+        {
+            Activity::addPayItems($aid, $pay_items);
+        }
 
         if(isset($data['info']) && in_array('select', $data['info']) && $success)
         {
-            $aid = $success;
             $sel_name = $data['sel_name'];
             $option_list = isset($data['sel_options']) ? implode(', ', $data['sel_options']) : '';
             $short_names = isset($data['sel_short_names']) ? implode(', ', $data['sel_short_names']) : '';
@@ -140,7 +151,10 @@ class ActivityController extends ControllerBase
             $url = isset($data['url']) ? $data['url'] : null;
             $auto_start = isset($data['auto_start']) ? $data['auto_start'] : null;
             $start_date = isset($data['start_date']) ? $data['start_date'] : null;
+            $trip_line = isset($data['trip_line']) ? $data['trip_line'] : null;
             $end_date = isset($data['end_date']) ? $data['end_date'] : null;
+            $sign_start_date = isset($data['sign_start_date']) ? $data['sign_start_date'] : null;
+            $sign_end_date = isset($data['sign_end_date']) ? $data['sign_end_date'] : null;
             $state = isset($data['state']) ? $data['state'] : null;
             $info = isset($data['info']) ? implode(', ', $data['info']) : null;
             $option = isset($data['option']) ? $data['option'] : null;
@@ -150,12 +164,55 @@ class ActivityController extends ControllerBase
             $award_end = isset($data['award_end']) ? $data['award_end'] : null;
             $award_state = isset($data['award_state']) ? $data['award_state'] : null;
             $need_pay = isset($data['need_pay']) ? $data['need_pay'] : null;
+            $pay_items = isset($data['pay_items']) ? $data['pay_items'] : null;
             $deposit = isset($data['deposit']) ? $data['deposit'] : null;
             $need_notice = isset($data['need_notice']) ? $data['need_notice'] : null;
             $pay_types = isset($data['pay_types']) ? implode(', ',$data['pay_types']) : null;
             $group_column = isset($data['group_column']) ? $data['group_column'] : null;
 
-            $rst = Activity::updateActivity($id, $name, $pic_data, $contents, $place, $url, $auto_start, $start_date, $end_date, $state, $info, $option, $type_id, $need_check_in, $award_start, $award_end, $award_state, $need_pay, $deposit, $need_notice, $pay_types, $group_column);
+            $rst = Activity::updateActivity($id, $name, $pic_data, $contents, $place, $url, $auto_start, $start_date, $end_date, $sign_start_date, $sign_end_date, $trip_line, $state, $info, $option, $type_id, $need_check_in, $award_start, $award_end, $award_state, $need_pay, $deposit, $need_notice, $pay_types, $group_column);
+
+            //更新付款项目
+
+            $aid = $id;
+
+            if(empty($pay_items))
+            {
+
+                Activity::delPayItems($aid);
+            }
+            else
+            {
+                $pay_item_ids = array();
+                $new_pay_items = array();
+                foreach($pay_items as $pay_item)
+                {
+                    $pay_item_id = isset($pay_item['id']) ? $pay_item['id'] : null;
+                    if($pay_item_id)
+                    {
+                        Goods::updateGoods($pay_item_id, array(
+                            'name' => $pay_item['name'],
+                            'price' => $pay_item['price']
+                        ));
+                        $pay_item_ids[] = $pay_item_id;
+                    }
+                    else
+                    {
+                       $new_pay_items[] = $pay_item;
+                    }
+                }
+
+                if(!empty($pay_item_ids))
+                {
+                    Activity::delPayItemsButIds($aid, $pay_item_ids);
+                }
+
+                if(!empty($new_pay_items))
+                {
+                    Activity::addPayItems($aid, $new_pay_items);
+                }
+            }
+
 
             //更新ActivitySelect
             if(isset($data['info']) && in_array('select', $data['info']))

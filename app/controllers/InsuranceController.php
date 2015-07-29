@@ -83,6 +83,49 @@ class InsuranceController extends ControllerBase
     }
 
     /**
+     * 获取指定保险信息的已有精算结果的公司
+     * @param $info_id
+     */
+    public function getHasActuaryCompanyAction($info_id)
+    {
+        $company_list = Insurance::getHasActuaryCompany($info_id);
+
+        $this->view->setVar('data', array(
+            'rows' => $company_list
+        ));
+    }
+
+    /**
+     * 获取指定保险信息的指定保险公司精算结果
+     * @param $info_id
+     * @param $company_id
+     */
+    public function getFinalResultAction($info_id, $company_id)
+    {
+        $result = Insurance::getFinalResult($info_id, $company_id);
+
+        $this->view->setVar('data', array(
+            'row' => $result
+        ));
+    }
+
+    /**
+     * 保存指定保险信息的指定保险公司尽算结果
+     * @param $info_id
+     * @param $company_id
+     */
+    public function saveFinalResultAction($info_id, $company_id)
+    {
+        $result = $this->request->getPost('data');
+
+        $success = Insurance::saveFinalResult($info_id, $company_id, $result);
+
+        $this->view->setVar('data', array(
+            'success' => $success
+        ));
+    }
+
+    /**
      * 提交无法精算理由
      */
     public function insuranceCantExactReasonAction()
@@ -128,7 +171,7 @@ class InsuranceController extends ControllerBase
         if($success)
         {
             $push_title = '您的车险保单已出单，请登录本地惠保险巨惠进行查看！';
-            PushNotifications::addFailurePushUser(2, $user_id, null, null, $push_title, 0);
+            PushNotifications::addPushMessage(2, $user_id, null, null, $push_title, 0);
         }
 
         $this->view->setVar('data', array(
@@ -180,7 +223,7 @@ class InsuranceController extends ControllerBase
 
         if($success)
         {
-            PushNotifications::addFailurePushUser(2, $user_id, null, null, '您的保单已精算完成，居然有那么多福利，快来本地惠-保险巨惠-我的订单看看吧！', 0);
+            PushNotifications::addPushMessage(2, $user_id, null, null, '您的保单已精算完成，居然有那么多福利，快来本地惠-保险巨惠-我的订单看看吧！', 0);
         }
 
         $this->view->setVar('data', array(
@@ -228,7 +271,7 @@ class InsuranceController extends ControllerBase
         if($success)
         {
             $push_title = '您的车险保单已出单，请登录本地惠保险巨惠进行查看！';
-            PushNotifications::addFailurePushUser(2, $user_id, null, null, $push_title, 0);
+            PushNotifications::addPushMessage(2, $user_id, null, null, $push_title, 0);
         }
 
         $this->view->setVar('data', array(

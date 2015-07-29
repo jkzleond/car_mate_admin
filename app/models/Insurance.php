@@ -383,7 +383,7 @@ SQL;
 
         $sql = 'update Insurance_Info set %s where id = :id';
         $bind = array('id' => $id);
-        $field_str = '';
+        $field_str = 'lastModifiedTime = getdate(), ';
 
         $state_id = isset($criteria['state_id']) ? $criteria['state_id'] : null;
 
@@ -583,6 +583,47 @@ SQL;
     }
 
     /**
+     * 保存精算参数
+     * @param $info_id
+     * @param $criteria
+     * @return bool|int
+     */
+    public static function saveFinalParam($info_id, $criteria)
+    {
+        $sql_exist = 'select finalParam_id from Insurance_Info where id = :info_id';
+        $bind_exist = array(
+            'info_id' => $info_id
+        );
+        $exist = self::nativeQuery($sql_exist, $bind_exist);
+        $exist_param_id = $exist['finalParam_id'];
+
+        $connection = self::_getConnection();
+        $connection->begin();
+
+        if($exist_param_id)
+        {
+            $delete_param_sql = "delete from Insurance_FinalParam where id = $exist_param_id";
+            $delete_param_success = $connection->execute($delete_param_sql);
+
+            if(!$delete_param_success)
+            {
+                $connection->rollback();
+                return false;
+            }
+        }
+
+        $new_param_id = self::addInsuranceFinalParam($criteria);
+
+        if(!$new_param_id)
+        {
+            $connection->rollback();
+            return false;
+        }
+
+        return $new_param_id;
+    }
+
+    /**
      * @param $id
      * @return object
      */
@@ -660,6 +701,7 @@ SQL;
 		     ,afterDiscountSelfIgnition
 		     ,singleNotDeductibleSelfIgnition
 		     ,business
+             ,giftMoney
 		 FROM Insurance_Result where id = :id
 SQL;
 
@@ -746,6 +788,7 @@ SQL;
 			'after_discount_self_ignition' => null,
 			'single_not_deductible_self_ignition' => null,
 			'business' => null
+            ,'gift_money' => null
         );
 
         if($data and is_array($data))
@@ -830,6 +873,7 @@ SQL;
 			,afterDiscountSelfIgnition
 			,singleNotDeductibleSelfIgnition
 			,business
+            ,giftMoney
 		)values(
 			:round_year
 			,:last_month
@@ -900,6 +944,7 @@ SQL;
 			,:after_discount_self_ignition
 			,:single_not_deductible_self_ignition
 			,:business
+            ,:gift_money
 		)
 SQL;
 
@@ -1124,6 +1169,7 @@ SQL;
 		     ,afterDiscountSelfIgnition
 		     ,singleNotDeductibleSelfIgnition
 		     ,business
+             ,giftMoney
 		 FROM Insurance_FinalResult where id = :id
 SQL;
 
@@ -1139,6 +1185,127 @@ SQL;
     {
         $sql = 'SELECT companyId, discount, companyName, ename FROM Insurance_Discount';
         return self::nativeQuery($sql, null, null, Db::FETCH_OBJ);
+    }
+
+    /**
+     * 获取指定保险信息的已精算的保险公司(新保险可计算多家保险公司)
+     * @param $info_id
+     * @return array
+     */
+    public static function getHasActuaryCompany($info_id)
+    {
+        $sql = <<<SQL
+        select c.companyId as id, c.shortName as short_name from
+        (
+          select company_id from Insurance_Info_To_FinalResult where info_id = :info_id
+        ) i2fr
+        left join Insurance_Discount c on c.companyId = i2fr.company_id
+SQL;
+        $bind = array('info_id' => $info_id);
+
+        return self::nativeQuery($sql, $bind);
+    }
+
+    /**
+     * 获取指定保险信息的指定保险公司的精算结果
+     * @param $info_id
+     * @param $company_id
+     * @return array
+     */
+    public static function getFinalResult($info_id, $company_id)
+    {
+        $sql = <<<SQL
+        select top 1 fr.*, i2fr.company_id from
+        (
+          select company_id, result_id from Insurance_Info_To_FinalResult
+          where info_id = :info_id and company_id = :company_id
+        ) i2fr
+        left join Insurance_Discount c on c.companyId = i2fr.company_id
+        left join Insurance_FinalResult fr on fr.id = i2fr.result_id
+SQL;
+        $bind = array(
+            'info_id' => $info_id,
+            'company_id' => $company_id
+        );
+
+        return self::fetchOne($sql, $bind);
+    }
+
+    /**
+     * 保存指定保险信息的指定保险公司精算结果
+     * @param $info_id
+     * @param $company_id
+     * @param array|null $criteria
+     * @return bool|int
+     */
+    public static function saveFinalResult($info_id, $company_id, array $criteria=null)
+    {
+        $sql_exist = 'select top 1 id, result_id from Insurance_Info_To_FinalResult where info_id = :info_id and company_id = :company_id';
+        $bind_exist = array(
+            'info_id' => $info_id,
+            'company_id' => $company_id
+        );
+        $exist = self::fetchOne($sql_exist, $bind_exist, null, Db::FETCH_ASSOC);
+        $exist_i2fr_id = !empty($exist) ? $exist['id'] : null;
+        $exist_result_id = !empty($exist) ? $exist['result_id'] : null;
+
+        $connection = self::_getConnection();
+        $connection->begin();
+
+        if($exist_result_id)
+        {
+            $delete_i2rf_sql = "delete from Insurance_Info_To_FinalResult where id = $exist_i2fr_id";
+            $delete_i2rf_success = $connection->execute($delete_i2rf_sql);
+
+            if(!$delete_i2rf_success)
+            {
+                $connection->rollback();
+                return false;
+            }
+
+            $delete_result_sql = "delete from Insurance_FinalResult where id = $exist_result_id";
+            $delete_result_success = $connection->execute($delete_result_sql);
+
+            if(!$delete_result_success)
+            {
+                $connection->rollback();
+                return false;
+            }
+        }
+
+        $new_result_id = self::addInsuranceFinalResult($criteria);
+
+        if(!$new_result_id)
+        {
+            $connection->rollback();
+            return false;
+        }
+
+        $add_i2fr_sql = <<<SQL
+        insert into Insurance_Info_To_FinalResult (
+        info_id, company_id, result_id
+        ) values (
+        :info_id, :company_id, :new_result_id
+        )
+SQL;
+        $add_i2fr_bind = array(
+            'info_id' => $info_id,
+            'company_id' => $company_id,
+            'new_result_id' => $new_result_id
+        );
+
+        $add_i2fr_success = $connection->execute($add_i2fr_sql, $add_i2fr_bind);
+
+        if(!$add_i2fr_success)
+        {
+            $connection->rollback();
+            return false;
+        }
+
+        $success  = $connection->commit();
+        if(!$success) return false;
+
+        return $connection->lastInsertId();
     }
 
     /**

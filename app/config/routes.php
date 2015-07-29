@@ -218,6 +218,22 @@ $insurance->addGet('/insuranceBuy', array(
     'action' => 'insuranceBuy'
 ));
 
+//获取已精算公司
+$insurance->addGet('/insurance/{info:\d+}/hasActuaryCompany.json', array(
+    'action' => 'getHasActuaryCompany'
+));
+
+//保险获取指定保险公司的精算结果
+$insurance->addGet('/insurance/finalResult/{info_id:\d+}/{company_id:\d+}.json', array(
+    'action' => 'getFinalResult'
+));
+
+//保险保存某家公司的精算结果
+$insurance->addPost('/insurance/finalResult/{info_id:\d+}/{company_id:\d+}.json', array(
+    'action' => 'saveFinalResult'
+));
+
+
 //保险无法尽算理由
 $insurance->addPut('/insuranceCantExactReason.json', array(
     'action' => 'insuranceCantExactReason'

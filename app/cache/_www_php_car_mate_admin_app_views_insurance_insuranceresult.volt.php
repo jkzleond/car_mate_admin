@@ -34,63 +34,63 @@
                 </tr>
                 <tr>
                     <th>车牌号</th>
-                    <td bgcolor="#EEE">{{ info.c_hphm }}</td>
+                    <td bgcolor="#EEE"><?php echo $info->c_hphm; ?></td>
                     <th>车主姓名</th>
-                    <td bgcolor="#EEE">{{ info.userName }}</td>
+                    <td bgcolor="#EEE"><?php echo $info->userName; ?></td>
                     <th>联系方式</th>
-                    <td bgcolor="#EEE">{{ info.phoneNo }}</td>
+                    <td bgcolor="#EEE"><?php echo $info->phoneNo; ?></td>
                 </tr>
                 <tr>
                     <th>车架号</th>
-                    <td bgcolor="#EEE">{{ info.c_frameNumber }}</td>
+                    <td bgcolor="#EEE"><?php echo $info->c_frameNumber; ?></td>
                     <th>行驶省</th>
-                    <td bgcolor="#EEE">{{ info.c_provinceName }}</td>
+                    <td bgcolor="#EEE"><?php echo $info->c_provinceName; ?></td>
                     <th>行驶城市</th>
-                    <td bgcolor="#EEE">{{ info.c_cityName }}</td>
+                    <td bgcolor="#EEE"><?php echo $info->c_cityName; ?></td>
                 </tr>
                 <tr>
                     <th>车价</th>
-                    <td bgcolor="#EEE">{{ insurance.carPrice }}<input type="hidden" name="car_price" value="{{ insurance.carPrice }}"/></td>
+                    <td bgcolor="#EEE"><?php echo $insurance->carPrice; ?><input type="hidden" name="car_price" value="<?php echo $insurance->carPrice; ?>"/></td>
                     <th>座位</th>
-                    <td bgcolor="#EEE">{{ insurance.carSeat }}<input type="hidden" name="car_seat" value="{{ insurance.carSeat }}"/></td>
+                    <td bgcolor="#EEE"><?php echo $insurance->carSeat; ?><input type="hidden" name="car_seat" value="<?php echo $insurance->carSeat; ?>"/></td>
                     <th>车主邮箱</th>
-                    <td bgcolor="#EEE">{{ info.emailAddr }}</td>
+                    <td bgcolor="#EEE"><?php echo $info->emailAddr; ?></td>
                 </tr>
                 <tr>
                     <th>整年、月参数</th>
                     <td bgcolor="#EEE">
-                        {{ result.roundYear }}|{{ result.roundMonth }}
-                        <input type="hidden" name="round_year" value="{{ result.roundYear }}"/>
-                        <input type="hidden" name="round_month" value="{{ result.roundMonth }}"/>
+                        <?php echo $result->roundYear; ?>|<?php echo $result->roundMonth; ?>
+                        <input type="hidden" name="round_year" value="<?php echo $result->roundYear; ?>"/>
+                        <input type="hidden" name="round_month" value="<?php echo $result->roundMonth; ?>"/>
                     </td>
                     <th>初登年月</th>
                     <td bgcolor="#EEE">
-                        {{ insurance.firstYear }}.{{ insurance.firstMonth }}
-                        <input type="hidden" name="first_year" value="{{ insurance.firstYear }}"/>
-                        <input type="hidden" name="first_month" value="{{ insurance.firstMonth }}"/>
+                        <?php echo $insurance->firstYear; ?>.<?php echo $insurance->firstMonth; ?>
+                        <input type="hidden" name="first_year" value="<?php echo $insurance->firstYear; ?>"/>
+                        <input type="hidden" name="first_month" value="<?php echo $insurance->firstMonth; ?>"/>
                     </td>
                     <th>起保年月</th>
                     <td bgcolor="#EEE">
-                        {{ insurance.insuranceYear }}.{{ insurance.insuranceMonth }}
-                        <input type="hidden" name="insurance_year" value="{{ insurance.insuranceYear }}"/>
-                        <input type="hidden" name="insurance_month" value="{{ insurance.insuranceMonth }}"/>
+                        <?php echo $insurance->insuranceYear; ?>.<?php echo $insurance->insuranceMonth; ?>
+                        <input type="hidden" name="insurance_year" value="<?php echo $insurance->insuranceYear; ?>"/>
+                        <input type="hidden" name="insurance_month" value="<?php echo $insurance->insuranceMonth; ?>"/>
                     </td>
                 </tr>
                 <tr height="25px">
                     <th>联系地址</th>
-                    <td bgcolor="#EEE">{{ info.a_address }}</td>
+                    <td bgcolor="#EEE"><?php echo $info->a_address; ?></td>
                     <th>发动机号</th>
-                    <td bgcolor="#EEE">{{ info.c_fdjh }}</td>
+                    <td bgcolor="#EEE"><?php echo $info->c_fdjh; ?></td>
                     <th>品牌型号</th>
-                    <td bgcolor="#EEE">{{ info.c_autoname }}</td>
+                    <td bgcolor="#EEE"><?php echo $info->c_autoname; ?></td>
                 </tr>
                 <tr>
                     <th>身份证号</th>
-                    <td bgcolor="#EEE">{{ info.sfzh }}</td>
-                    {% if info.state_id == 7 %}
+                    <td bgcolor="#EEE"><?php echo $info->sfzh; ?></td>
+                    <?php if ($info->state_id == 7) { ?>
                     <td >无法精算理由</td>
-                    <td bgcolor="#EEE">{{ info.failureReason }}</td>
-                    {% endif %}
+                    <td bgcolor="#EEE"><?php echo $info->failureReason; ?></td>
+                    <?php } ?>
                 </tr>
                 <tr height="25px">
                     <td  colspan="6">&nbsp;</td>
@@ -99,13 +99,13 @@
                     <th>保险公司及折扣</th>
                     <td bgcolor="#CCDDEE" colspan="5">
                         <select name="discount_company_id" id="insurance_discount_select_btn" class="input-xlarge">
-                            {% for discount in discount_list %}
-                                {% if insurance.d_companyId == discount.companyId%}
-                            <option value="{{ discount.companyId }}" data-discount="{{ discount.discount }}" selected>{{ discount.companyName }}(折扣:{{ discount.discount }})</option>
-                                {% else %}
-                            <option value="{{ discount.companyId }}" data-discount="{{ discount.discount }}">{{ discount.companyName }}(折扣:{{ discount.discount }})</option>
-                                {% endif %}
-                            {% endfor %}
+                            <?php foreach ($discount_list as $discount) { ?>
+                                <?php if ($insurance->d_companyId == $discount->companyId) { ?>
+                            <option value="<?php echo $discount->companyId; ?>" data-discount="<?php echo $discount->discount; ?>" selected><?php echo $discount->companyName; ?>(折扣:<?php echo $discount->discount; ?>)</option>
+                                <?php } else { ?>
+                            <option value="<?php echo $discount->companyId; ?>" data-discount="<?php echo $discount->discount; ?>"><?php echo $discount->companyName; ?>(折扣:<?php echo $discount->discount; ?>)</option>
+                                <?php } ?>
+                            <?php } ?>
                         </select>
                     </td>
                 </tr>
@@ -123,164 +123,164 @@
                     <th bgcolor="#EFEFEF">交强险</th>
                     <td >
                         <select name="compulsory_id">
-                            {% for compulsory_state in compulsory_state_list %}
-                                {% if insurance.compulsory_id == compulsory_state.id %}
-                            <option value="{{ compulsory_state.id }}" selected>{{ compulsory_state.status }}</option>
-                                {% else %}
-                            <option value="{{ compulsory_state.id }}">{{ compulsory_state.status }}</option>
-                                {% endif %}
-                            {% endfor %}
+                            <?php foreach ($compulsory_state_list as $compulsory_state) { ?>
+                                <?php if ($insurance->compulsory_id == $compulsory_state->id) { ?>
+                            <option value="<?php echo $compulsory_state->id; ?>" selected><?php echo $compulsory_state->status; ?></option>
+                                <?php } else { ?>
+                            <option value="<?php echo $compulsory_state->id; ?>"><?php echo $compulsory_state->status; ?></option>
+                                <?php } ?>
+                            <?php } ?>
                         </select>
                     </td>
-                    <td><input class="insurance-number-disabled" name="standard_compulsory_insurance" id="standard_compulsory_insurance" value="{{ result.standardCompulsoryInsurance | number_format(2) }}" readonly="readonly"/></td>
-                    <td><input class="after-discount-value" data-rel="#standard_compulsory_insurance" name="after_discount_compulsory_insurance" id="after_discount_compulsory_insurance" value="{{ result.afterDiscountCompulsoryInsurance | number_format(2) }}"/></td>
-                    <td colspan="2"><input class="single-not-deductible-value" name="single_not_deductible_compulsory_insurance" id="single_not_deductible_compulsory_insurance" value="{{ result.singleNotDeductibleCompulsoryInsurance | number_format(2) }}"/></td>
+                    <td><input class="insurance-number-disabled" name="standard_compulsory_insurance" id="standard_compulsory_insurance" value="<?php echo number_format($result->standardCompulsoryInsurance, 2); ?>" readonly="readonly"/></td>
+                    <td><input class="after-discount-value" data-rel="#standard_compulsory_insurance" name="after_discount_compulsory_insurance" id="after_discount_compulsory_insurance" value="<?php echo number_format($result->afterDiscountCompulsoryInsurance, 2); ?>"/></td>
+                    <td colspan="2"><input class="single-not-deductible-value" name="single_not_deductible_compulsory_insurance" id="single_not_deductible_compulsory_insurance" value="<?php echo number_format($result->singleNotDeductibleCompulsoryInsurance, 2); ?>"/></td>
                 </tr>
                 <tr>
                     <th>车损险</th>
                     <td>
                         <select name="damage_id">
-                            {% for insurance_status in insurance_status_list %}
-                                {% if insurance.damage_id == insurance_status.id%}
-                            <option value="{{ insurance_status.id }}" selected>{{ insurance_status.status }}</option>
-                                {% endif %}
-                            <option value="{{ insurance_status.id }}">{{ insurance_status.status }}</option>
-                            {% endfor %}
+                            <?php foreach ($insurance_status_list as $insurance_status) { ?>
+                                <?php if ($insurance->damage_id == $insurance_status->id) { ?>
+                            <option value="<?php echo $insurance_status->id; ?>" selected><?php echo $insurance_status->status; ?></option>
+                                <?php } ?>
+                            <option value="<?php echo $insurance_status->id; ?>"><?php echo $insurance_status->status; ?></option>
+                            <?php } ?>
                         </select>
                     </td>
-                    <td ><input class="insurance-number-disabled" name="standard_damage_insurance" id="standard_damage_insurance" value="{{ result.standardDamageInsurance | number_format(2) }}" readonly="readonly"/></td>
-                    <td ><input class="after-discount-value" data-rel="#standard_damage_insurance" name="after_discount_damage_insurance" id="after_discount_damage_insurance" value="{{ result.afterDiscountDamageInsurance | number_format(2) }}"/></td>
-                    <td  colspan="2"><input class="single-not-deductible-value" name="single_not_deductible_damage_insurance" id="single_not_deductible_damage_insurance" value="{{ result.singleNotDeductibleDamageInsurance | number_format(2) }}"/></td>
+                    <td ><input class="insurance-number-disabled" name="standard_damage_insurance" id="standard_damage_insurance" value="<?php echo number_format($result->standardDamageInsurance, 2); ?>" readonly="readonly"/></td>
+                    <td ><input class="after-discount-value" data-rel="#standard_damage_insurance" name="after_discount_damage_insurance" id="after_discount_damage_insurance" value="<?php echo number_format($result->afterDiscountDamageInsurance, 2); ?>"/></td>
+                    <td  colspan="2"><input class="single-not-deductible-value" name="single_not_deductible_damage_insurance" id="single_not_deductible_damage_insurance" value="<?php echo number_format($result->singleNotDeductibleDamageInsurance, 2); ?>"/></td>
                 </tr>
                 <tr>
                     <th>第三者</th>
-                    <td ><input class="insurance-number-int" type="text" name="third" value="{{ insurance.third | number_format(2) }}"/></td>
-                    <td ><input class="insurance-number-disabled" name="standard_third" id="standard_third" value="{{ result.standardThird | number_format(2) }}" readonly="readonly"/></td>
-                    <td ><input class="after-discount-value" data-rel="#standard_third" name="after_discount_third" id="after_discount_third" value="{{ result.afterDiscountThird | number_format(2) }}"/></td>
-                    <td  colspan="2"><input class="single-not-deductible-value" name="single_not_deductible_third" id="single_not_deductible_third" value="{{ result.singleNotDeductibleThird | number_format(2) }}"/></td>
+                    <td ><input class="insurance-number-int" type="text" name="third" value="<?php echo number_format($insurance->third, 2); ?>"/></td>
+                    <td ><input class="insurance-number-disabled" name="standard_third" id="standard_third" value="<?php echo number_format($result->standardThird, 2); ?>" readonly="readonly"/></td>
+                    <td ><input class="after-discount-value" data-rel="#standard_third" name="after_discount_third" id="after_discount_third" value="<?php echo number_format($result->afterDiscountThird, 2); ?>"/></td>
+                    <td  colspan="2"><input class="single-not-deductible-value" name="single_not_deductible_third" id="single_not_deductible_third" value="<?php echo number_format($result->singleNotDeductibleThird, 2); ?>"/></td>
                 </tr>
                 <tr>
                     <th rowspan="2">座位</th>
-                    <td>驾驶员（1）: <input class="insurance-number-int" name="driver" value="{{ insurance.driver | number_format(2) }}"/></td>
-                    <td><input class="insurance-number-disabled" name="standard_driver" id="standard_driver" value="{{ result.standardDriver | number_format(2) }}" readonly="readonly"/></td>
-                    <td><input class="after-discount-value" data-rel="#standard_driver" name="after_discount_driver" id="after_discount_driver" value="{{ result.afterDiscountDriver | number_format(2) }}"/></td>
-                    <td colspan="2"><input class="single-not-deductible-value" name="single_not_deductible_driver" id="single_not_deductible_driver" value="{{ result.singleNotDeductibleDriver | number_format(2) }}"/></td>
+                    <td>驾驶员（1）: <input class="insurance-number-int" name="driver" value="<?php echo number_format($insurance->driver, 2); ?>"/></td>
+                    <td><input class="insurance-number-disabled" name="standard_driver" id="standard_driver" value="<?php echo number_format($result->standardDriver, 2); ?>" readonly="readonly"/></td>
+                    <td><input class="after-discount-value" data-rel="#standard_driver" name="after_discount_driver" id="after_discount_driver" value="<?php echo number_format($result->afterDiscountDriver, 2); ?>"/></td>
+                    <td colspan="2"><input class="single-not-deductible-value" name="single_not_deductible_driver" id="single_not_deductible_driver" value="<?php echo number_format($result->singleNotDeductibleDriver, 2); ?>"/></td>
                 </tr>
                 <tr>
-                    <td>乘客（{{ insurance.carSeat - 1 }}） : <input class="insurance-number-int" name="passenger" value="{{ insurance.passenger | number_format(2) }}"/></td>
-                    <td><input class="insurance-number-disabled" name="standard_passenger" id="standard_passenger" value="{{ result.standardPassenger | number_format(2) }}" readonly="readonly"/></td>
-                    <td><input class="after-discount-value" data-rel="#standard_passenger" name="after_discount_passenger" id="afterDiscountPassenger" value="{{ result.afterDiscountPassenger | number_format(2) }}"/></td>
-                    <td colspan="2"><input   class="single-not-deductible-value" name="single_not_deductible_passenger" id="single_not_deductible_passenger" value="{{ result.singleNotDeductiblePassenger | number_format(2) }}"/></td>
+                    <td>乘客（<?php echo $insurance->carSeat - 1; ?>） : <input class="insurance-number-int" name="passenger" value="<?php echo number_format($insurance->passenger, 2); ?>"/></td>
+                    <td><input class="insurance-number-disabled" name="standard_passenger" id="standard_passenger" value="<?php echo number_format($result->standardPassenger, 2); ?>" readonly="readonly"/></td>
+                    <td><input class="after-discount-value" data-rel="#standard_passenger" name="after_discount_passenger" id="afterDiscountPassenger" value="<?php echo number_format($result->afterDiscountPassenger, 2); ?>"/></td>
+                    <td colspan="2"><input   class="single-not-deductible-value" name="single_not_deductible_passenger" id="single_not_deductible_passenger" value="<?php echo number_format($result->singleNotDeductiblePassenger, 2); ?>"/></td>
                 </tr>
                 <tr>
                     <th>盗抢</th>
                     <td >
                         <select name="robbery_id">
-                            {% for insurance_status in insurance_status_list %}
-                                {% if insurance.robbery_id == insurance_status.id%}
-                            <option value="{{ insurance_status.id }}" selected>{{ insurance_status.status }}</option>
-                                {% else %}
-                            <option value="{{ insurance_status.id }}">{{ insurance_status.status }}</option>
-                                {% endif %}
-                            {% endfor %}
+                            <?php foreach ($insurance_status_list as $insurance_status) { ?>
+                                <?php if ($insurance->robbery_id == $insurance_status->id) { ?>
+                            <option value="<?php echo $insurance_status->id; ?>" selected><?php echo $insurance_status->status; ?></option>
+                                <?php } else { ?>
+                            <option value="<?php echo $insurance_status->id; ?>"><?php echo $insurance_status->status; ?></option>
+                                <?php } ?>
+                            <?php } ?>
                         </select>
                     </td>
-                    <td><input class="insurance-number-disabled" name="standard_robbery" id="standard_robbery" value="{{ result.standardRobbery | number_format(2) }}" readonly="readonly"/></td>
-                    <td><input  class="after-discount-value" data-rel="#standard_robbery" name="after_discount_robbery" id="after_discount_robbery" value="{{ result.afterDiscountRobbery | number_format(2) }}"/></td>
-                    <td colspan="2"><input class="single-not-deductible-value" name="single_not_deductible_robbery" id="single_not_deductible_robbery" value="{{ result.singleNotDeductibleRobbery | number_format(2) }}"/></td>
+                    <td><input class="insurance-number-disabled" name="standard_robbery" id="standard_robbery" value="<?php echo number_format($result->standardRobbery, 2); ?>" readonly="readonly"/></td>
+                    <td><input  class="after-discount-value" data-rel="#standard_robbery" name="after_discount_robbery" id="after_discount_robbery" value="<?php echo number_format($result->afterDiscountRobbery, 2); ?>"/></td>
+                    <td colspan="2"><input class="single-not-deductible-value" name="single_not_deductible_robbery" id="single_not_deductible_robbery" value="<?php echo number_format($result->singleNotDeductibleRobbery, 2); ?>"/></td>
                 </tr>
                 <tr>
                     <th>玻璃</th>
                     <td>
                         <select name="glass_id">
-                            {% for glass_state in glass_state_list %}
-                                {% if insurance.glass_id == glass_state.id %}
-                            <option value="{{ glass_state.id }}" selected>{{ glass_state.status }}</option>
-                                {% else %}
-                            <option value="{{ glass_state.id }}">{{ glass_state.status }}</option>
-                                {% endif %}
-                            {% endfor %}
+                            <?php foreach ($glass_state_list as $glass_state) { ?>
+                                <?php if ($insurance->glass_id == $glass_state->id) { ?>
+                            <option value="<?php echo $glass_state->id; ?>" selected><?php echo $glass_state->status; ?></option>
+                                <?php } else { ?>
+                            <option value="<?php echo $glass_state->id; ?>"><?php echo $glass_state->status; ?></option>
+                                <?php } ?>
+                            <?php } ?>
                         </select>
                     </td>
-                    <td><input class="insurance-number-disabled" name="standard_glass" id="standard_glass" value="{{ result.standardGlass | number_format(2) }}" readonly="readonly"/></td>
-                    <td><input  class="after-discount-value" data-rel="#standard_glass" name="after_discount_glass" id="after_discount_glass" value="{{ result.afterDiscountGlass | number_format(2) }}"/></td>
-                    <td colspan="2"><input class="single-not-deductible-value" name="single_not_deductible_glass" id="single_not_deductible_glass" value="{{ result.singleNotDeductibleGlass | number_format(2) }}"/></td>
+                    <td><input class="insurance-number-disabled" name="standard_glass" id="standard_glass" value="<?php echo number_format($result->standardGlass, 2); ?>" readonly="readonly"/></td>
+                    <td><input  class="after-discount-value" data-rel="#standard_glass" name="after_discount_glass" id="after_discount_glass" value="<?php echo number_format($result->afterDiscountGlass, 2); ?>"/></td>
+                    <td colspan="2"><input class="single-not-deductible-value" name="single_not_deductible_glass" id="single_not_deductible_glass" value="<?php echo number_format($result->singleNotDeductibleGlass, 2); ?>"/></td>
                 </tr>
                 <tr>
                     <th>划痕</th>
-                    <td><input class="insurance-number" type="text" name="scratch" id="scratch" value="{{ insurance.scratch | number_format(2) }}"/></td>
-                    <td><input class="insurance-number-disabled" name="standard_scratch" id="standard_scratch" value="{{ result.standardScratch | number_format(2) }}" readonly="readonly"/></td>
-                    <td><input  class="after-discount-value" data-rel="#standard_scratch" name="after_discount_scratch" id="after_discount_scratch" value="{{ result.afterDiscountScratch | number_format(2) }}"/></td>
-                    <td  colspan="2"><input class="single-not-deductible-value" name="single_not_deductible_scratch" id="single_not_deductible_scratch" value="{{ result.singleNotDeductibleScratch | number_format(2) }}"/></td>
+                    <td><input class="insurance-number" type="text" name="scratch" id="scratch" value="<?php echo number_format($insurance->scratch, 2); ?>"/></td>
+                    <td><input class="insurance-number-disabled" name="standard_scratch" id="standard_scratch" value="<?php echo number_format($result->standardScratch, 2); ?>" readonly="readonly"/></td>
+                    <td><input  class="after-discount-value" data-rel="#standard_scratch" name="after_discount_scratch" id="after_discount_scratch" value="<?php echo number_format($result->afterDiscountScratch, 2); ?>"/></td>
+                    <td  colspan="2"><input class="single-not-deductible-value" name="single_not_deductible_scratch" id="single_not_deductible_scratch" value="<?php echo number_format($result->singleNotDeductibleScratch, 2); ?>"/></td>
                 </tr>
                 <tr>
                     <th>自燃</th>
                     <td>
                         <select name="self_ignition_id">
-                            {% for insurance_status in insurance_status_list %}
-                                {% if insurance.selfIgnition_id == insurance_status.id%}
-                            <option value="{{ insurance_status.id }}" selected>{{ insurance_status.status }}</option>
-                                {% else %}
-                            <option value="{{ insurance_status.id }}">{{ insurance_status.status }}</option>
-                                {% endif %}
-                            {% endfor %}
+                            <?php foreach ($insurance_status_list as $insurance_status) { ?>
+                                <?php if ($insurance->selfIgnition_id == $insurance_status->id) { ?>
+                            <option value="<?php echo $insurance_status->id; ?>" selected><?php echo $insurance_status->status; ?></option>
+                                <?php } else { ?>
+                            <option value="<?php echo $insurance_status->id; ?>"><?php echo $insurance_status->status; ?></option>
+                                <?php } ?>
+                            <?php } ?>
                         </select>
                     </td>
-                    <td><input class="insurance-number-disabled" name="standard_self_ignition" id="standard_self_ignition" value="{{ result.standardSelfIgnition | number_format(2) }}" readonly="readonly"/></td>
-                    <td><input  class="after-discount-value" data-rel="#standard_self_ignition" name="after_discount_self_ignition" id="after_discount_self_ignition" value="{{ result.afterDiscountSelfIgnition | number_format(2) }}"/></td>
-                    <td colspan="2"><input class="single-not-deductible-value" name="single_not_deductible_self_ignition" id="single_not_deductible_self_ignition" value="{{ result.singleNotDeductibleSelfIgnition | number_format(2) }}"/></td>
+                    <td><input class="insurance-number-disabled" name="standard_self_ignition" id="standard_self_ignition" value="<?php echo number_format($result->standardSelfIgnition, 2); ?>" readonly="readonly"/></td>
+                    <td><input  class="after-discount-value" data-rel="#standard_self_ignition" name="after_discount_self_ignition" id="after_discount_self_ignition" value="<?php echo number_format($result->afterDiscountSelfIgnition, 2); ?>"/></td>
+                    <td colspan="2"><input class="single-not-deductible-value" name="single_not_deductible_self_ignition" id="single_not_deductible_self_ignition" value="<?php echo number_format($result->singleNotDeductibleSelfIgnition, 2); ?>"/></td>
                 </tr>
                 <tr>
                     <th>可选免赔额</th>
-                    <td><input class="insurance-number" type="text" name="optional_deductible" id="optional_deductible" value="{{ insurance.optionalDeductible | number_format(2) }}"/></td>
-                    <td><input class="insurance-number-disabled" name="standard_optional_deductible" id="standard_optional_deductible" value="{{ result.standardOptionalDeductible | number_format(2) }}" readonly="readonly"/></td>
-                    <td><input  class="after-discount-value" data-rel="#standard_optional_deductible" name="after_discount_optional_deductible" id="after_discount_optional_deductible" value="{{ result.afterDiscountOptionalDeductible | number_format(2) }}"/></td>
+                    <td><input class="insurance-number" type="text" name="optional_deductible" id="optional_deductible" value="<?php echo number_format($insurance->optionalDeductible, 2); ?>"/></td>
+                    <td><input class="insurance-number-disabled" name="standard_optional_deductible" id="standard_optional_deductible" value="<?php echo number_format($result->standardOptionalDeductible, 2); ?>" readonly="readonly"/></td>
+                    <td><input  class="after-discount-value" data-rel="#standard_optional_deductible" name="after_discount_optional_deductible" id="after_discount_optional_deductible" value="<?php echo number_format($result->afterDiscountOptionalDeductible, 2); ?>"/></td>
                     <td colspan="2">&nbsp;</td>
                 </tr>
                 <tr>
                     <th>不计免赔</th>
                     <td >
                         <select name="not_deductible_id">
-                            {% for insurance_status in insurance_status_list %}
-                                {% if insurance.notDeductible_id == insurance_status.id%}
-                            <option value="{{ insurance_status.id }}" selected>{{ insurance_status.status }}</option>
-                                {% else %}
-                            <option value="{{ insurance_status.id }}">{{ insurance_status.status }}</option>
-                                {% endif %}
-                            {% endfor %}
+                            <?php foreach ($insurance_status_list as $insurance_status) { ?>
+                                <?php if ($insurance->notDeductible_id == $insurance_status->id) { ?>
+                            <option value="<?php echo $insurance_status->id; ?>" selected><?php echo $insurance_status->status; ?></option>
+                                <?php } else { ?>
+                            <option value="<?php echo $insurance_status->id; ?>"><?php echo $insurance_status->status; ?></option>
+                                <?php } ?>
+                            <?php } ?>
                         </select>
                     </td>
-                    <td><input class="insurance-number-disabled" name="standard_not_deductible" id="standard_not_deductible" value="{{ result.standardNotDeductible | number_format(2) }}" readonly="readonly"/></td>
-                    <td><input  class="after-discount-value" data-rel="#standard_not_deductible" name="after_discount_not_deductible" id="after_discount_not_deductible" value="{{ result.afterDiscountNotDeductible | number_format(2) }}"/></td>
+                    <td><input class="insurance-number-disabled" name="standard_not_deductible" id="standard_not_deductible" value="<?php echo number_format($result->standardNotDeductible, 2); ?>" readonly="readonly"/></td>
+                    <td><input  class="after-discount-value" data-rel="#standard_not_deductible" name="after_discount_not_deductible" id="after_discount_not_deductible" value="<?php echo number_format($result->afterDiscountNotDeductible, 2); ?>"/></td>
                     <td colspan="2">&nbsp;</td>
                 </tr>
                 <tr>
                     <th colspan="2" style="text-align: center;">合计</th>
-                    <td bgcolor="#FFEE99"><input class="insurance-number-disabled" name="total_standard" id="total_standard" value="{{ result.totalStandard | number_format(2) }}" readonly="readonly"/></td>
-                    <td bgcolor="#FFEE99"><input name="total_after_discount" id="total_after_discount" value="{{ result.totalAfterDiscount | number_format(2) }}"/></td>
-                    <td bgcolor="#FFEE99" colspan="2"><input name="total_single_not_deductible" id="total_single_not_deductible" value="{{ result.totalSingleNotDeductible | number_format(2) }}"/></td>
+                    <td bgcolor="#FFEE99"><input class="insurance-number-disabled" name="total_standard" id="total_standard" value="<?php echo number_format($result->totalStandard, 2); ?>" readonly="readonly"/></td>
+                    <td bgcolor="#FFEE99"><input name="total_after_discount" id="total_after_discount" value="<?php echo number_format($result->totalAfterDiscount, 2); ?>"/></td>
+                    <td bgcolor="#FFEE99" colspan="2"><input name="total_single_not_deductible" id="total_single_not_deductible" value="<?php echo number_format($result->totalSingleNotDeductible, 2); ?>"/></td>
                 </tr>
                 <tr>
                     <th>商业</th>
-                    <td bgcolor="#FFEE99"><input class="insurance-number" name="business" value="{{ result.business | number_format(2) }}"/></td>
+                    <td bgcolor="#FFEE99"><input class="insurance-number" name="business" value="<?php echo number_format($result->business, 2); ?>"/></td>
                     <td bgcolor="#FFEE99">
                         车船税（
-                        {% if insurance.tax === 0 or insurance.tax === '0' %}
+                        <?php if ($insurance->tax === 0 || $insurance->tax === '0') { ?>
                         不
-                        {% endif %}
+                        <?php } ?>
                         代缴）:
                     </td>
                     <td bgcolor="#FFEE99">
-                        <input class="insurance-number" type="text" name="tax_money" value="{{ result.taxMoney | number_format(2) }}"/>
+                        <input class="insurance-number" type="text" name="tax_money" value="<?php echo number_format($result->taxMoney, 2); ?>"/>
                     </td>
                     <td bgcolor="#FFEE99" colspan="2">
-                        排量：{% if insurance.displacement %} {{ insurance.displacement }} {% endif %}
+                        排量：<?php if ($insurance->displacement) { ?> <?php echo $insurance->displacement; ?> <?php } ?>
                     </td>
                 </tr>
                 <tr>
                     <th>出单礼包</th>
                     <td colspan="4">
-                        <input class="insurance-number" type="text" name="gift_money" value="{{ result.giftMoney | number_format(2) }}"/>         
+                        <input class="insurance-number" type="text" name="gift_money" value="<?php echo number_format($result->giftMoney, 2); ?>"/>         
                     </td> 
                 </tr>   
                 <tr>
@@ -292,50 +292,50 @@
                 </tr>
                 <tr height="30px">
                     <td  colspan="3" style="text-align: center;">
-                        <input type="hidden" name="user_id" value="{{ info.userId }}"/>
-                        <input type="hidden" name="info_id" value="{{ info.id }}"/>
-                        <input type="hidden" name="result_id" value="{{ result.id }}"/>
+                        <input type="hidden" name="user_id" value="<?php echo $info->userId; ?>"/>
+                        <input type="hidden" name="info_id" value="<?php echo $info->id; ?>"/>
+                        <input type="hidden" name="result_id" value="<?php echo $result->id; ?>"/>
 
-                        {% if info.state_id == 2 or info.state_id == 7 %}
+                        <?php if ($info->state_id == 2 || $info->state_id == 7) { ?>
                         <input type="submit" id="insurance_company_result_cu_btn" class="btn btn-primary" value="提交当前保险公司精算结果(新)" style="width: 250px"/>
                         <input type="submit" id="insurance_result_update_btn" class="btn btn-warning" value="提交精算结果" style="width: 250px"/>
-                        {% elseif info.state_id == 3 %}
+                        <?php } elseif ($info->state_id == 3) { ?>
                         <input type="submit" id="insurance_company_result_cu_btn" class="btn btn-primary" value="提交当前保险公司精算结果(新)" style="width: 250px"/>
                         <input type="submit" id="insurance_result_update_btn" class="btn btn-warning" value="提交精算结果" style="width: 250px"/>
                         <input type="submit" id="insurance_issuing_btn" class="btn btn-primary" value="出单" style="width: 250px"/>
-                        {% endif %}
+                        <?php } ?>
                     </td>
-                    {% if info.state_id == 2 or info.state_id == 3 or info.state_id == 4 or info.state_id == 7 %}
+                    <?php if ($info->state_id == 2 || $info->state_id == 3 || $info->state_id == 4 || $info->state_id == 7) { ?>
                     <td  colspan="3">
-                        <input type="button" id="insurance_unupdate_btn" data-id="{{ result.id }}" value="无法精算" class="reason-btn btn btn-danger" style="width: 250px"/>
+                        <input type="button" id="insurance_unupdate_btn" data-id="<?php echo $result->id; ?>" value="无法精算" class="reason-btn btn btn-danger" style="width: 250px"/>
                     </td>
-                    {% else %}
+                    <?php } else { ?>
                     <td  colspan="3">
                     </td>
-                    {% endif %}
+                    <?php } ?>
                 </tr>
             </table>
         </form>
     </div>
 </div>
 
-{% if info.state_id == 2 or info.state_id == 3 or info.state_id == 4 or info.state_id == 7 %}
+<?php if ($info->state_id == 2 || $info->state_id == 3 || $info->state_id == 4 || $info->state_id == 7) { ?>
 <div id="insurance_reason_dialog">
     <form action="" id="insurance_reason_form">
-        <input type="hidden" name="id" value="{{ info.id }}"/>
+        <input type="hidden" name="id" value="<?php echo $info->id; ?>"/>
         <div class="row-fluid">
             <span class="label">理由</span>
             <textarea name="reason" rows="5" cols="40"></textarea>
         </div>
     </form>
 </div>
-{% endif %}
+<?php } ?>
 
-{% if info.state_id == 3 %}
+<?php if ($info->state_id == 3) { ?>
 <div id="insurance_issuing_dialog">
     <form action="" id="insurance_issuing_form">
-        <input type="hidden" id="" name="id" value="{{ info.id }}"/>
-        <input type="hidden" id="" name="user_id" value="{{ info.userId }}"/>
+        <input type="hidden" id="" name="id" value="<?php echo $info->id; ?>"/>
+        <input type="hidden" id="" name="user_id" value="<?php echo $info->userId; ?>"/>
         <div class="row-fluid">
             <span class="label">出单时间</span>
             <input name="issuing_time" validate="required" />
@@ -350,7 +350,7 @@
         </div>
     </form>
 </div>
-{% endif %}
+<?php } ?>
 
 <script type="text/javascript">
     (function($){
@@ -392,8 +392,8 @@
             $('#insurance_window').data('need_destroy', need_destroy_dialogs);
         }
 
-        {# 条件输出js #}
-        {% if info.state_id == 2 or info.state_id == 3 or info.state_id == 4 or info.state_id == 7 %}
+        
+        <?php if ($info->state_id == 2 || $info->state_id == 3 || $info->state_id == 4 || $info->state_id == 7) { ?>
         //创建窗口
         var insurance_reason_dialog = $('#insurance_reason_dialog').dialog({
             title: '无法精算理由',
@@ -463,9 +463,9 @@
             return false;
         });
 
-        {% endif %}
+        <?php } ?>
 
-        {% if info.state_id == 3 %}
+        <?php if ($info->state_id == 3) { ?>
 
         //出单时间控件
         var issuing_time_box = $('#insurance_issuing_form [name=issuing_time]').datetimebox();
@@ -552,9 +552,9 @@
             return false;
         });
 
-        {% endif %}
+        <?php } ?>
 
-        {% if info.state_id == 2 or info.state_id == 3 or info.state_id == 7 %}
+        <?php if ($info->state_id == 2 || $info->state_id == 3 || $info->state_id == 7) { ?>
             //提交尽算结果按钮点击事件
             $('#insurance_result_update_btn').click(function(event){
                 event.preventDefault();
@@ -636,7 +636,7 @@
                 });
             });
 
-        {% endif %}
+        <?php } ?>
 
         //折扣后输入框输入事件
         $('.after-discount-value+.numberbox>.textbox-text').keyup(function(event){
@@ -705,7 +705,7 @@
         });
 
         /*数据相关*/
-        var info_id = '{{info.id}}';
+        var info_id = '<?php echo $info->id; ?>';
 
         loadHasActuaryCompany();
 

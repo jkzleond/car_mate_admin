@@ -8,7 +8,7 @@
 
 class PushNotifications extends ModelEx {
 
-    public static function addFailurePushUser($type_id=null, $user_id=null, $client=null, $contents=null, $title=null, $count=null)
+    public static function addPushMessage($type_id=null, $user_id=null, $client=null, $contents=null, $title=null, $count=null)
     {
         $sql = <<<SQL
         insert into ReadyPush(

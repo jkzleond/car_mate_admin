@@ -180,7 +180,7 @@
                     </tr>
                     <tr>
                         <th>内容</th>
-                        <td colspan="3"><div data-field="contents"></div></td>   
+                        <td colspan="3"><div data-field="contents"></div></td>
                     </tr>
                 </table>
             </div>
@@ -201,7 +201,7 @@
             height: 400,
             removePlugins : 'save'
         });
-        var finder_path = "<?php echo $this->url->get('/js/ckfinder/'); ?>";
+        var finder_path = "{{ url('/js/ckfinder/') }}";
         //集成ckfinder
         CKFinder.setupCKEditor(item_contents_editor, finder_path);
 
@@ -571,7 +571,7 @@
          * 事件相关
          */
 
-        //查找按钮点击事件
+            //查找按钮点击事件
         $('#item_search_btn').click(function(event){
             var criteria = {};
             criteria.name = $('#item_search_bar [name="name"]').val();

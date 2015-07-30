@@ -35,6 +35,7 @@ class Insurance extends ModelEx
         $email_addr = null;
         $start_date = null;
         $end_date = null;
+        $order_state = null;
 
         if(!empty($criteria) && is_array($criteria))
         {
@@ -48,6 +49,7 @@ class Insurance extends ModelEx
             $email_addr = isset($criteria['email_addr']) ? $criteria['email_addr'] : null;
             $start_date = isset($criteria['start_date']) ? $criteria['start_date'] : null;
             $end_date = isset($criteria['end_date']) ? $criteria['end_date'] : null;
+            $order_state = isset($criteria['order_state']) ? $criteria['order_state'] : null;
         }
 
         if($province_id)
@@ -76,7 +78,15 @@ class Insurance extends ModelEx
 
         if($state and $state != '-1')
         {
-            $cte_condition[] = 'i.state_id = :state';
+            if($state != 4)
+            {
+                $cte_condition[] = 'i.state_id = :state';
+            }
+            else
+            {
+                $cte_condition[] = "i.state_id = :state and i.payState = 1";
+            }
+
             $bind['state'] = $state;
         }
 
@@ -110,6 +120,12 @@ class Insurance extends ModelEx
             $bind['end_date'] = $end_date;
         }
 
+        if($order_state)
+        {
+            $cte_condition[] = 'o.state = :order_state';
+            $bind['order_state'] = $order_state;
+        }
+
         if(!empty($cte_condition))
         {
             $cte_condition_str = 'where '.implode(' and ', $cte_condition);
@@ -127,73 +143,92 @@ class Insurance extends ModelEx
 
         $sql = <<<SQL
         with InsuranceInfo_CTE as (
-			select ROW_NUMBER() OVER (order by i.createDate desc ) as rownum ,i.id
-		      ,i.user_userId
-		      ,i.carNo_id
-		      ,i.carType_id
-		      ,i.insuranceParam_id
-		      ,i.insuranceResult_id
-		      ,i.state_id
-		      ,i.createDate
-		      ,i.userName
-		      ,i.phoneNo
-		      ,i.emailAddr
-		      ,i.finalResult_id
-		      ,i.finalParam_id
-		      ,i.insuranceNo
-		    from Insurance_Info i
-		    left join IAM_USER u on i.user_userId= u.userid
-		    left join CarInfo car on car.id = i.carNo_id
-		    %s
-		)
-		SELECT i.id
-	    	,i.user_userId
-	      	,i.carType_id typeCode
-	      	,type.carType carType
-	      	,type.typeName typeName
-	      	,i.insuranceParam_id
-	      	,i.userName
-	      	,i.insuranceNo
- 	      	,r.id r_id
-	      	,r.totalStandard r_totalStandard
-	      	,r.totalAfterDiscount r_totalAfterDiscount
- 	      	,f.id f_id
-	      	,f.totalStandard f_totalStandard
-	      	,f.totalAfterDiscount f_totalAfterDiscount
-	      	,e.id state_id
-	      	,e.state stateName
-	      	,i.createDate
-	      	,i.phoneNo
-	      	,i.emailAddr
-	      	,i.finalParam_id
-		    ,car.hpzl c_hpzl
-		    ,car.hphm c_hphm
-		    ,car.fdjh c_fdjh
-		    ,car.autoname c_autoname
-		    ,car.createTime c_createTime
-		    ,car.isState c_isState
-		    ,car.frameNumber c_frameNumber
-		    ,car.province_id c_provinceId
-		    ,p.name c_provinceName
-		    ,car.city_id c_cityId
-		    ,c.name c_cityName
-		    ,u.uname
-		    ,u.userid
-		    ,u.phone
-		from InsuranceInfo_CTE i
-		left join Insurance_ExactStatus e on e.id = i.state_id
-		left join Insurance_Result r on r.id = i.insuranceResult_id
-		left join Insurance_FinalResult f on f.id = i.finalResult_id
-		left join Insurance_CarType type on type.code = i.carType_id
-		left join CarInfo car on car.id = i.carNo_id
-		left join Province p on p.id = car.province_Id
-		left join City c on c.id = car.city_Id
-		left join IAM_USER u on u.userid=i.user_userid
-		%s
-		order by i.id desc
+            select ROW_NUMBER() OVER (order by i.createDate desc ) as rownum ,i.id
+              ,i.user_userId
+              ,i.carNo_id
+              ,i.carType_id
+              ,i.insuranceParam_id
+              ,i.insuranceResult_id
+              ,i.state_id
+              ,i.createDate
+              ,i.userName
+              ,i.phoneNo
+              ,i.emailAddr
+              ,i.finalResult_id
+              ,i.finalParam_id
+              ,i.insuranceNo
+              ,car.hpzl c_hpzl
+              ,car.hphm c_hphm
+              ,car.fdjh c_fdjh
+              ,car.autoname c_autoname
+              ,car.createTime c_createTime
+              ,car.isState c_isState
+              ,car.frameNumber c_frameNumber
+              ,car.province_id c_provinceId
+              ,car.city_id c_cityId
+              ,o.orderNo as order_no
+              ,o.tradeNo as order_trade_no
+              ,o.state as order_state
+              ,o.payType as order_pay_type
+            from Insurance_Info i
+              left join IAM_USER u on i.user_userId= u.userid
+              left join CarInfo car on car.id = i.carNo_id
+              left join (
+                          select orderNo, tradeNo, state, payType, relId
+                          from PayList
+                          where orderType = 'insurance'
+                        ) o on o.relId = i.id
+            $cte_condition_str
+        )
+        SELECT i.id
+          ,i.user_userId
+          ,i.carType_id typeCode
+          ,type.carType carType
+          ,type.typeName typeName
+          ,i.insuranceParam_id
+          ,i.userName
+          ,i.insuranceNo
+          ,r.id r_id
+          ,r.totalStandard r_totalStandard
+          ,r.totalAfterDiscount r_totalAfterDiscount
+          ,f.id f_id
+          ,f.totalStandard f_totalStandard
+          ,f.totalAfterDiscount f_totalAfterDiscount
+          ,e.id state_id
+          ,e.state stateName
+          ,i.createDate
+          ,i.phoneNo
+          ,i.emailAddr
+          ,i.finalParam_id
+          ,c_hpzl
+          ,c_hphm
+          ,c_fdjh
+          ,c_autoname
+          ,c_createTime
+          ,c_isState
+          ,c_frameNumber
+          ,c_provinceId
+          ,p.name c_provinceName
+          ,c_cityId
+          ,c.name c_cityName
+          ,u.uname
+          ,u.userid
+          ,u.phone
+          ,i.order_no
+          ,i.order_trade_no
+          ,i.order_state
+          ,i.order_pay_type
+        from InsuranceInfo_CTE i
+          left join Insurance_ExactStatus e on e.id = i.state_id
+          left join Insurance_Result r on r.id = i.insuranceResult_id
+          left join Insurance_FinalResult f on f.id = i.finalResult_id
+          left join Insurance_CarType type on type.code = i.carType_id
+          left join Province p on p.id = i.c_provinceId
+          left join City c on c.id = i.c_cityId
+          left join IAM_USER u on u.userid=i.user_userid
+        $page_condition
+        order by i.id desc
 SQL;
-
-        $sql = sprintf($sql, $cte_condition_str, $page_condition);
 
         return self::nativeQuery($sql, $bind);
     }
@@ -260,7 +295,15 @@ SQL;
 
         if($state and $state != '-1')
         {
-            $condition[] = 'i.state_id = :state';
+            if($state != 4)
+            {
+                $condition[] = 'i.state_id = :state';
+            }
+            else
+            {
+                $condition[] = "i.state_id = :state and i.payState = 1";
+            }
+
             $bind['state'] = $state;
         }
 

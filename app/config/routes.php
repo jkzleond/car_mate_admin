@@ -710,6 +710,22 @@ $router->addPut('/dealDeliver/{id:\d+}.json', array(
 ));
 
 /**
+ * 违法代缴
+ */
+
+$illegal = new \Phalcon\Mvc\Router\Group(array(
+    'controller' => 'illegal'
+));
+
+$illegal->setPrefix('/illegal');
+
+$illegal->addGet('/orderMng', array(
+    'action' => 'orderManage'
+));
+
+$router->mount($illegal);
+
+/**
  * 公告
  */
 

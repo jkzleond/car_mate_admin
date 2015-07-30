@@ -244,9 +244,13 @@
                         <?php } ?>
                     </ul>
                 </li>
-
-
-
+                <li class="dropdown"><a href=""><span class="iconfa-truck"></span>违章代缴</a>
+                    <ul>
+                        <?php if ($this->isIncluded('dealList', $auth)) { ?>
+                        <li><a href="/illegal/orderMng">订单管理</a></li>
+                        <?php } ?>
+                    </ul>
+                </li>
                 <li class="dropdown"><a href=""><span  class="iconfa-signal"></span>系统</a>
                     <ul>
                         <?php if ($this->isIncluded('welAdv', $auth)) { ?>

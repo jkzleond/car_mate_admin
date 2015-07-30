@@ -228,9 +228,13 @@
                         {% endif %}
                     </ul>
                 </li>
-
-
-
+                <li class="dropdown"><a href=""><span class="iconfa-truck"></span>违章代缴</a>
+                    <ul>
+                        {% if 'dealList' in auth %}
+                        <li><a href="/illegal/orderMng">订单管理</a></li>
+                        {% endif %}
+                    </ul>
+                </li>
                 <li class="dropdown"><a href=""><span  class="iconfa-signal"></span>系统</a>
                     <ul>
                         {% if 'welAdv' in auth %}

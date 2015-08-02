@@ -185,7 +185,7 @@
                 {field:'gift',title:'礼包',width:'15%',align:'center'},
                 {field:'gift2',title:'礼包2',width:'15%',align:'center'},
                 {field:'companyId',title:'操作',width:'15%',align:'center', formatter: function(value, row, index){
-                    return '<div class="btn-group"><button class="btn btn-warning insurance-company-edit-btn"><i class="icon-edit"></i></button><button class="btn btn-danger insurance-company-del-btn" data-id="' + value + '"><i class="icon-trash"></i></button></div>'
+                    return '<div class="btn-group"><button class="btn btn-warning insurance-company-edit-btn"><i class="icon-edit"></i></button><button class="btn btn-danger insurance-company-del-btn" data-id="' + value + '"><i class="icon-trash"></i></button></div>';
                 }}
             ]]
         });

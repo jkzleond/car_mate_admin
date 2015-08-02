@@ -218,6 +218,11 @@ $insurance->addGet('/insuranceBuy', array(
     'action' => 'insuranceBuy'
 ));
 
+//保险购买处理页面
+$insurance->addGet('/insuranceOrderInfo/{info_id:\d+}', array(
+    'action' => 'insuranceOrderInfo'
+));
+
 //获取已精算公司
 $insurance->addGet('/insurance/{info:\d+}/hasActuaryCompany.json', array(
     'action' => 'getHasActuaryCompany'
@@ -719,8 +724,24 @@ $illegal = new \Phalcon\Mvc\Router\Group(array(
 
 $illegal->setPrefix('/illegal');
 
+//违章代缴-订单管理页面
 $illegal->addGet('/orderMng', array(
     'action' => 'orderManage'
+));
+
+//违章代缴-获取订单列表
+$illegal->addPost('/orderList.json', array(
+    'action' => 'getOrderList'
+));
+
+//违章代缴-获取订单明细
+$illegal->addGet('/orderDetail/{order_id:\d+}', array(
+    'action' => 'orderDetail'
+));
+
+//违章代缴-处理违章
+$illegal->addPut('/orderProcess/{order_id:\d+}.json', array(
+    'action' => 'orderProcess'
 ));
 
 $router->mount($illegal);

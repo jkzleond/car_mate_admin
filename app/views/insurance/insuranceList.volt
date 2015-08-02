@@ -120,7 +120,7 @@
                     return CarMate.utils.date('Y-m-d H:i:s', date_conv);
                 }},
                 {field:'phoneNo',title:'电话号码',width:'8%',align:'center'},
-                {field:'stateName',title:'精算状态',width:'8%',align:'center'},
+                {field:'stateName',title:'精算状态',width:'6%',align:'center'},
                 {field:'r_totalStandard',title:'全额保价',width:'8%',align:'center', formatter: function(value, row, index){
                     var formated = null;
                     if(row.f_totalStandard)
@@ -146,11 +146,14 @@
                     return formated;
                 }},
 
-                {field:'id',title:'操作',width:'6%',align:'center', formatter: function(value, row, index){
+                {field:'id',title:'操作',width:'10%',align:'center', formatter: function(value, row, index){
+                    var insurance_info_id = value;
                     var state_id = row.state_id;
+                    var pay_state = row.payState;
 
                     var insurance_result_url = "{{ url('/insuranceResult') }}";
                     var insurance_buy_url = "{{ url('/insuranceBuy') }}";
+                    var insurance_order_info_url = "{{ url('/insuranceOrderInfo') }}";
 
                     var exact_param = {
                         info_id: row.id,
@@ -199,13 +202,19 @@
                     insurance_buy_url = insurance_buy_url + '?' + buy_param_str;
 
 
+                    insurance_order_info_url = insurance_order_info_url + '/' + insurance_info_id;
+
+
                     if(state_id == 2)
                     {
                         return '<button class="btn insurance-op" data-state="exact" data-state-id="' + state_id + '" data-url="' + insurance_result_url + '">精算</button>';
                     }
                     else if(state_id == 4)
                     {
-                        return '<button class="btn insurance-op" data-state="buy" data-state-id="' + state_id + '" data-url="' + insurance_buy_url + '" >购买处理</button>';
+                        if(pay_state)
+                        {
+                            return '<button class="btn btn-info insurance-op" data-state="order_info" data-url="' + insurance_order_info_url + '">订单详情</button><button class="btn insurance-op" data-state="buy" data-state-id="' + state_id + '" data-url="' + insurance_buy_url + '" >购买处理</button>';
+                        }
                     }
                     else if(state_id == 5)
                     {
@@ -224,11 +233,18 @@
             title: '保险窗口',
             iconCls: 'icon-info-sign',
             width: '80%',
-            height: 700,
+            height: 'auto',
             closed: true,
             shadow: false,
             modal: true,
             openAnimation: 'fade',
+            onOpen: function(){
+                $(this).window('resize', {
+                    width: 'auto',
+                    height: 'auto'
+                });
+                $(this).window('center');
+            },
             onBeforeLoad: function(){
                 //为避免两次加载(奇怪的bug),加入标志
                 var load_once = $('#insurance_window').data('load_once');
@@ -246,6 +262,32 @@
             },
             onLoad: function(){
                 $('#insurance_window').data('load_once', false);
+
+                var resize_width = 'auto';
+                var resize_height = 'auto';
+
+                var $panel = $(this).window('panel');
+                var panel_width = $panel.outerWidth();
+                var panel_height = $panel.outerHeight();
+                var client_width = window.innerWidth;
+                var client_height = window.innerHeight;
+
+                if(client_width < panel_width)
+                {
+                    resize_width = Math.round(client_width * 0.8);
+                }
+
+                if(client_height < panel_height)
+                {
+                    resize_height = Math.round(client_height * 0.8);
+                }
+
+                $(this).window('resize', {
+                    width: resize_width,
+                    height: resize_height
+                });
+
+                $(this).window('center');
             },
             onBeforeClose: function(){
                 /*var state_id = $('#insurance_window').data('state_id');
@@ -329,6 +371,16 @@
                     .window('refresh', detail_url)
                     .window('center');
             }
+            else if(btn_state == 'order_info')
+            {
+                var detail_url = $(this).attr('data-url');
+                $('#insurance_window')
+                    .window('setTitle', '保险订单信息')
+                    .window('open', true)
+                    .window('refresh', detail_url)
+                    .window('center');
+            }
+
             return false;
         });
 

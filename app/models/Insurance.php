@@ -150,6 +150,7 @@ class Insurance extends ModelEx
               ,i.insuranceParam_id
               ,i.insuranceResult_id
               ,i.state_id
+              ,i.payState
               ,i.createDate
               ,i.userName
               ,i.phoneNo
@@ -187,6 +188,7 @@ class Insurance extends ModelEx
           ,type.typeName typeName
           ,i.insuranceParam_id
           ,i.userName
+          ,i.payState
           ,i.insuranceNo
           ,r.id r_id
           ,r.totalStandard r_totalStandard
@@ -1541,5 +1543,28 @@ SQL;
     {
         $sql = 'SELECT [code], [carType] as [type], [typeName] as [name] FROM Insurance_CarType';
         return self::nativeQuery($sql, null, null, Db::FETCH_OBJ);
+    }
+
+    /**
+     * 获取保险订单信息
+     * @param $insurance_info_id
+     * @return object
+     */
+    public static function getInsuranceOrderInfo($insurance_info_id)
+    {
+        $sql = <<<SQL
+        select i.user_userid as user_id, i.userName as user_name, i.phoneNo as phone,
+        o.orderNo as order_no, o.tradeNo as trade_no, o.payType as pay_type, o.money as order_fee,
+        o.state, o.payTime as pay_time
+        from Insurance_Info i
+        left join (
+          select orderNo, tradeNo, payType, money, state, payTime, relId from PayList
+          where orderType = 'insurance' and relId = :insurance_info_id
+        ) o on o.relId = i.id
+        where i.id = :insurance_info_id
+SQL;
+        $bind = array('insurance_info_id' => $insurance_info_id);
+
+        return self::fetchOne($sql, $bind);
     }
 }

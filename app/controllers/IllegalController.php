@@ -17,4 +17,49 @@ class IllegalController extends ControllerBase
     {
 
     }
+
+    /**
+     * 获取订单列表
+     */
+    public function getOrderListAction()
+    {
+        $criteria = $this->request->getPost('criteria');
+        $page_num = $this->request->getPost('page');
+        $page_size = $this->request->getPost('rows');
+        $order_list = Order::getIllegalOrderList($criteria, $page_num, $page_size);
+        $order_total = Order::getIllegalOrderCount($criteria);
+
+        $this->view->setVar('data', array(
+            'rows' => $order_list,
+            'count' => count($order_list),
+            'total' => $order_total
+        ));
+    }
+
+    /**
+     * 订单详情页面
+     * @param $order_id
+     */
+    public function orderDetailAction($order_id)
+    {
+        $order_info = Order::getIllegalOrderInfoById($order_id);
+        $order_items = Order::getIllegalOrderItems($order_id);
+        $order_info->items = $order_items;
+
+        $this->view->setVar('order', $order_info);
+    }
+
+    /**
+     * 订单处理(处理违章)
+     * @param $order_id
+     */
+    public function orderProcessAction($order_id)
+    {
+        $criteria = $this->request->getPut('criteria');
+        $success = Order::updateOrder($order_id, $criteria);
+
+        $this->view->setVar('data', array(
+            'success' => $success
+        ));
+    }
 }

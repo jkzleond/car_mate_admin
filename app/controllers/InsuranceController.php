@@ -83,6 +83,17 @@ class InsuranceController extends ControllerBase
     }
 
     /**
+     * 保险订单信息页面
+     * @param insurance_info_id
+     */
+    public function insuranceOrderInfoAction($insurance_info_id)
+    {
+        $insurance_order_info = Insurance::getInsuranceOrderInfo($insurance_info_id);
+
+        $this->view->setVar('order_info', $insurance_order_info);
+    }
+
+    /**
      * 获取指定保险信息的已有精算结果的公司
      * @param $info_id
      */

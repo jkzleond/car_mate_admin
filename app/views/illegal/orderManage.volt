@@ -143,11 +143,7 @@
             idField: 'id',
             columns:[[
                 {field:'order_no', title:'订单号', width:'15%', align:'center'},
-                {field:'create_date', title:'订单时间', width:'12%', align:'center', formatter: function(value, row, index){
-                    if(!value) return;
-                    var conv = CarMate.utils.date.mssqlToJs(value);
-                    return CarMate.utils.date('Y-m-d H:i:s', conv);
-                }},
+                {field:'create_date', title:'订单时间', width:'12%', align:'center'},
                 {field:'user_id', title:'用户名', width:'15%', align:'center'},
                 {field:'user_name', title:'姓名', width:'6%', align:'center'},
                 {field:'phone', title:'手机号', width:'9%', align:'center'},

@@ -94,14 +94,15 @@ class Order extends ModelEx
 
         $sql = <<<SQL
         with ORDER_CTE as (
-            select o.id, o.order_no, o.trade_no, o.user_id, o2i.hphm, o2i.[count] as illegal_num, o2i.sum_fkje, o.pay_type, o.order_fee, o.pay_state, o.pay_time, o.mark, o.create_date, o.fail_reason, u.phone, u.uname as user_name,
+            select o.id, o.order_no, o.trade_no, o.user_id, o.client_type, o2i.hphm, o2i.[count] as illegal_num, o2i.sum_fkje, o.pay_type, o.order_fee, o.pay_state, o.pay_time, o.mark, o.create_date, o.fail_reason, u.phone, u.uname as user_name,
             ROW_NUMBER() over(order by o.create_date desc) as rownum
             from (
-                 select id, orderNo as order_no, tradeNo as trade_no, userId as user_id, payType as pay_type,
+                 select id, orderNo as order_no, tradeNo as trade_no, userId as user_id, clientType as client_type,
+                 payType as pay_type,
                  money as order_fee, state as pay_state,
                  mark, failReason as fail_reason,
-                 createTime as create_date,
-                 payTime as pay_time
+                 convert(varchar(20), createTime, 20) as create_date,
+                 convert(varchar(20), payTime, 20) as pay_time
                 from PayList
                 where orderType = 'illegal'
             ) o

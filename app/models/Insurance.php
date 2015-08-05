@@ -151,7 +151,7 @@ class Insurance extends ModelEx
               ,i.insuranceResult_id
               ,i.state_id
               ,i.payState
-              ,i.createDate
+              convert(varchar(20), i.createDate, 20) as createDate
               ,i.userName
               ,i.phoneNo
               ,i.emailAddr

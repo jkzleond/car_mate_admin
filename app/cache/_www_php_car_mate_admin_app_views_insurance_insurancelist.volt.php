@@ -114,11 +114,7 @@
                 {field:'userid',title:'用户ID',width:'15%',align:'center'},
                 {field:'userName',title:'车主姓名',width:'6%',align:'center'},
                 {field:'uname',title:'真实姓名',width:'6%',align:'center'},
-                {field:'createDate',title:'申请时间',width:'8%',align:'center', formatter: function(value, row, index){
-                    if(!value) return '';
-                    var date_conv = CarMate.utils.date.mssqlToJs(value);
-                    return CarMate.utils.date('Y-m-d H:i:s', date_conv);
-                }},
+                {field:'createDate',title:'申请时间',width:'8%',align:'center'},
                 {field:'phoneNo',title:'电话号码',width:'8%',align:'center'},
                 {field:'stateName',title:'精算状态',width:'6%',align:'center'},
                 {field:'r_totalStandard',title:'全额保价',width:'8%',align:'center', formatter: function(value, row, index){

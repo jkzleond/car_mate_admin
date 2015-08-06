@@ -127,7 +127,7 @@
         //数据表格
         var illegal_grid = $('#illegal_grid').datagrid({
             url: '/illegal/orderList.json',
-            title: '商品列表',
+            title: '订单列表',
             iconCls: 'icon-list',
             width: '100%',
             height: 'auto',

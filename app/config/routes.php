@@ -744,6 +744,21 @@ $illegal->addPut('/orderProcess/{order_id:\d+}.json', array(
     'action' => 'orderProcess'
 ));
 
+//驾驶员信息管理页面
+$illegal->addGet('/driverInfoMng', array(
+    'action' => 'driverInfoManage'
+));
+
+//获取驾驶员信息列表
+$illegal->add('/driverInfoList.json', array(
+    'action' => 'getDriverInfoList'
+));
+
+//更新驾驶员信息
+$illegal->addPut('/driverInfo/{info_id:\d+}.json', array(
+    'action' => 'updateDriverInfo'
+));
+
 $router->mount($illegal);
 
 /**

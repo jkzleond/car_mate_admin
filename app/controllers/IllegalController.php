@@ -62,4 +62,44 @@ class IllegalController extends ControllerBase
             'success' => $success
         ));
     }
+
+    /**
+     * 驾驶员信息管理页面
+     */
+    public function driverInfoManageAction()
+    {
+
+    }
+
+    /**
+     * 获取驾驶员信息列表
+     */
+    public function getDriverInfoListAction()
+    {
+        $page_num = $this->request->getPost('page');
+        $page_size = $this->request->getPost('rows');
+        $criteria = $this->request->getPost('criteria');
+        $driver_info_list = DriverInfo::getDriverInfoList($criteria, $page_num, $page_size);
+        $driver_info_total = DriverInfo::getDriverInfoCount($criteria);
+
+        $this->view->setVar('data', array(
+            'rows' => $driver_info_list,
+            'count' => count($driver_info_list),
+            'total' => $driver_info_total
+        ));
+    }
+
+    /**
+     * 更新驾驶员信息
+     * @param $info_id
+     */
+    public function updateDriverInfoAction($info_id)
+    {
+        $criteria = $this->request->getPut('criteria');
+        $success = DriverInfo::updateDriverInfo($info_id, $criteria);
+
+        $this->view->setVar('data', array(
+            'success' => $success
+        ));
+    }
 }

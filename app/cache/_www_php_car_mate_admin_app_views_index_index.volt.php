@@ -248,6 +248,7 @@
                     <ul>
                         <?php if ($this->isIncluded('dealList', $auth)) { ?>
                         <li><a href="/illegal/orderMng">订单管理</a></li>
+                        <li><a href="/illegal/driverInfoMng">驾驶员信息</a></li>
                         <?php } ?>
                     </ul>
                 </li>

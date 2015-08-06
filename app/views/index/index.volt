@@ -232,6 +232,7 @@
                     <ul>
                         {% if 'dealList' in auth %}
                         <li><a href="/illegal/orderMng">订单管理</a></li>
+                        <li><a href="/illegal/driverInfoMng">驾驶员信息</a></li>
                         {% endif %}
                     </ul>
                 </li>

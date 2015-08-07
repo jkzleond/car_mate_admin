@@ -53,6 +53,8 @@
                         <div class="span12">
                             <span class="label">驾驶证号</span>
                             <input type="hidden" name="info_id">
+                            <input type="hidden" name="user_id">
+                            <input type="hidden" name="hphm">
                             <input type="text" name="license_no">
                         </div>
                     </div>
@@ -65,7 +67,14 @@
                     <div class="row-fluid">
                         <div class="span12">
                             <span class="label">发动机号</span>
+                            <input type="hidden" name="old_engine_no">
                             <input type="text" name="engine_no">
+                        </div>
+                    </div>
+                    <div class="row-fluid">
+                        <div class="span12">
+                            <span class="label">车架号</span>
+                            <input type="text" name="frame_no">
                         </div>
                     </div>
                 </div>
@@ -99,13 +108,16 @@
             toolbar: '#driver_info_grid_tb',
             idField: 'id',
             columns:[[
+                //{field:'id', title:'用户名(ID)', width:'15%', align:'center'},
                 {field:'user_id', title:'用户名(ID)', width:'15%', align:'center'},
                 {field:'user_name', title:'姓名', width:'6%', align:'center'},
-                {field:'phone', title:'手机号', width:'15%', align:'center'},
-                {field:'hphm', title:'车牌号', width:'7%', align:'center'},
+                {field:'phone', title:'手机号', width:'10%', align:'center'},
                 {field:'license_no', title:'驾驶证号', width:'15%', align:'center'},
-                {field:'archive_no', title:'档案编号', width:'15%', align:'center'},
-                {field:'engine_no', title:'发动机号', width:'15%', align:'center'},
+                {field:'archive_no', title:'档案编号', width:'10%', align:'center'},
+                {field:'hphm', title:'车牌号', width:'7%', align:'center'},
+                {field:'hpzl', title:'号牌种类', width:'7%', align:'center'},
+                {field:'engine_no', title:'发动机号', width:'7%', align:'center'},
+                {field:'frame_no', title:'车架号', width:'15%', align:'center'},
                 {field: 'id', title: '操作', width: '10%', align: 'center', formatter: function(value, row, index){
                     var update_btn_html = '<button class="btn btn-warning driver-info-update-btn" data-id="'+ value +'" alt="编辑"><i class="iconfa-edit"></i></button>';
                     return update_btn_html;
@@ -129,18 +141,28 @@
                     text: '编辑',
                     handler: function(){
                         var info_id = $('#driver_info_update_window [name="info_id"]').val();
+                        var user_id = $('#driver_info_update_window [name="user_id"]').val();
+                        var hphm = $('#driver_info_update_window [name="hphm"]').val();
                         var license_no = $('#driver_info_update_window [name="license_no"]').val();
                         var archive_no = $('#driver_info_update_window [name="archive_no"]').val();
+                        var old_engine_no = $('#driver_info_update_window [name="old_engine_no"]').val();
                         var engine_no = $('#driver_info_update_window [name="engine_no"]').val();
+                        var frame_no = $('#driver_info_update_window [name="frame_no"]').val();
                         
                         $.ajax({
                             url: '/illegal/driverInfo/' + info_id + '.json',
                             method: 'PUT',
                             data: {
-                                criteria: {
+                                data: {
                                     license_no: license_no, 
                                     archive_no: archive_no,
-                                    engine_no: engine_no
+                                    engine_no: engine_no,
+                                    frame_no: frame_no
+                                },
+                                criteria: {
+                                    engine_no: old_engine_no,
+                                    user_id: user_id,
+                                    hphm: hphm
                                 }
                             },
                             dataType: 'json',
@@ -198,8 +220,11 @@
 
             var info_id = $(this).attr('data-id');
             driver_info_update_window.find('[name=info_id]').val(info_id);
+            driver_info_update_window.find('[name=user_id]').val(selected_info.user_id);
+            driver_info_update_window.find('[name=hphm]').val(selected_info.hphm);
             driver_info_update_window.find('[name=license_no]').val(selected_info.license_no);
             driver_info_update_window.find('[name=archive_no]').val(selected_info.archive_no);
+            driver_info_update_window.find('[name=old_engine_no]').val(selected_info.engine_no);
             driver_info_update_window.find('[name=engine_no]').val(selected_info.engine_no);
 
             driver_info_update_window.dialog('open');

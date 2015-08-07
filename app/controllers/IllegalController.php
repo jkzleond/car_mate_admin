@@ -95,8 +95,12 @@ class IllegalController extends ControllerBase
      */
     public function updateDriverInfoAction($info_id)
     {
+        $data = $this->request->getPut('data');
         $criteria = $this->request->getPut('criteria');
-        $success = DriverInfo::updateDriverInfo($info_id, $criteria);
+        //var_dump($data);
+        //var_dump($criteria);
+        $success = DriverInfo::updateDriverInfo($info_id, $data);
+        CarInfo::updateCarInfoWithCondition($criteria, $data);
 
         $this->view->setVar('data', array(
             'success' => $success

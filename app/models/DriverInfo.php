@@ -55,10 +55,11 @@ class DriverInfo extends ModelEx
 
 		$sql = <<<SQL
 		with DI_CTE as (
-			select di.id, di.license_no, di.archieve_no as archive_no, di.user_id, di.hphm, di.fdjh as engine_no, u.phone, u.uname as user_name,
+			select di.id, di.license_no, di.archieve_no as archive_no, di.user_id, di.hphm, isnull(c.engineNumber, di.fdjh) as engine_no, u.phone, u.uname as user_name, c.hpzl, c.frameNumber as frame_no,
 			ROW_NUMBER() over( order by di.id asc) as rownum
 			from DriverInfo di
 			left join IAM_USER u on u.userId = di.user_id
+			left join CarInfo c on c.userId = di.user_id and c.hphm = di.hphm
 			$cte_condition_str
 		)
 		select * from DI_CTE

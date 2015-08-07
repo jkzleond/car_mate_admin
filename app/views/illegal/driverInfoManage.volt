@@ -226,6 +226,7 @@
             driver_info_update_window.find('[name=archive_no]').val(selected_info.archive_no);
             driver_info_update_window.find('[name=old_engine_no]').val(selected_info.engine_no);
             driver_info_update_window.find('[name=engine_no]').val(selected_info.engine_no);
+            driver_info_update_window.find('[name=frame_no]').val(selected_info.frame_no);
 
             driver_info_update_window.dialog('open');
         });

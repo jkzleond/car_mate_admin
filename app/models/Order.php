@@ -41,6 +41,12 @@ class Order extends ModelEx
             $cte_condition_arr[] = "(o.pay_state = 'TRADE_SUCCESS' or o.pay_state = 'TRADE_FINISHED')";
         }
 
+        if($crt->client_type)
+        {
+            $cte_condition_arr[] = 'o.client_type = :client_type';
+            $bind['client_type'] = $crt->client_type;
+        }
+
         if($crt->mark == 1)
         {
             $cte_condition_arr[] = 'o.mark is null';
@@ -154,6 +160,12 @@ SQL;
             $condition_arr[] = "(o.pay_state = 'TRADE_SUCCESS' or o.pay_state = 'TRADE_FINISHED')";
         }
 
+        if($crt->client_type)
+        {
+            $condition_arr[] = 'o.client_type = :client_type';
+            $bind['client_type'] = $crt->client_type;
+        }
+
         if($crt->mark == 1)
         {
             $condition_arr[] = 'o.mark is null';
@@ -200,7 +212,7 @@ SQL;
         select count(o.id)
             from (
                  select id, orderNo as order_no, tradeNo as trade_no, userId as user_id, payType as pay_type,
-                 money as order_fee, state as pay_state, mark,
+                 money as order_fee, state as pay_state, mark, clientType as client_type,
                  createTime as create_date,
                  payTime as pay_time
                 from PayList
@@ -253,6 +265,24 @@ SQL;
         $bind = array('order_id' => $order_id);
 
         return self::fetchOne($sql, $bind);
+    }
+
+    /**
+     * 获取订单客户端类型列表
+     * @return array
+     */
+    public static function getOrderClientTypeList()
+    {
+        $sql = 'select clientType as client_type from PayList group by clientType order by clientType';
+        $result = self::nativeQuery($sql);
+        $client_types = array();
+
+        foreach($result as $row)
+        {
+            $client_types[] = $row['client_type'];
+        }
+
+        return $client_types;
     }
 
     /**

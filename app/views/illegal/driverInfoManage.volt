@@ -119,14 +119,13 @@
                 {field:'engine_no', title:'发动机号', width:'7%', align:'center'},
                 {field:'frame_no', title:'车架号', width:'15%', align:'center'},
                 {field: 'id', title: '操作', width: '10%', align: 'center', formatter: function(value, row, index){
-                    var update_btn_html = '<button class="btn btn-warning driver-info-update-btn" data-id="'+ value +'" alt="编辑"><i class="iconfa-edit"></i></button>';
+                    var update_btn_html = '<button class="btn btn-warning driver-info-update-btn" data-id="'+ value +'" title="编辑"><i class="iconfa-edit"></i></button>';
                     return update_btn_html;
                 }}
             ]]
         });
 
         //窗口
-
         var driver_info_update_window = $('#driver_info_update_window').dialog({
             title: '驾驶员信息编辑',
             iconCls: 'icon-wrench',

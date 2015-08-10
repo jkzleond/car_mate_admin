@@ -47,16 +47,29 @@
                         </div>
                         <div class="row-fluid">
                             <div class="span3">
+                                <span class="label">客户端</span>
+                                <select name="client_type" class="input-small">
+                                    <option value="">全部</option>
+                                    {% for client_type in client_types %}
+                                        {% if client_type != 'unknown' %}
+                                    <option value="{{ client_type }}">{{ client_type }}</option>
+                                        {% else %}
+                                    <option value="{{ client_type }}">未知</option>
+                                        {% endif %}
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="span2">
                                 <span class="label">支付方式</span>
-                                <select name="pay_type" class="input-small">
+                                <select name="pay_type" class="input-mini">
                                     <option value="">全部</option>
                                     <option value="alipay">支付宝</option>
                                     <option value="wxpay">微信支付</option>
                                 </select>
                             </div>
-                            <div class="span3">
+                            <div class="span2">
                                 <span class="label">支付状态</span>
-                                <select name="pay_state" class="input-small">
+                                <select name="pay_state" class="input-mini">
                                     <option value="">全部</option>
                                     <option value="1">未支付</option>
                                     <option value="2">已支付</option>
@@ -141,15 +154,19 @@
             //pageList:[50,100,150,200],
             toolbar: '#illegal_grid_tb',
             idField: 'id',
-            columns:[[
-                {field:'order_no', title:'订单号', width:'15%', align:'center'},
-                {field:'create_date', title:'订单时间', width:'12%', align:'center'},
-                {field:'user_id', title:'用户名', width:'15%', align:'center'},
-                {field:'user_name', title:'姓名', width:'6%', align:'center'},
-                {field:'phone', title:'手机号', width:'9%', align:'center'},
-                {field:'hphm', title:'车牌号', width:'7%', align:'center'},
-//                {field:'illegal_num', title:'违章条数', width:'6%', align:'center'},
-//                {field:'sum_fkje', title:'处罚金额', width:'6%', align:'center'},
+            frozenColumns: [[
+                {field: 'id', title: '操作', width: '10%', align: 'center', formatter: function(value, row, index){
+                    var info_btn_html = '<button class="btn btn-info illegal-order-detail-btn" data-id="'+ value +'">明细</button>';
+                    var process_btn_html = '<button class="btn btn-primary illegal-process-btn" data-id="' + value + '">处理</button>';
+                    if(row.pay_state == 'TRADE_SUCCESS' || row.pay_state == 'TRADE_FINISHED')
+                    {
+                        return info_btn_html + process_btn_html;
+                    }
+                    else
+                    {
+                        return info_btn_html;
+                    }
+                }},
                 {field:'pay_type', title:'支付方式', width:'6%', align:'center', formatter: function(value, row, index){
                     if(value == 'alipay')
                     {
@@ -160,7 +177,6 @@
                         return '微信支付';
                     }
                 }},
-                {field:'order_fee', title:'订单金额', width:'6%', align:'center'},
                 {field:'pay_state', title:'支付状态', width:'6%', align:'center', formatter: function(value, row, index){
                     if(value == 'TRADE_SUCCESS' || value == 'TRADE_FINISHED')
                     {
@@ -183,24 +199,32 @@
                     {
                         return '未处理';
                     }
-                }},
-                {field: 'id', title: '操作', width: '10%', align: 'center', formatter: function(value, row, index){
-                    var info_btn_html = '<button class="btn btn-info illegal-order-detail-btn" data-id="'+ value +'">明细</button>';
-                    var process_btn_html = '<button class="btn btn-primary illegal-process-btn" data-id="' + value + '">处理</button>';
-                    if(row.pay_state == 'TRADE_SUCCESS' || row.pay_state == 'TRADE_FINISHED')
+                }}
+            ]],
+            columns:[[
+                {field:'order_no', title:'订单号', width:'15%', align:'center'},
+                {field:'create_date', title:'订单时间', width:'12%', align:'center'},
+                {field:'user_id', title:'用户名', width:'15%', align:'center'},
+                {field:'user_name', title:'姓名', width:'6%', align:'center'},
+                {field:'phone', title:'手机号', width:'9%', align:'center'},
+                {field:'hphm', title:'车牌号', width:'7%', align:'center'},
+                {field:'illegal_num', title:'违章条数', width:'6%', align:'center'},
+//                {field:'sum_fkje', title:'处罚金额', width:'6%', align:'center'},
+                {field:'order_fee', title:'订单金额', width:'6%', align:'center'},
+                {field:'client_type', title:'客户端', width:'6%', align:'center', formatter: function(value, row, index){
+                    if( value == 'unknown' )
                     {
-                        return info_btn_html + process_btn_html;
+                        return '未知';
                     }
                     else
                     {
-                        return info_btn_html;
+                        return value;
                     }
                 }}
             ]]
         });
 
         //窗口
-
         var illegal_detail_window = $('#illegal_detail_window').window({
             title: '违章代缴订单明细',
             iconCls: 'icon-info-sign',
@@ -314,6 +338,7 @@
             criteria.hphm = $('#illegal_search_bar [name="hphm"]').val();
             criteria.pay_type = $('#illegal_search_bar [name="pay_type"]').val();
             criteria.pay_state = $('#illegal_search_bar [name="pay_state"]').val();
+            criteria.client_type = $('#illegal_search_bar [name="client_type"]').val();
             criteria.mark = $('#illegal_search_bar [name="mark"]').val();
             criteria.start_date = start_datebox.datebox('getValue');
             criteria.end_date = end_datebox.datebox('getValue');

@@ -15,7 +15,8 @@ class IllegalController extends ControllerBase
      */
     public function orderManageAction()
     {
-
+        $client_types = Order::getOrderClientTypeList();
+        $this->view->setVar('client_types', $client_types);
     }
 
     /**
@@ -61,6 +62,24 @@ class IllegalController extends ControllerBase
         $this->view->setVar('data', array(
             'success' => $success
         ));
+    }
+
+    /**
+     * 订单退款
+     * @param  $order_id
+     */
+    public function orderRefundAction($order_id)
+    {
+        $order_info = Order::getIllegalOrderInfoById($order_id);
+        $pay_type = $order_info['pay_type'];
+        if($pay_type == 'alipay')
+        {
+
+        }
+        elseif($pay_type == 'wxpay')
+        {
+
+        }
     }
 
     /**

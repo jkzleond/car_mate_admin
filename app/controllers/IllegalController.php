@@ -68,18 +68,10 @@ class IllegalController extends ControllerBase
      * 订单退款
      * @param  $order_id
      */
-    public function orderRefundAction($order_id)
+    public function orderRefundAction($order_id, $refund_fee)
     {
-        $order_info = Order::getIllegalOrderInfoById($order_id);
-        $pay_type = $order_info['pay_type'];
-        if($pay_type == 'alipay')
-        {
-
-        }
-        elseif($pay_type == 'wxpay')
-        {
-
-        }
+        $result_str = file_get_contents('http://116.55.248.76/cyh/index.php?Mode=OrderPay&Action=refund&order_id='.$order_id.'&refund_fee='.$refund_fee);
+        echo $result_str;
     }
 
     /**

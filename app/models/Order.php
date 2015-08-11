@@ -80,8 +80,8 @@ class Order extends ModelEx
 
         if($crt->hphm)
         {
-            $cte_condition_arr[] = 'o2i.hphm = :hphm';
-            $bind['hphm'] = $crt->hphm;
+            $cte_condition_arr[] = 'o2i.hphm like :hphm';
+            $bind['hphm'] = '%'.$crt->hphm.'%';
         }
 
         if(!empty($cte_condition_arr))
@@ -199,8 +199,8 @@ SQL;
 
         if($crt->hphm)
         {
-            $condition_arr[] = 'o2i.hphm = :hphm';
-            $bind['hphm'] = $crt->hphm;
+            $condition_arr[] = 'o2i.hphm like :hphm';
+            $bind['hphm'] = '%'.$crt->hphm.'%';
         }
 
         if(!empty($condition_arr))

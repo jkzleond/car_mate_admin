@@ -108,10 +108,28 @@ class IllegalController extends ControllerBase
     {
         $data = $this->request->getPut('data');
         $criteria = $this->request->getPut('criteria');
-        //var_dump($data);
-        //var_dump($criteria);
+        
         $success = DriverInfo::updateDriverInfo($info_id, $data);
-        CarInfo::updateCarInfoWithCondition($criteria, $data);
+
+        if($criteria)
+        {
+            CarInfo::updateCarInfoWithCondition($criteria, $data);
+        }
+
+        $this->view->setVar('data', array(
+            'success' => $success
+        ));
+    }
+
+    /**
+     * 更新车辆信息
+     * @param  $car_info_id
+     */
+    public function updateCarInfo($car_info_id)
+    {
+        $criteria = $this->request->getPut('criteria');
+
+        $success = CarInfo::updateCarInfoById($car_info_id, $criteria);
 
         $this->view->setVar('data', array(
             'success' => $success

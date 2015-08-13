@@ -7,7 +7,7 @@ class CarInfo extends ModelEx
 	 * @param  array|null $criteria
 	 * @return 
 	 */
-	public static function updateCarInfo($info_id, array $criteria=null)
+	public static function updateCarInfoById($info_id, array $criteria=null)
 	{
 		$crt = new Criteria($criteria);
 		$field_str = '';

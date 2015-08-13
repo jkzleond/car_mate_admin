@@ -764,6 +764,11 @@ $illegal->addPut('/driverInfo/{info_id:\d+}.json', array(
     'action' => 'updateDriverInfo'
 ));
 
+//更新车辆信息
+$illegal->addPut('/carInfo/{car_info_id:\d+}.json', array(
+    'action' => 'updateCarInfo'
+));
+
 $router->mount($illegal);
 
 /**

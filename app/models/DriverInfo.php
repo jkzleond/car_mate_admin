@@ -140,7 +140,6 @@ SQL;
 			$bind['archive_no'] = $crt->archive_no;
 		}
 
-
 		if($crt->engine_no)
 		{
 			$field_str .= 'fdjh = :engine_no, ';

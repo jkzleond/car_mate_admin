@@ -268,6 +268,11 @@
                 });
 
                 $(this).window('center');
+
+                $(document).trigger('pageLoad:illegalOrderDetail');
+            },
+            onBeforeClose: function(){
+                $(document).trigger('pageLeave:illegalOrderDetail');
             }
         });
 
@@ -322,10 +327,9 @@
             ],
             onClose: function(){
                 $(this).find('[name="mark"][value="PROCESS_SUCCESS"]').click();
+                $(this).find('[name="fail_reason"]').val('');
             }
         });
-
-
 
         /**
          * 事件相关

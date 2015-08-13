@@ -240,16 +240,17 @@ SQL;
     public static function getIllegalOrderInfoById($order_id)
     {
         $sql = <<<SQL
-        select o.id, o.order_no, o.trade_no, o.user_id, o2i.hphm, o2i.[count] as illegal_num, o2i.sum_fkje, o.pay_type, o.order_fee, o.pay_state, o.pay_time, o.mark, o.fail_reason, o.create_date, di.license_no, di.archieve_no as archive_no, di.fdjh,
+        select o.id, o.order_no, o.trade_no, o.user_id, o2i.hphm, o2i.[count] as illegal_num, o2i.sum_fkje, o.pay_type, o.order_fee, o.pay_state, o.pay_time, o.mark, o.fail_reason, o.create_date, di.license_no, di.archieve_no as archive_no, di.id as driver_info_id, ci.id as car_info_id, isnull(ci.engineNumber, di.fdjh) as engine_no,
         u.phone, u.uname as user_name,
         ROW_NUMBER() over(order by o.create_date desc) as rownum
         from (
-             select id, orderNo as order_no, tradeNo as trade_no, userId as user_id, payType as pay_type,
-             money as order_fee, state as pay_state,
-             mark, failReason as fail_reason,
-             createTime as create_date,
-             payTime as pay_time,
-             infoId as info_id
+            select id, orderNo as order_no, tradeNo as trade_no, userId as user_id, payType as pay_type,
+            money as order_fee, state as pay_state,
+            mark, failReason as fail_reason,
+            createTime as create_date,
+            payTime as pay_time,
+            infoId as info_id,
+            carInfoId as car_info_id
             from PayList
             where orderType = 'illegal'
         ) o
@@ -259,6 +260,7 @@ SQL;
             group by orderId
         ) o2i on o2i.order_id = o.id
         left join DriverInfo di on di.id = o.info_id
+        left join CarInfo ci on ci.id = o.car_info_id
         left join IAM_USER u on u.userId = o.user_id
         where o.id = :order_id
 SQL;

@@ -569,16 +569,17 @@ SQL;
      * @param $province_id
      * @return array
      */
-    public static function addLocalFavourAdv($rele_id, $adv, $adv3, $is_state, $type, $province_id)
+    public static function addLocalFavourAdv($rele_id, $adv, $adv3, $is_state, $type, $province_id, $contents)
     {
-        $sql = 'insert into LocalFavourAdv(releId,adv,adv3,isState,isOrder,[type],provinceId) values(:rele_id,:adv,:adv3,:is_state,0,:type,:province_id)';
+        $sql = 'insert into LocalFavourAdv(releId,adv,adv3,isState,isOrder,[type],provinceId, contents) values(:rele_id,:adv,:adv3,:is_state,0,:type,:province_id, :contents)';
         return self::nativeExecute($sql, array(
             'rele_id' => $rele_id,
             'adv' => $adv,
             'adv3' => $adv3,
             'is_state' => $is_state,
             'type' => $type,
-            'province_id' => $province_id
+            'province_id' => $province_id,
+            'contents' => $contents
         ));
     }
 

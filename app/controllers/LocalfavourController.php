@@ -278,7 +278,8 @@ class LocalfavourController extends ControllerBase
         $is_state = isset($local_favour_adv['is_state']) ? $local_favour_adv['is_state'] : 0;
         $type = $local_favour_adv['type'];
         $province_id = $local_favour_adv['province_id'];
-
+        $contents = !empty($local_favour_adv['contents']) ? $local_favour_adv['contents'] : null;  
+        print_r($contents);
         $host = $this->request->getHttpHost();
 
         $adv = null;
@@ -306,7 +307,7 @@ class LocalfavourController extends ControllerBase
         }
 
 
-        $success = LocalFavour::addLocalFavourAdv($rele_id, $adv, $adv3, $is_state, $type, $province_id);
+        $success = LocalFavour::addLocalFavourAdv($rele_id, $adv, $adv3, $is_state, $type, $province_id, $contents);
 
         $this->view->setVar('data', array(
             'success' => $success

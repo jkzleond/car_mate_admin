@@ -272,7 +272,7 @@ class LocalfavourController extends ControllerBase
         $creates = $this->request->getPost('creates');
         $local_favour_adv = $creates[0];
 
-        $rele_id = $local_favour_adv['rele_id'];
+        $rele_id = !empty($local_favour_adv['rele_id']) ? $local_favour_adv['rele_id'] : null;
         $adv_src = isset($local_favour_adv['adv_src']) ? $local_favour_adv['adv_src'] : null;
         $adv3_src = isset($local_favour_adv['adv3_src']) ? $local_favour_adv['adv3_src'] : null;
         $is_state = isset($local_favour_adv['is_state']) ? $local_favour_adv['is_state'] : 0;

@@ -645,8 +645,32 @@
                 });
                 $('#activity_grid').datagrid('fixDetailRowHeight',index);
             },
+            frozenColumns: [[
+                {field:'id',title:'操作',width:'12%',align:'center', formatter: function(value, row, index){
+                    if(!value) return;
+                    if(row.state != 2)
+                    {
+                        return '<div class="btn-group"><button title="预览" class="btn btn-mini btn-info activity-preview-btn" data-id="' + value + '"><i class="icon-eye-open"></i></button><button class="btn btn-mini btn-warning activity-update-btn" data-id="' + value + '"><i class="icon-edit"></i></button><button class="btn btn-mini btn-danger activity-del-btn" data-id="' + value + '"><i class="icon-trash"></i></button></div>';
+                    }
+                    else
+                    {
+                        return '<div class="btn-group"><button title="预览" class="btn btn-mini btn-info activity-preview-btn" data-id="' + value + '"><i class="icon-eye-open"></i></button><button class="btn btn-mini btn-warning activity-update-btn" data-id="' + value + '"><i class="icon-edit"></i></button></div>';
+                    }
+
+                }}
+            ]],
             columns:[[
                 {field:'name', title:'活动名称', width:'15%', align:'center'},
+                {field:'rownum', title:'url(新)', width:'15%', align:'center', formatter: function(value, row, index){
+                    if(row.typeId == '3')
+                    {
+                        return 'http://116.55.248.76:8092/#tour/detail/' + row.id;
+                    }
+                    else
+                    {
+                        return 'http://116.55.248.76:8092/#activity/detail/' + row.id;
+                    }
+                }},
                 {field:'url',title:'相关链接',width:'20%',align:'center'},
                 {field:'createDate',title:'创建时间',width:'9%',align:'center', formatter: function(value, row, index){
                     if(!value) return '';
@@ -682,19 +706,7 @@
                 }},
                 {field:'typeName',title:'类型',width:'6%',align:'center'},
                 {field:'num',title:'参与人数',width:'6%',align:'center'},
-                {field:'gainNum',title:'领取人数',width:'6%',align:'center'},
-                {field:'id',title:'操作',width:'12%',align:'center', formatter: function(value, row, index){
-                    if(!value) return;
-                    if(row.state != 2)
-                    {
-                        return '<div class="btn-group"><button title="预览" class="btn btn-mini btn-info activity-preview-btn" data-id="' + value + '"><i class="icon-eye-open"></i></button><button class="btn btn-mini btn-warning activity-update-btn" data-id="' + value + '"><i class="icon-edit"></i></button><button class="btn btn-mini btn-danger activity-del-btn" data-id="' + value + '"><i class="icon-trash"></i></button></div>';
-                    }
-                    else
-                    {
-                        return '<div class="btn-group"><button title="预览" class="btn btn-mini btn-info activity-preview-btn" data-id="' + value + '"><i class="icon-eye-open"></i></button><button class="btn btn-mini btn-warning activity-update-btn" data-id="' + value + '"><i class="icon-edit"></i></button></div>';
-                    }
-
-                }}
+                {field:'gainNum',title:'领取人数',width:'6%',align:'center'}
             ]]
         });
 

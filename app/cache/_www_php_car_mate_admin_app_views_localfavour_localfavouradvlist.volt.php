@@ -387,9 +387,11 @@
             var adv = $('#create_adv_form [name=adv]').val();
             var adv3 = $('#create_adv_form [name=adv3]').val();
             var province_id = $('#create_adv_form [name=province_id]').val();
-            var type = $('#create_adv_form [name=type]').val();
+            var type = $('#create_adv_form [name=type]:checked').val();
             var rele_id = null;
             var contents = null;
+
+            console.log(type);
 
             if( type == 'LocalFavour' )
             {

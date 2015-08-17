@@ -279,7 +279,7 @@ class LocalfavourController extends ControllerBase
         $type = $local_favour_adv['type'];
         $province_id = $local_favour_adv['province_id'];
         $contents = !empty($local_favour_adv['contents']) ? $local_favour_adv['contents'] : null;  
-        print_r($contents);
+
         $host = $this->request->getHttpHost();
 
         $adv = null;

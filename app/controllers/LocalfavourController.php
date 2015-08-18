@@ -298,10 +298,11 @@ class LocalfavourController extends ControllerBase
 
         if($adv3_src)
         {
-            preg_match('/data:image\/(?P<mime_type>.*);base64,(?P<base64_code>.*)/', $adv3_src, $adv3_matches);
-            $file_name = uniqid().date('YmdHis').$adv3_matches['mime_type'];
+            //preg_match('/data:image\/(?P<mime_type>.*);base64,(?P<base64_code>.*)/', $adv3_src, $adv3_matches);
+            //echo $adv3_src.PHP_EOL;
+            $file_name = uniqid().date('YmdHis').$adv3_src['mime_type'];
             $file_path = __DIR__.'/../../public/uploads/';
-            file_put_contents($file_path.$file_name, base64_decode($adv3_matches['base64_code']));
+            file_put_contents($file_path.$file_name, base64_decode($adv3_src['base64_data']));
 
             $adv3 = 'http://'.$host.$this->url->get('/uploads/').$file_name;
         }

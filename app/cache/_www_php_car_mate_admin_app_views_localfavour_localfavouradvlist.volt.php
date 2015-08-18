@@ -391,8 +391,6 @@
             var rele_id = null;
             var contents = null;
 
-            console.log(type);
-
             if( type == 'LocalFavour' )
             {
                 rele_id = $('#adv_local_favour').combogrid('getValue');
@@ -416,8 +414,13 @@
             var adv_src = $('#create_adv_form #thumbnail_adv').attr('src');
             var adv3_src = $('#create_adv_form #thumbnail_adv3').attr('src');
 
+            var adv3_matches = adv3_src.match('data:image/(.*);base64,(.*)');
+    
             local_favour_adv.set('adv_src', adv_src);
-            local_favour_adv.set('adv3_src', adv3_src);
+            local_favour_adv.set('adv3_src', {
+                mime_type: adv3_matches[1],
+                base64_data: adv3_matches[2]
+            });
             local_favour_adv.set('type', type);
             local_favour_adv.set('province_id', province_id);
 

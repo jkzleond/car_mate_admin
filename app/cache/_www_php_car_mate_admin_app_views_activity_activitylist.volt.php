@@ -664,11 +664,11 @@
                 {field:'rownum', title:'url(新)', width:'15%', align:'center', formatter: function(value, row, index){
                     if(row.typeId == '3')
                     {
-                        return 'http://116.55.248.76:8092/#tour/detail/' + row.id;
+                        return 'http://116.55.248.76:8092/?{url_param}#tour/detail/' + row.id;
                     }
                     else
                     {
-                        return 'http://116.55.248.76:8092/#activity/detail/' + row.id;
+                        return 'http://116.55.248.76:8092/?{url_param}#activity/detail/' + row.id;
                     }
                 }},
                 {field:'url',title:'相关链接',width:'20%',align:'center'},

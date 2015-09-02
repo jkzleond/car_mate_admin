@@ -125,7 +125,7 @@ class IllegalController extends ControllerBase
      * 更新车辆信息
      * @param  $car_info_id
      */
-    public function updateCarInfo($car_info_id)
+    public function updateCarInfoAction($car_info_id)
     {
         $criteria = $this->request->getPut('criteria');
 

@@ -135,4 +135,31 @@ class IllegalController extends ControllerBase
             'success' => $success
         ));
     }
+
+    /**
+     * 流水列表页面
+     */
+    public function transactionListAction()
+    {
+
+    }
+
+    /**
+     * 获取流水列表数据
+     */
+    public function getTransactionListAction()
+    {
+        $criteria = $this->request->getPost('criteria');
+        $page_num = $this->request->getPost('page');
+        $page_size = $this->request->getPost('rows');
+        $criteria['pay_state'] = 2;
+        $order_list = Order::getIllegalOrderList($criteria, $page_num, $page_size);
+        $order_total = Order::getIllegalOrderCount($criteria);
+
+        $this->view->setVar('data', array(
+            'rows' => $order_list,
+            'count' => count($order_list),
+            'total' => $order_total
+        ));
+    }
 }

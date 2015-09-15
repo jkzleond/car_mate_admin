@@ -188,6 +188,22 @@ $statistics->add('/insuranceActTotalStatistics/{start_date:\d{4}-\d{2}-\d{2}}/{e
     'action' => 'getInsuranceActTotalStatistics'
 ));
 
+/**
+ * 违章代缴业务统计
+ */
+
+$statistics->addGet('/orderIllegalStatistics', array(
+    'action' => 'orderIllegalStatistics'
+));
+
+$statistics->add('/orderIllegalStatistics/{start_date:\d{4}-\d{2}-\d{2}}/{end_date:\d{4}-\d{2}-\d{2}}/{group_type:[a-zA-Z]+}.json', array(
+    'action' => 'getOrderIllegalStatistics'
+));
+
+$statistics->add('/orderIllegalTotalStatistics/{start_date:\d{4}-\d{2}-\d{2}}/{end_date:\d{4}-\d{2}-\d{2}}.json', array(
+    'action' => 'getOrderIllegalTotalStatistics'
+));
+
 $router->mount($statistics);
 
 /**
@@ -767,6 +783,16 @@ $illegal->addPut('/driverInfo/{info_id:\d+}.json', array(
 //更新车辆信息
 $illegal->addPut('/carInfo/{car_info_id:\d+}.json', array(
     'action' => 'updateCarInfo'
+));
+
+//流水列表页面
+$illegal->addGet('/transactionList', array(
+    'action' => 'transactionList'
+));
+
+//获取流水列表数据
+$illegal->add('/transactionList.json', array(
+    'action' => 'getTransactionList'
 ));
 
 $router->mount($illegal);

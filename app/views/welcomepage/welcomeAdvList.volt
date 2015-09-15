@@ -217,6 +217,14 @@
         //图片选择器改变事件
         $('#welcome_adv_pic_file').change(function(event){
             var file = this.files[0];
+            if(file.size > 512000)
+            {
+                $.messager.show({
+                    title: '系统消息',
+                    msg: '上传图片必须小于500Kb'
+                });
+                return;
+            }
             var reader = new FileReader();
             reader.addEventListener('load', function(event){
                 var img_src = event.target.result;

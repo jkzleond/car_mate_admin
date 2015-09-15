@@ -131,15 +131,9 @@
 		"side_bar_visible": false,
 		"status_bar_visible": false
 	},
-	"expanded_folders":
-	[
-		"/www/php/car_mate_admin",
-		"/www/php/car_mate_admin/app",
-		"/www/php/car_mate_admin/app/config",
-		"/www/php/car_mate_admin/app/controllers"
-	],
 	"file_history":
 	[
+		"/www/php/car_mate_admin/app/controllers/NoticeController.php",
 		"/www/php/car_mate_admin/app/controllers/IllegalController.php",
 		"/www/php/car_mate_admin/app/controllers/AuserController.php",
 		"/www/php/car_mate_admin/app/models/LocalFavour.php",
@@ -233,7 +227,7 @@
 	],
 	"find":
 	{
-		"height": 41.0
+		"height": 33.0
 	},
 	"find_in_files":
 	{
@@ -247,6 +241,8 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"function getSoap",
+			"form",
 			"excute",
 			"- ",
 			"illegal_order_detail_table",
@@ -304,7 +300,7 @@
 	],
 	"incremental_find":
 	{
-		"height": 41.0
+		"height": 33.0
 	},
 	"input":
 	{
@@ -338,10 +334,10 @@
 		"height": 0.0
 	},
 	"pinned_build_system": "",
-	"project": "car_mate_admin.sublime-project",
+	"project": "car_mate_admin.sublime-workspace",
 	"replace":
 	{
-		"height": 76.0
+		"height": 62.0
 	},
 	"save_all_on_build": true,
 	"select_file":

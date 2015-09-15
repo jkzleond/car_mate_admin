@@ -186,6 +186,9 @@
                         <li><a href="/statistics/firstPreliminaryCalculationStatistics">每日新增用户数(保险)</a></li>
                         <li><a href="/statistics/insuranceActStatistics">保险系统行为统计</a></li>
                         <?php } ?>
+                        <?php if ($this->isIncluded('totalStatistics', $auth)) { ?>
+                        <li><a href="/statistics/orderIllegalStatistics">违章代缴业务统计</a></li>
+                        <?php } ?>
                     </ul>
                 </li>
                 <li class="dropdown"><a href=""><span class="iconfa-briefcase"></span> 保险系统</a>
@@ -249,6 +252,7 @@
                         <?php if ($this->isIncluded('dealList', $auth)) { ?>
                         <li><a href="/illegal/orderMng">订单管理</a></li>
                         <li><a href="/illegal/driverInfoMng">驾驶员信息</a></li>
+                        <li><a href="/illegal/transactionList">流水列表</a></li>
                         <?php } ?>
                     </ul>
                 </li>

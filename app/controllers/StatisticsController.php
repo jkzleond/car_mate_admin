@@ -283,5 +283,40 @@ class StatisticsController extends ControllerBase
         $this->view->setVar('data', $insurance_act_total_statistics);
     }
 
+    /**
+     * 违章业务统计页面
+     * 
+     */
+    public function orderIllegalStatisticsAction()
+    {
+        $this->view->setVars(array(
+            'default_end_time' => date('Y-m-d'),
+            'default_start_time' => date('Y-m-d', strtotime('-11 day'))
+        ));
+    }
+
+    /**
+     * 获取违章代缴业务统计数据
+     * @param  string $start_date
+     * @param  string $end_date
+     * @param  string $group_type
+     */
+    public function getOrderIllegalStatisticsAction($start_date, $end_date, $group_type)
+    {
+        $order_illegal_statistics = Statistics::getOrderIllegalCount($start_date, $end_date, $group_type);
+        $this->view->setVar('data', $order_illegal_statistics);
+    }
+
+    /**
+     * 获取违章代缴业务总数统计
+     * @param  string $start_date
+     * @param  string $end_date
+     */
+    public function getOrderIllegalTotalStatisticsAction($start_date, $end_date)
+    {
+        $order_illegal_total_statistics = Statistics::getOrderIllegalTotalCount($start_date, $end_date);
+        $this->view->setVar('data', $order_illegal_total_statistics);
+    }
+
 }
 

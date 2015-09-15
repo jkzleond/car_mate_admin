@@ -452,6 +452,29 @@ SQL;
     }
 
     /**
+     * 获取违章代缴业务统计数据
+     * @param  string $start_date
+     * @param  string $end_date
+     * @param  string $group_type
+     * @return array
+     */
+    public static function getOrderIllegalCount($start_date=null, $end_date=null, $group_type=null)
+    {
+        return self::_call_statistics_process('getOrderIllegalCount', $start_date, $end_date, $group_type);
+    }
+
+    /**
+     * 获取违章代缴业务总数
+     * @param  string $start_date
+     * @param  string $end_date
+     * @return array
+     */
+    public static function getOrderIllegalTotalCount($start_date=null, $end_date=null)
+    {
+        return self::_call_statistics_process('getOrderIllegalTotalCount', $start_date, $end_date);
+    }
+
+    /**
      * 调用指定的存储过程
      * @param $proc_name 过程名称
      * @param $start_date
@@ -512,6 +535,4 @@ SQL;
         );
         return $normalized_data;
     }
-
-
 }

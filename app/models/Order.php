@@ -36,7 +36,7 @@ class Order extends ModelEx
         {
             $cte_condition_arr[] = "(o.pay_state != 'TRADE_SUCCESS' and o.pay_state != 'TRADE_FINISHED' or o.pay_state is null)";
         }
-    else if($crt->pay_state == 2)
+        else if($crt->pay_state == 2)
         {
             $cte_condition_arr[] = "(o.pay_state = 'TRADE_SUCCESS' or o.pay_state = 'TRADE_FINISHED')";
         }
@@ -101,6 +101,7 @@ class Order extends ModelEx
         $sql = <<<SQL
         with ORDER_CTE as (
             select o.id, o.order_no, o.trade_no, o.user_id, o.client_type, o2i.hphm, o2i.[count] as illegal_num, o2i.sum_fkje, o.pay_type, o.order_fee, o.pay_state, o.pay_time, o.mark, o.create_date, o.fail_reason, u.phone, u.uname as user_name,
+            refundState as refund_state, refundFee as refund_fee, poundage, (o2i.[count]*10 - poundage) as real_income, des,
             ROW_NUMBER() over(order by o.create_date desc) as rownum
             from (
                  select id, orderNo as order_no, tradeNo as trade_no, userId as user_id, clientType as client_type,

@@ -633,7 +633,7 @@ SQL;
             $bind['award_state'] = $award_state;
         }
 
-        if($need_pay or $need_pay == 0 or $need_pay == '0')
+        if($need_pay or $need_pay === 0 or $need_pay === '0')
         {
             $field_str .= 'needPay = :need_pay, ';
             $bind['need_pay'] = $need_pay;

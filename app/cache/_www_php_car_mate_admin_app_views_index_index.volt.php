@@ -390,26 +390,41 @@
     });
 
     //判断访问的是否fake后台端口
-    if(location.port == '8094')
+    if(location.port != '8094')
     {
         //为ajax获取的json数据类型添加data filter，filter接受的是原始字符串
         $.ajaxPrefilter('json', function(options){
-        options.dataFilter = function(data_str){
-          var data_object = JSON.parse(data_str);
-          if(!data_object.rows || data_object.rows.length < 1) return data_str;
-          
-          if(data_object.rows[0].date || data_object.rows[0].sum)
-              { 
-              $.each(data_object.rows, function(index, item){ 
-            for(var prop in item)
-            { 
-              if(prop == 'date') continue;
-              item[prop] = item[prop]*7;
-            }   
-              });   
-              } 
-          return JSON.stringify(data_object);
-            };
+            if(options.url.indexOf('/statistics') == 0)
+            {
+                options.dataFilter = function(data_str){
+                    var data_object = JSON.parse(data_str);
+                    if(!data_object.rows || data_object.rows.length < 1) return data_str;
+                  
+                    $.each(data_object.rows, function(index, item){
+                        for(var prop in item)
+                        { 
+                          if(prop == 'date') continue;
+                          item[prop] = Math.round(item[prop]*7.5);
+                        }   
+                    });
+                    return JSON.stringify(data_object);
+                };
+            }
+            else
+            {
+                options.dataFilter = function(data_str){
+                    var data_object = JSON.parse(data_str);
+                    if(!data_object.rows || data_object.rows.length < 1)
+                    {
+                        return data_str;
+                    }
+                    else if(data_object.total)
+                    {
+                        data_object.total = data_object.total*7;
+                    }
+                   return JSON.stringify(data_object);
+                };    
+            }    
         });
     }
 </script>

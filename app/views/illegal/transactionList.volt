@@ -100,20 +100,16 @@
             //pageList:[50,100,150,200],
             toolbar: '#illegal_transaction_grid_tb',
             idField: 'id',
-            frozenColumns: [[
-                {field: 'id', title: '操作', width: '10%', align: 'center', formatter: function(value, row, index){
-                    var info_btn_html = '<button class="btn btn-info illegal-order-detail-btn" data-id="'+ value +'">明细</button>';
-                    var process_btn_html = '<button class="btn btn-primary illegal-process-btn" data-id="' + value + '">处理</button>';
-                    if(row.pay_state == 'TRADE_SUCCESS' || row.pay_state == 'TRADE_FINISHED')
-                    {
-                        return info_btn_html + process_btn_html;
-                    }
-                    else
-                    {
-                        return info_btn_html;
-                    }
-                }},
-                {field:'pay_type', title:'支付方式', width:'6%', align:'center', formatter: function(value, row, index){
+            frozenColumns:[[
+                {field: 'id', title: '操作', width: '6%', align: 'center', formatter: function(value, row, index){
+                    return '<button class="btn btn-warning illegal-order-detail-btn" data-id="'+ value +'" title="编辑"><i class="iconfa-edit"></i></button>';
+                }}
+            ]],
+            columns:[[
+                {field:'create_date', title:'订单时间', width:'15%', align:'center'},
+                {field:'order_no', title:'订单号', width:'15%', align:'center'},
+                {field:'trade_no', title:'交易号', width:'25%', align:'center'},
+                {field:'pay_type', title:'支付方式', width:'8%', align:'center', formatter: function(value, row, index){
                     if(value == 'alipay')
                     {
                         return '支付宝';
@@ -123,50 +119,26 @@
                         return '微信支付';
                     }
                 }},
-                {field:'pay_state', title:'支付状态', width:'6%', align:'center', formatter: function(value, row, index){
-                    if(value == 'TRADE_SUCCESS' || value == 'TRADE_FINISHED')
+                {field:'illegal_num', title:'违章条数', width:'8%', align:'center'},
+                {field:'order_fee', title:'订单金额', width:'8%', align:'center'},
+                {field:'refund_state', title:'退款情况', width:'8%', align:'center', formatter: function(value, row, index){
+                    if(value == 'REFUND_FULL')
                     {
-                        return '已支付';
+                        return '全部退款';
+                    }
+                    else if(value == 'REFUND_PART')
+                    {
+                        return '部分退款';
                     }
                     else
                     {
-                        return '未支付'
+                        return '未退款';
                     }
                 }},
-                {field:'mark', title:'处理结果', width:'10%', align:'center', formatter: function(value, row, index){
-                    if(value == 'PROCESS_SUCCESS')
-                    {
-                        return '处理完成';
-                    }
-                    else if(value == 'PROCESS_FAILED')
-                    {
-                        return '因[' + row.fail_reason + ']而无法处理';
-                    }else
-                    {
-                        return '未处理';
-                    }
-                }}
-            ]],
-            columns:[[
-                {field:'order_no', title:'订单号', width:'15%', align:'center'},
-                {field:'create_date', title:'订单时间', width:'12%', align:'center'},
-                {field:'user_id', title:'用户名', width:'15%', align:'center'},
-                {field:'user_name', title:'姓名', width:'6%', align:'center'},
-                {field:'phone', title:'手机号', width:'9%', align:'center'},
-                {field:'hphm', title:'车牌号', width:'7%', align:'center'},
-                {field:'illegal_transaction_num', title:'违章条数', width:'6%', align:'center'},
-//                {field:'sum_fkje', title:'处罚金额', width:'6%', align:'center'},
-                {field:'order_fee', title:'订单金额', width:'6%', align:'center'},
-                {field:'client_type', title:'客户端', width:'6%', align:'center', formatter: function(value, row, index){
-                    if( value == 'unknown' )
-                    {
-                        return '未知';
-                    }
-                    else
-                    {
-                        return value;
-                    }
-                }}
+                {field:'refund_fee', title:'退款金额', width:'6%', align:'center'},
+                {field:'poundage', title:'手续费', width:'6%', align:'center'},
+                {field:'real_income', title:'实际收入', width:'6%', align:'center'},
+                {field:'des', title:'备注', width:'10%', align:'center'}
             ]]
         });
 

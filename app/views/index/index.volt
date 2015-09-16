@@ -374,7 +374,7 @@
     });
 
     //判断访问的是否fake后台端口
-    if(location.port != '8094')
+    if(location.port == '8094')
     {
         //为ajax获取的json数据类型添加data filter，filter接受的是原始字符串
         $.ajaxPrefilter('json', function(options){

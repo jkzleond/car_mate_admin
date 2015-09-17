@@ -154,7 +154,7 @@
 
                             for(var i = 0; i < len; i++)
                             {
-                                $(n).children('select').append('<option value="' + option_list[i] + '">' + short_names[i] + '</option>');
+                                $(n).children('select').append('<option value="' + short_names[i] + '">' + option_list[i] + '</option>');
                             }
                         }
                         $(n).show();

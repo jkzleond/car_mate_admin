@@ -816,7 +816,7 @@ SQL;
     public static function updateActivitySelect($aid, $name=null, $option_list=null, $short_names=null, $deposit_list=null)
     {
         
-        $sql = 'update ActivitySelect set %s where aid = :aid';
+        /*$sql = 'update ActivitySelect set %s where aid = :aid';
         
         $field_str = '';
         $bind = array('aid' => $aid);
@@ -848,6 +848,33 @@ SQL;
         $field_str = rtrim($field_str, ', ');
 
         $sql = sprintf($sql, $field_str);
+
+        return self::nativeExecute($sql, $bind);*/
+        $connection = self::_getConnection();
+        $connection->begin();
+
+        $del_success = self::delActivitySelect($aid);
+
+        if(!$del_success)
+        {
+            $connection->rollback();
+            return false;
+        }
+
+        self::addActivitySelect($aid, $name, $option_list, $short_names, $deposit_list);
+
+        return $connection->commit();
+    }
+
+    /**
+     * 删除活动下拉选项
+     * @param  int|string $aid
+     * @return bool
+     */
+    public static function delActivitySelect($aid)
+    {
+        $sql = 'delete from ActivitySelect where aid = :aid';
+        $bind = array('aid' => $aid);
 
         return self::nativeExecute($sql, $bind);
     }

@@ -202,9 +202,9 @@
                 $("#user_activity_table tbody").append(
                     "<tr>" +
                     "<td>"+item.date+"</td>" +
-                    "<td>"+item.userRate+"</td>" +
-                    "<td>"+item.sum+"</td>" +
                     "<td>"+ item.user +"</td>" +
+                    "<td>"+item.sum+"</td>" +
+                    "<td>"+item.userRate+"</td>" +
                     "<td>"+ growth_rate +"</td>" +
                     "</tr>"
                 );

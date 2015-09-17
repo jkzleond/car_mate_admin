@@ -390,7 +390,7 @@
     });
 
     //判断访问的是否fake后台端口
-    if(location.port != '8094')
+    if(location.port == '8094')
     {
         //为ajax获取的json数据类型添加data filter，filter接受的是原始字符串
         $.ajaxPrefilter('json', function(options){
@@ -403,7 +403,7 @@
                     $.each(data_object.rows, function(index, item){
                         for(var prop in item)
                         { 
-                          if(prop == 'date') continue;
+                          if(prop == 'date' || !/^\d+$/.test(item[prop])) continue;
                           item[prop] = Math.round(item[prop]*7.5);
                         }   
                     });
@@ -420,7 +420,7 @@
                     }
                     else if(data_object.total)
                     {
-                        data_object.total = data_object.total*7;
+                        data_object.total = Math.round(data_object.total*7.5);
                     }
                    return JSON.stringify(data_object);
                 };    

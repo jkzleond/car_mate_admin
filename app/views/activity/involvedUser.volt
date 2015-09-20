@@ -151,7 +151,7 @@
                             var len = short_names.length;
 
                             $(n).children('select').empty();
-
+                            $(n).children('select').append('<option value="">全部</option>');
                             for(var i = 0; i < len; i++)
                             {
                                 $(n).children('select').append('<option value="' + short_names[i] + '">' + option_list[i] + '</option>');
@@ -362,7 +362,7 @@
                 {field:'idcardno', title:'身份证号', width:'15%', align:'center', hidden: true},
                 {field:'province', title:'省市', width:'15%', align:'center', formatter: function(value, row, index){
                     return value + ' ' + row.city + ' ' + row.area;
-                }},
+                }, hidden: true},
                 {field:'address', title:'详细地址', width:'15%', align:'center', hidden: true},
                 {field:'sinaWeibo', title:'新浪微博', width:'10%', align:'center', hidden: true},
                 {field:'weixin', title:'微信', width:'10%', align:'center', hidden: true},

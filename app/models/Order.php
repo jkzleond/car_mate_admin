@@ -20,6 +20,31 @@ class Order extends ModelEx
 
         $bind = array();
 
+        if($crt->order_no)
+        {
+            $cte_condition_arr[] = 'o.order_no like :order_no';
+            $bind['order_no'] = '%'.$crt->order_no.'%';
+        }
+
+        if($crt->trade_no)
+        {
+            $cte_condition_arr[] = 'o.trade_no like :trade_no';
+            $bind['trade_no'] = '%'.$crt->trade_no.'%';
+        }
+
+        if($crt->refund_state == '1')
+        {
+            $cte_condition_arr[] = 'o.refund_state is null';
+        }
+        elseif($crt->refund_state == '2')
+        {
+            $cte_condition_arr[] = "o.refund_state = 'REFUND_PART'";
+        }
+        elseif($crt->refund_state == '3')
+        {
+            $cte_condition_arr[] = "o.refund_state = 'REFUND_FULL'";
+        }   
+
         if($crt->user_id)
         {
             $cte_condition_arr[] = 'o.user_id = :user_id';
@@ -83,6 +108,7 @@ class Order extends ModelEx
             $cte_condition_arr[] = 'o2i.hphm like :hphm';
             $bind['hphm'] = '%'.$crt->hphm.'%';
         }
+
 
         if(!empty($cte_condition_arr))
         {
@@ -320,6 +346,28 @@ SQL;
         {
             $field_str .= 'mark = :mark, ';
             $bind['mark'] = $crt->mark;
+        }
+
+        if($crt->refund_state == 'REFUND_PART' or $crt->refund_state == 'REFUND_FULL')
+        {
+            $field_str .= 'refundState = :refund_state, ';
+            $bind['refund_state'] = $crt->refund_state;
+        }
+        elseif($crt->refund_state == 'REFUND_NO')
+        {
+            $field_str .= 'refundState = null, ';
+        }
+
+        if($crt->refund_fee or is_float($crt->refund_state))
+        {
+            $field_str .= 'refundFee = :refund_fee, ';
+            $bind['refund_fee'] = $crt->refund_fee;
+        }
+
+        if($crt->des)
+        {
+            $field_str .= 'des = :des, ';
+            $bind['des'] = $crt->des;
         }
 
         if($crt->fail_reason)

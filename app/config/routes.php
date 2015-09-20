@@ -526,6 +526,11 @@ $activity->add('/activityUserPay/{ids:(\d+(,\d+)*)}.json', array(
     'action' => 'userPay'
 ));
 
+//付款活动订单管理页面
+$activity->addGet('/orderMng', array(
+    'action' => 'orderManage'
+));
+
 $router->mount($activity);
 
 /**
@@ -793,6 +798,11 @@ $illegal->addGet('/transactionList', array(
 //获取流水列表数据
 $illegal->add('/transactionList.json', array(
     'action' => 'getTransactionList'
+));
+
+//更新流水
+$illegal->addPut('/transaction/{order_id:\d+}.json', array(
+    'action' => 'updateTransaction'
 ));
 
 $router->mount($illegal);

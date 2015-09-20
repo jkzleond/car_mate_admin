@@ -162,4 +162,17 @@ class IllegalController extends ControllerBase
             'total' => $order_total
         ));
     }
+
+    /**
+     * 更新流水
+     */
+    public function updateTransactionAction($order_id)
+    {
+        $criteria = $this->request->getPut('criteria');
+        $success = Order::updateOrder($order_id, $criteria);
+
+        $this->view->setVar('data', array(
+            'success' => $success
+        ));
+    }
 }

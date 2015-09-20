@@ -67,7 +67,31 @@
                 <div id="illegal_transaction_grid"></div>
             </div>
             <div id="illegal_transaction_edit_window">
-                
+                <div class="row-fluid">
+                    <div class="span6">
+                        <span class="label">退款状态</span>
+                        <select name="refund_state" class="input-small">
+                            <option value="REFUND_NO">未退款</option>
+                            <option value="REFUND_PART">部分退款</option>
+                            <option value="REFUND_FULL">全额退款</option>
+                        </select>
+                    </div>
+                    <div class="span6">
+                        <span class="label">退款金额</span>
+                        <input type="text" name="refund_fee" class="number-input input-small">
+                    </div>
+                </div>
+                <div class="row-fluid">
+                    <div class="span12">
+                        <span class="label">备注</span>
+                        <textarea name="des" class="input-xlarge"></textarea>
+                    </div>
+                </div>
+                <div class="row-fluid">
+                    <div class="span12">
+                        <input type="hidden" name="order_id">
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -82,6 +106,12 @@
         //时间控件
         var start_datebox = $('#illegal_transaction_grid_tb [name="start_date"]').datebox({editable: false});
         var end_datebox = $('#illegal_transaction_grid_tb [name="end_date"]').datebox({editable: false});
+
+        //数字控件
+        var refund_fee_box = $('#illegal_transaction_edit_window [name=refund_fee]').numberbox({
+            precision: 2,
+            min: 0.00
+        });
 
         //数据表格
         var illegal_transaction_grid = $('#illegal_transaction_grid').datagrid({
@@ -102,7 +132,7 @@
             idField: 'id',
             frozenColumns:[[
                 {field: 'id', title: '操作', width: '6%', align: 'center', formatter: function(value, row, index){
-                    return '<button class="btn btn-warning illegal-order-detail-btn" data-id="'+ value +'" title="编辑"><i class="iconfa-edit"></i></button>';
+                    return '<button class="btn btn-warning illegal-transaction-edit-btn" data-id="'+ value +'" title="编辑"><i class="iconfa-edit"></i></button>';
                 }}
             ]],
             columns:[[
@@ -194,10 +224,10 @@
             }
         });
 
-        var illegal_transaction_process_window = $('#illegal_transaction_process_window').dialog({
-            title: '违章代缴处理',
+        var illegal_transaction_edit_window = $('#illegal_transaction_edit_window').dialog({
+            title: '违章代缴流水编辑',
             iconCls: 'icon-wrench',
-            width: 240,
+            width: '350',
             height: 'auto',
             closed: true,
             shadow: false,
@@ -205,15 +235,16 @@
             openAnimation: 'fade',
             buttons: [
                 {
-                    text: '处理',
+                    text: '编辑',
                     handler: function(){
-                        var order_id = $('#illegal_transaction_process_window [name="order_id"]').val();
-                        var mark = $('#illegal_transaction_process_window [name="mark"]:checked').val();
-                        var fail_reason = $('#illegal_transaction_process_window [name="fail_reason"]').val();
+                        var order_id = $('#illegal_transaction_edit_window [name="order_id"]').val();
+                        var refund_state = $('#illegal_transaction_edit_window [name="refund_state"]').val();
+                        var refund_fee = refund_fee_box.numberbox('getValue');
+                        var des = $('#illegal_transaction_edit_window [name="des"]').val();
                         $.ajax({
-                            url: '/illegal/orderProcess/' + order_id + '.json',
+                            url: '/illegal/transaction/' + order_id + '.json',
                             method: 'PUT',
-                            data: {criteria: {mark: mark, fail_reason: fail_reason}},
+                            data: {criteria: {refund_state: refund_state, refund_fee: refund_fee, des: des}},
                             dataType: 'json',
                             global: true
                         }).done(function(data){
@@ -221,31 +252,32 @@
                             {
                                 $.messager.show({
                                     title: '系统消息',
-                                    msg: '违章处理结果提交失败'
+                                    msg: '违章代缴业务流水更新失败'
                                 });
                             }
                             else
                             {
                                 $.messager.show({
                                     title: '系统消息',
-                                    msg: '违章处理结果提交成功'
+                                    msg: '违章代缴业务流水更新成功'
                                 });
                                 illegal_transaction_grid.datagrid('reload');
                             }
                         });
-                        illegal_transaction_process_window.window('close');
+                        illegal_transaction_edit_window.window('close');
                     }
                 },
                 {
                     text: '取消',
                     handler: function(){
-                        illegal_transaction_process_window.window('close');
+                        illegal_transaction_edit_window.window('close');
                     }
                 }
             ],
             onClose: function(){
-                $(this).find('[name="mark"][value="PROCESS_SUCCESS"]').click();
-                $(this).find('[name="fail_reason"]').val('');
+                $(this).find('[name=refund_state]').val('REFUND_NO');
+                refund_fee_box.numberbox('setValue', '0.00');
+                $(this).find('[name=des]').val('');
             }
         });
 
@@ -255,47 +287,46 @@
         //查找按钮点击事件
         $('#illegal_transaction_search_btn').click(function(event){
             var criteria = {};
-            criteria.user_id = $('#illegal_transaction_search_bar [name="user_id"]').val();
-            criteria.phone = $('#illegal_transaction_search_bar [name="phone"]').val();
-            criteria.hphm = $('#illegal_transaction_search_bar [name="hphm"]').val();
+            criteria.order_no = $('#illegal_transaction_search_bar [name="order_no"]').val();
+            criteria.trade_no = $('#illegal_transaction_search_bar [name="trade_no"]').val();
+            criteria.refund_state = $('#illegal_transaction_search_bar [name="refund_state"]').val();
             criteria.pay_type = $('#illegal_transaction_search_bar [name="pay_type"]').val();
-            criteria.pay_state = $('#illegal_transaction_search_bar [name="pay_state"]').val();
-            criteria.client_type = $('#illegal_transaction_search_bar [name="client_type"]').val();
-            criteria.mark = $('#illegal_transaction_search_bar [name="mark"]').val();
             criteria.start_date = start_datebox.datebox('getValue');
             criteria.end_date = end_datebox.datebox('getValue');
             illegal_transaction_grid.datagrid('load',{criteria: criteria});
         });
 
-        //违章代缴订单明细按钮点击事件
-        $(document).on('click', '.illegal-order-detail-btn', function(event){
+        //违章代缴流水编辑按钮点击事件
+        $(document).on('click', '.illegal-transaction-edit-btn', function(event){
             var order_id = $(this).attr('data-id');
-            var opt = illegal_transaction_detail_window.window('options');
-            opt.href = '/illegal/orderDetail/' + order_id;
-            illegal_transaction_detail_window
-                .window(opt)
-                .window('setTitle', '违章代缴订单明细')
-                .window('open');
+            var order_index = illegal_transaction_grid.datagrid('getRowIndex', order_id);
+            var order_fee = illegal_transaction_grid.datagrid('getRows')[order_index].order_fee;
+            illegal_transaction_edit_window.find('[name=order_id]').val(order_id);
+            refund_fee_box.numberbox({
+                max: order_fee
+            });
+            refund_fee_box.numberbox('setValue', '0.00');
+            refund_fee_box.numberbox('disable');
+            illegal_transaction_edit_window.dialog('open');
         });
 
-        //违章代缴处理按钮点击事件
-        $(document).on('click', '.illegal-process-btn', function(event){
-            var order_id = $(this).attr('data-id');
-            illegal_transaction_process_window.find('[name=order_id]').val(order_id);
-            illegal_transaction_process_window.window('open');
-        });
-
-        //当选择违章无法处理时的事件
-        $('#illegal_transaction_process_form [name="mark"]').change(function(event){
-            var is_fail = $(this).val() == 'PROCESS_FAILED';
-
-            if(is_fail)
+        //退款状态改变事件
+        $('#illegal_transaction_edit_window [name=refund_state]').change(function(event){
+            var new_value = $(this).val();
+            var max_value = refund_fee_box.numberbox('options').max;
+            if(new_value == 'REFUND_FULL')
             {
-                $('#illegal_transaction_fail_reason_container').show();
+                refund_fee_box.numberbox('setValue', max_value);
+                refund_fee_box.numberbox('disable');
+            }
+            else if(new_value == 'REFUND_NO')
+            {
+                refund_fee_box.numberbox('setValue', '0.00');
+                refund_fee_box.numberbox('disable');
             }
             else
             {
-                $('#illegal_transaction_fail_reason_container').hide();
+                refund_fee_box.numberbox('enable');   
             }
         });
 
@@ -306,15 +337,14 @@
         CarMate.page.on_leave = function(){
             //销毁窗口
             illegal_transaction_detail_window.window('destroy');
-            illegal_transaction_process_window.dialog('destroy');
+            illegal_transaction_edit_window.dialog('destroy');
 
             //销毁时间控件
             start_datebox.datebox('destroy');
             end_datebox.datebox('destroy');
 
             //清除动态绑定事件
-            $(document).off('click', '.illegal-order-detail-btn');
-            $(document).off('click', '.illegal-process-btn');
+            $(document).off('click', '.illegal-transaction-edit-btn');
         };
     };
 </script>

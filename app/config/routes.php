@@ -192,6 +192,7 @@ $statistics->add('/insuranceActTotalStatistics/{start_date:\d{4}-\d{2}-\d{2}}/{e
  * 违章代缴业务统计
  */
 
+//违章代缴业务订单统计页面
 $statistics->addGet('/orderIllegalStatistics', array(
     'action' => 'orderIllegalStatistics'
 ));
@@ -204,12 +205,37 @@ $statistics->add('/orderIllegalTotalStatistics/{start_date:\d{4}-\d{2}-\d{2}}/{e
     'action' => 'getOrderIllegalTotalStatistics'
 ));
 
+//违章代缴业务用户统计页面
+$statistics->addGet('/orderIllegalUserStatistics', array(
+    'action' => 'orderIllegalUserStatistics'
+));
+
+$statistics->add('/orderIllegalNewUserStatistics/{start_date:\d{4}-\d{2}-\d{2}}/{end_date:\d{4}-\d{2}-\d{2}}/{group_type:[a-zA-Z]+}.json', array(
+    'action' => 'getOrderIllegalNewUserStatistics'
+));
+
+$statistics->add('/orderIllegalUserTotalStatistics/{start_date:\d{4}-\d{2}-\d{2}}/{end_date:\d{4}-\d{2}-\d{2}}.json', array(
+    'action' => 'getOrderIllegalUserTotalStatistics'
+));
+
+//违章代缴业务追踪统计页面
+$statistics->addGet('/orderIllegalTrackStatistics', array(
+    'action' => 'orderIllegalTrackStatistics'
+));
+
+$statistics->add('/orderIllegalTrackStatistics/{user_id:.*}/{start_date:\d{4}-\d{2}-\d{2}}/{end_date:\d{4}-\d{2}-\d{2}}/{group_type:[a-zA-Z]+}.json', array(
+    'action' => 'getOrderIllegalTrackStatistics'
+));
+
+$statistics->add('/orderIllegalTrackTotalStatistics/{user_id:.*}/{start_date:\d{4}-\d{2}-\d{2}}/{end_date:\d{4}-\d{2}-\d{2}}.json', array(
+    'action' => 'getOrderIllegalTrackTotalStatistics'
+));
+
 $router->mount($statistics);
 
 /**
  * 保险
  */
-
 $insurance = new \Phalcon\Mvc\Router\Group(array(
     'controller' => 'insurance'
 ));
@@ -803,6 +829,11 @@ $illegal->add('/transactionList.json', array(
 //更新流水
 $illegal->addPut('/transaction/{order_id:\d+}.json', array(
     'action' => 'updateTransaction'
+));
+
+//获取违章代缴用户信息列表
+$illegal->add('/orderUserList.json', array(
+    'action' => 'getOrderUserList'
 ));
 
 $router->mount($illegal);

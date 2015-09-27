@@ -29,12 +29,17 @@
                             <option value="column">柱状图</option>
                         </select>
                     </fieldset>
+                </div>
+                <div class="row-fluid">
+                    <fieldset class="span3">
+                        <span class="label">用户名</span>
+                        <input type="text" name="user_name" id="">
+                    </fieldset>
                     <button id="finder_btn" class="btn btn-primary pull-right span1">确定</button>
                 </div>
             </form>
             <div class="charts">
                 <div id="charts_container"></div>
-                <div id="charts_container2"></div>
             </div>
             <table width="100%" >
                 <tr>
@@ -46,7 +51,10 @@
                         <div style="padding:10px;">
                             <table id="user_total_table" width="100%" class="table" cellpadding="0" cellspacing="1">
                                 <thead>
-                                <tr><th>成交单数</th><th>支付宝单数</th><th>微信单数</th><th>线下支付单数</th><th>Android</th><th>iPhone</th><th>iPad</th><th>iPodTouch</th><th>Windows Phone</th><th>其他</th></tr>
+                                <tr>
+                                    <th>Android</th><th>iPhone</th><th>iPad</th><th>iPodTouch</th><th>Windows Phone</th><th>其他</th>
+                                    <th>昆明</th><th>非昆明</th><th>总数</th>
+                                </tr>
                                 </thead>
                                 <tbody>
                                 
@@ -59,7 +67,9 @@
                     <td colspan="2">
                         <table id="user_table" width="100%" class="table" cellpadding="0" cellspacing="1">
                             <thead>
-                            <tr><th>日期</th><th>成交单数</th><th>支付宝</th><th>微信</th><th>线下</th><th>Android</th><th>iPhone</th><th>iPad</th><th>iPodTouch</th><th>Windows Phone</th><th>其他</th><th>总违章条数</th><th>手续费合计</th><th>实际收入合计</th><th>订单环比</th></tr>
+                            <tr>
+                                <th>日期</th><th>Android</th><th>iPhone</th><th>iPad</th><th>iPodTouch</th><th>Windows Phone</th><th>其他</th>
+                                <th>昆明</th><th>非昆明</th><th>总数</th><th>新增环比</th></tr>
                             </thead>
                             <tbody>
                             
@@ -101,7 +111,7 @@
                 zoomType: 'xy'
             },
             title: {
-                text: '违章代缴业务订单数统计'
+                text: '违章代缴业务新增用户数统计'
             },
             subtitle: {
                 text: '按天'
@@ -111,7 +121,7 @@
             },
             yAxis: {
                 title: {
-                    text: '订单数'
+                    text: '新增用户数'
                 }
             },
             tooltip: {
@@ -128,21 +138,6 @@
                 }
             },
             series: [
-                {
-                    id: 'alipay',
-                    name: '支付宝',
-                    data: []
-                },
-                {
-                    id: 'wxpay',
-                    name: '微信',
-                    data: []
-                },
-                {
-                    id: 'offline',
-                    name: '线下支付',
-                    data: []
-                },
                 {
                     id: 'android',
                     name: 'android',
@@ -170,78 +165,28 @@
                 },
                 {
                     id: 'other',
-                    name: '其他',
+                    name: '未知客户端',
+                    data: []
+                },
+                {
+                    id: 'km',
+                    name: '昆明',
+                    data: []
+                },
+                {
+                    id: 'unkm',
+                    name: '非昆明',
                     data: []
                 },
                 {   id: 'sum',
-                    name: '总成交数',
+                    name: '新增用户总数',
                     data: []
                 }]
         };
 
-        var options2 = {
-            chart: {
-                type: $('#chart_type').val(),
-                height: 300,
-                backgroundColor: 'none',
-                zoomType: 'xy'
-            },
-            title: {
-                text: '违章代缴业务实际收入统计'
-            },
-            subtitle: {
-                text: '按天'
-            },
-            xAxis: {
-                categories: []
-            },
-            yAxis: {
-                title: {
-                    text: '订单数'
-                }
-            },
-            tooltip: {
-                crosshairs: true,
-                shared: true
-            },
-            plotOptions: {
-                spline: {
-                    marker: {
-                        radius: 4,
-                        lineColor: '#666666',
-                        lineWidth: 1
-                    }
-                }
-            },
-            series: [
-                {
-                    id: 'realIncome',
-                    name: '实际收入合计',
-                    data: []
-                },
-                {
-                    id: 'alipayRealIncome',
-                    name: '支付宝实际收入合计',
-                    data: []
-                },
-                {
-                    id: 'wxpayRealIncome',
-                    name: '微信支付实际收入合计',
-                    data: []
-                },
-                {
-                    id: 'offlineRealIncome',
-                    name: '线下支付实际收入合计',
-                    data: []
-                }
-            ]
-        };
-
         $('#charts_container').highcharts(options);
-        $('#charts_container2').highcharts(options2);
 
         var charts = $('#charts_container').highcharts();
-        var charts2 = $('#charts_container2').highcharts();
 
         //定义pie_charts控件,用于显示访问总量统计
 
@@ -261,7 +206,7 @@
                 //pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
                 useHTML: true,
                 formatter: function(){
-                    return '<b>'+ this.point.name +'</b></br> '+'订单数:'+this.point.y + "<br/>" + "百分比:" +this.percentage.toFixed(2) +' %';
+                    return '<b>'+ this.point.name +'</b></br> '+'交易成功用户数:'+this.point.y + "<br/>" + "百分比:" +this.percentage.toFixed(2) +' %';
                 }
             },
             plotOptions: {
@@ -303,7 +248,7 @@
                 //pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
                 useHTML: true,
                 formatter: function(){
-                    return '<b>'+ this.point.name +'</b></br> '+'订单数:'+this.point.y + "<br/>" + "百分比:" +this.percentage.toFixed(2) +' %';
+                    return '<b>'+ this.point.name +'</b></br> '+'交易成功用户数:'+this.point.y + "<br/>" + "百分比:" +this.percentage.toFixed(2) +' %';
                 }
             },
             plotOptions: {
@@ -322,7 +267,7 @@
             series: [{
                 id: 'total',
                 type: 'pie',
-                name: '支付方式所占比例',
+                name: '区域占比例',
                 data: [
 
                 ]
@@ -342,8 +287,8 @@
             condition.start_date = start_date_box.datebox('getValue');
             condition.end_date = end_date_box.datebox('getValue');
             condition.group_type = $('#user_statistics_form [name=group_type]:checked').val();
-            OrderIllegalStatistics.find(condition);
-            OrderIllegalTotalStatistics.find(condition);
+            OrderIllegalNewUserStatistics.find(condition);
+            OrderIllegalUserTotalStatistics.find(condition);
             return false;
         });
 
@@ -367,10 +312,10 @@
          * 数据相关
          */
 
-        //定义OrderIllegalStatistics(访问)模型类
-        var OrderIllegalStatistics = CarMate.Model.extend({
+        //定义OrderIllegalNewUserStatistics(访问)模型类
+        var OrderIllegalNewUserStatistics = CarMate.Model.extend({
             __class_props__:{
-                baseUrl: '/statistics/orderIllegalStatistics',
+                baseUrl: '/statistics/orderIllegalNewUserStatistics',
                 buildUrl: function(condition){
                     if(!condition)
                     {
@@ -388,23 +333,18 @@
         });
 
         //查询到统计数据后的响应
-        OrderIllegalStatistics.on('found',function(event, models){
+        OrderIllegalNewUserStatistics.on('found',function(event, models){
             var len = models.length;
             var categories = [];
-            var alipay_data = [];
-            var wxpay_data = [];
-            var offline_data = [];
             var android_data = [];
             var iphone_data = [];
             var ipad_data = [];
             var ipod_touch_data = [];
             var window_phone_data = [];
             var other_data = [];
+            var km_data = [];
+            var unkm_data = [];
             var sum_data = [];
-            var realIncome_data = [];
-            var alipayRealIncome_data = [];
-            var wxpayRealIncome_data = [];
-            var offlineRealIncome_data = [];
 
             var pre_sum = 0;
 
@@ -415,23 +355,18 @@
             {
                 var model = models[i];
                 categories.push(model.date);
-                alipay_data.push(Number(model.alipayNum));
-                wxpay_data.push(Number(model.wxpayNum));
-                offline_data.push(Number(model.offlineNum));
                 android_data.push(Number(model.android));
                 iphone_data.push(Number(model.iPhone));
                 ipad_data.push(Number(model.iPad));
                 ipod_touch_data.push(Number(model.iPodTouch));
                 window_phone_data.push(Number(model.windowsPhone));
                 other_data.push(Number(model.other));
-                sum_data.push(Number(model.orderNum));
-                realIncome_data.push(Number(model.realIncome));
-                alipayRealIncome_data.push(Number(model.alipayRealIncome));
-                wxpayRealIncome_data.push(Number(model.wxpayRealIncome));
-                offlineRealIncome_data.push(Number(model.offlineRealIncome));
+                km_data.push(Number(model.km));
+                unkm_data.push(Number(model.unkm));
+                sum_data.push(Number(model.newUserNum));
 
                 //填充数据表格
-                var sum = Number(model.orderNum);
+                var sum = Number(model.newUserNum);
                 if(i === 0){
                     pre_sum = sum/2;
                 }
@@ -449,33 +384,28 @@
                 $("#user_table tbody").append(
                     "<tr>" +
                     "<td>" + model.date + "</td>" +
-                    "<td>" + model.orderNum + "</td>" +
-                    "<td>" + model.alipayNum + "</td>" +
-                    "<td>" + model.wxpayNum + "</td>" +
-                    "<td>" + model.offlineNum + "</td>" +
                     "<td>" + model.android + "</td>" +
                     "<td>" + model.iPhone + "</td>" +
                     "<td>" + model.iPad + "</td>" +
                     "<td>" + model.iPodTouch + "</td>" +
                     "<td>" + model.windowsPhone + "</td>" +
                     "<td>" + model.other + "</td>" +
-                    "<td>" + model.illegalNum + "</td>" +
-                    "<td>" + model.poundage + "</td>" +
-                    "<td>" + model.realIncome + "</td>" +
+                    "<td>" + model.km + "</td>" +
+                    "<td>" + model.unkm + "</td>" +
+                    "<td>" + model.newUserNum + "</td>" +
                     "<td>"+ growth_rate +"</td>" +
                     "</tr>"
                 );
             }
 
-            charts.get('alipay').setData(alipay_data, false);
-            charts.get('wxpay').setData(wxpay_data, false);
-            charts.get('offline').setData(offline_data, false);
             charts.get('android').setData(android_data, false);
             charts.get('iPhone').setData(iphone_data, false);
             charts.get('iPad').setData(ipad_data, false);
             charts.get('iPodTouch').setData(ipod_touch_data, false);
             charts.get('windowsPhone').setData(window_phone_data, false);
             charts.get('other').setData(other_data, false);
+            charts.get('km').setData(km_data, false);
+            charts.get('unkm').setData(unkm_data, false);
             charts.get('sum').setData(sum_data, false);
             //设置x轴类别
             charts.xAxis[0].setCategories(categories, false);
@@ -483,29 +413,20 @@
             charts.hideLoading();
             charts.redraw();
 
-            charts2.get('realIncome').setData(realIncome_data, false);
-            charts2.get('alipayRealIncome').setData(alipayRealIncome_data, false);
-            charts2.get('wxpayRealIncome').setData(wxpayRealIncome_data, false);
-            charts2.get('offlineRealIncome').setData(offlineRealIncome_data, false);
-            charts2.xAxis[0].setCategories(categories, false);
-            charts2.setTitle(null, {text: $('#user_statistics_form [name=group_type]:checked + span').text()});
-            charts2.hideLoading();
-            charts2.redraw();
-
         });
         //未查询到数据的响应
-        OrderIllegalStatistics.on('notFound',function(){
+        OrderIllegalNewUserStatistics.on('notFound',function(){
             charts.hideLoading();
         });
         //查询数据之前
-        OrderIllegalStatistics.on('beforeFind', function(){
+        OrderIllegalNewUserStatistics.on('beforeFind', function(){
             charts.showLoading();
         });
 
-        //定义OrderIllegalTotalStatistics模型
-        var OrderIllegalTotalStatistics = CarMate.Model.extend({
+        //定义OrderIllegalUserTotalStatistics模型
+        var OrderIllegalUserTotalStatistics = CarMate.Model.extend({
             __class_props__:{
-                baseUrl: '/statistics/orderIllegalTotalStatistics',
+                baseUrl: '/statistics/orderIllegalUserTotalStatistics/',
                 buildUrl: function(condition){
                     if(!condition)
                     {
@@ -522,7 +443,7 @@
         });
 
         //查询到访问总量统计数据后的响应
-        OrderIllegalTotalStatistics.on('found',function(event, models){
+        OrderIllegalUserTotalStatistics.on('found',function(event, models){
             //设置pie_charts
             var model = models[0];
             var series_data = [];
@@ -538,9 +459,8 @@
             pie_charts.hideLoading();
             pie_charts.redraw();
 
-            series_data2.push(['alipay', Number(model.alipayNum)]);
-            series_data2.push(['wxpay', Number(model.wxpayNum)]);
-            series_data2.push(['offline', Number(model.offlineNum)]);
+            series_data2.push(['昆明', Number(model.km)]);
+            series_data2.push(['非昆明', Number(model.unkm)]);
 
             pie_charts2.get('total').setData(series_data2, false);
             pie_charts2.hideLoading();
@@ -549,26 +469,25 @@
             //填充数据表格
             $("#user_total_table tbody").empty().append(
                 "<tr>" +
-                "<td>"+model.orderNum+"</td>" +
-                "<td>"+model.alipayNum+"</td>" +
-                "<td>"+model.wxpayNum+"</td>" +
-                "<td>"+model.offlineNum+"</td>" +
                 "<td>"+model.android+"</td>" +
                 "<td>"+model.iPhone+"</td>" +
                 "<td>"+model.iPad+"</td>" +
                 "<td>"+model.iPodTouch+"</td>" +
                 "<td>"+model.windowsPhone+"</td>" +
                 "<td>"+model.other+"</td>" +
+                "<td>"+model.km+"</td>" +
+                "<td>"+model.unkm+"</td>" +
+                "<td>"+model.userNum+"</td>" +
                 "</tr>"
             );
         });
 
         //未查询到数据的响应
-        OrderIllegalTotalStatistics.on('notFound',function(){
+        OrderIllegalUserTotalStatistics.on('notFound',function(){
             pie_charts.hideLoading();
         });
         //查询数据之前
-        OrderIllegalTotalStatistics.on('beforeFind', function(){
+        OrderIllegalUserTotalStatistics.on('beforeFind', function(){
             pie_charts.showLoading();
         });
 
@@ -577,8 +496,8 @@
         condition.start_date = start_date_box.datebox('getValue');
         condition.end_date = end_date_box.datebox('getValue');
         condition.group_type = $('#user_statistics_form [name=group_type]:checked').val();
-        OrderIllegalStatistics.find(condition);
-        OrderIllegalTotalStatistics.find(condition);
+        OrderIllegalNewUserStatistics.find(condition);
+        OrderIllegalUserTotalStatistics.find(condition);
 
     })(jQuery);
 </script>

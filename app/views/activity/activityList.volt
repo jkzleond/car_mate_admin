@@ -1202,5 +1202,5 @@
         $(document).off('click', '.check-user-view');
         $(document).off('click', '.pay-user-view');
         $(document).off('click', '.activity-remove-pay-item');
-    }
+    };
 </script>

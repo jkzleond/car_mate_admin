@@ -298,6 +298,128 @@ SQL;
     }
 
     /**
+     * 获取违章订单用户信息列表
+     * @param  array|null $criteria
+     * @param  int        $page_num
+     * @param  int        $page_size
+     * @return array
+     */
+    public static function getIllegalOrderUserList(array $criteria=null, $page_num=null, $page_size=null)
+    {
+        $crt = new Criteria($criteria);
+        $cte_condition_arr = array();
+        $cte_condition_str = '';
+        $page_condition_str = '';
+
+        $bind = array();
+
+        if($crt->user_id)
+        {
+            $cte_condition_arr[] = 'ou.user_id = :user_id';
+            $bind['user_id'] = $crt->user_id;
+        }
+
+        if($crt->pay_order_num or $crt->pay_order_num === '0' or $crt->pay_order_num === 0)
+        {
+            $cte_condition_arr[] = 'ou.pay_order_num = :pay_order_num';
+            $bind['pay_order_num'] = $crt->pay_order_num;
+        }
+
+        if(!empty($cte_condition_arr))
+        {
+            $cte_condition_str = 'where '.implode(' and ', $cte_condition_arr);
+        }
+
+        if($page_num)
+        {
+            $page_condition_str = 'where rownum between :from and :to';
+            //rownum 从 1 开始计数, $from 要 加 1
+            $from = $page_size * ( $page_num - 1) + 1;
+            $bind['from'] = $from;
+            $bind['to'] = $from + $page_size - 1 ;
+        }
+
+        $sql = <<<SQL
+        with USER_CTE as (
+            select ou.user_id, ou.order_num, ou.pay_order_num, ou.processed_illegal_num,
+            row_number() over(order by ou.order_num desc) as rownum
+            from
+            (
+                select o.userId as user_id,
+                count(1) as order_num,
+                isnull(count(case when o.state = 'TRADE_SUCCESS' or o.state = 'TRADE_FINISHED' then 1 end), 0) as pay_order_num,
+                isnull(sum(case when o.mark = 'PROCESS_SUCCESS' then o2i.illegal_num end), 0) as processed_illegal_num
+                from PayList o
+                left join (
+                    select orderId as order_id, count(id) as illegal_num
+                    from OrderToIllegal group by orderId
+                ) o2i on o2i.order_id = o.id
+                where o.orderType = 'illegal'
+                group by o.userId
+            ) ou
+            $cte_condition_str
+        )
+        select ou_cte.user_id, ou_cte.order_num, ou_cte.pay_order_num, ou_cte.processed_illegal_num, rownum, u.createDate as create_date, u.phone, u.uname as user_name
+        from USER_CTE ou_cte
+        left join IAM_USER u on u.userid = ou_cte.user_id        
+        $page_condition_str
+SQL;
+        
+        return self::nativeQuery($sql, $bind);
+    }
+
+    /**
+     * 获取违章订单用户信息总数
+     * @param  array|null $criteria
+     * @return int
+     */
+    public static function getIllegalOrderUserCount(array $criteria=null)
+    {
+        $crt = new Criteria($criteria);
+        $condition_arr = array();
+        $condition_str = '';
+        $bind = array();
+
+        if($crt->user_id)
+        {
+            $condition_arr[] = 'ou.user_id = :user_id';
+            $bind['user_id'] = $crt->user_id;
+        }
+
+        if($crt->pay_order_num or $crt->pay_order_num === '0' or $crt->pay_order_num === 0)
+        {
+            $condition_arr[] = 'ou.pay_order_num = :pay_order_num';
+            $bind['pay_order_num'] = $crt->pay_order_num;
+        }
+
+        if(!empty($condition_arr))
+        {
+            $condition_str = 'where '.implode(' and ', $condition_arr);
+        }
+
+        $sql = <<<SQL
+        select count(1)
+        from
+        (
+            select o.userId as user_id,
+            count(1) as order_num,
+            isnull(count(case when o.state = 'TRADE_SUCCESS' or o.state = 'TRADE_FINISHED' then 1 end), 0) as pay_order_num,
+            isnull(sum(case when o.mark = 'PROCESS_SUCCESS' then o2i.illegal_num end), 0) as processed_illegal_num
+            from PayList o
+            left join (
+                select orderId as order_id, count(id) as illegal_num
+                from OrderToIllegal group by orderId
+            ) o2i on o2i.order_id = o.id
+            where o.orderType = 'illegal'
+            group by o.userId
+        ) ou
+        $condition_str
+SQL;
+        $result = self::fetchOne($sql, $bind, null, Db::FETCH_NUM);
+        return $result[0];
+    }
+
+    /**
      * 获取订单客户端类型列表
      * @return array
      */

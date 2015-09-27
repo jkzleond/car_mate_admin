@@ -171,7 +171,9 @@
                         <li><a href="/statistics/insuranceActStatistics">保险系统行为统计</a></li>
                         {% endif %}
                         {% if 'totalStatistics' in auth%}
-                        <li><a href="/statistics/orderIllegalStatistics">违章代缴业务统计</a></li>
+                        <li><a href="/statistics/orderIllegalStatistics">违章代缴业务订单统计</a></li>
+                        <li><a href="/statistics/orderIllegalUserStatistics">违章代缴业务用户统计</a></li>
+                        <li><a href="/statistics/orderIllegalTrackStatistics">违章代缴业务追踪统计</a></li>
                         {% endif %}
                     </ul>
                 </li>
@@ -276,7 +278,6 @@
                         {% endif %}
                     </ul>
                 </li>
-
                 {% if 'adminUserManager' in auth %}
                 <li class="dropdown"><a href=""><span class="iconfa-th-list"></span>后台管理</a>
                     <ul>
@@ -284,10 +285,6 @@
                     </ul>
                 </li>
                 {% endif %}
-
-
-
-
             </ul>
         </div><!--leftmenu-->
 

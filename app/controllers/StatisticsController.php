@@ -284,7 +284,7 @@ class StatisticsController extends ControllerBase
     }
 
     /**
-     * 违章业务统计页面
+     * 违章业务订单统计页面
      * 
      */
     public function orderIllegalStatisticsAction()
@@ -308,7 +308,7 @@ class StatisticsController extends ControllerBase
     }
 
     /**
-     * 获取违章代缴业务总数统计
+     * 获取违章代缴业务总数统计数据
      * @param  string $start_date
      * @param  string $end_date
      */
@@ -316,6 +316,80 @@ class StatisticsController extends ControllerBase
     {
         $order_illegal_total_statistics = Statistics::getOrderIllegalTotalCount($start_date, $end_date);
         $this->view->setVar('data', $order_illegal_total_statistics);
+    }
+
+    /**
+     * 违章业务用户统计页面
+     * 
+     */
+    public function orderIllegalUserStatisticsAction()
+    {
+        $this->view->setVars(array(
+            'default_end_time' => date('Y-m-d'),
+            'default_start_time' => date('Y-m-d', strtotime('-11 day'))
+        ));
+    }
+
+    /**
+     * 获取违章代缴业务新用户统计数据
+     * @param  string $start_date
+     * @param  string $end_date
+     * @param  string $group_type
+     */
+    public function getOrderIllegalNewUserStatisticsAction($start_date, $end_date, $group_type)
+    {
+        $order_illegal_new_user_statistics = Statistics::getOrderIllegalNewUserStatistics($start_date, $end_date, $group_type);
+        $this->view->setVar('data', $order_illegal_new_user_statistics);
+    }
+
+    /**
+     * 获取违章代缴业务用户总数统计数据
+     * @param  string $start_date
+     * @param  string $end_date
+     */
+    public function getOrderIllegalUserTotalStatisticsAction($start_date, $end_date)
+    {
+        $order_illegal_user_total_statistics = Statistics::getOrderIllegalUserTotalStatistics($start_date, $end_date);
+        $this->view->setVar('data', $order_illegal_user_total_statistics);
+    }
+
+    /**
+     * 违章代缴业务追踪统计页面(统计某个用户的违章代缴相关数据)
+     */
+    public function orderIllegalTrackStatisticsAction()
+    {
+
+        $this->view->setVars(array(
+            'default_end_time' => date('Y-m-d'),
+            'default_start_time' => date('Y-m-d', strtotime('-11 day'))
+        ));
+    }
+
+    /**
+     * 获取指定user_id的用户违章代缴相关统计的数据
+     * @param  string $user_id
+     * @param  string $start_date
+     * @param  string $end_date
+     * @param  string $group_type
+     * @return array
+     */
+    public function getOrderIllegalTrackStatisticsAction($user_id, $start_date, $end_date, $group_type)
+    {
+        $order_illegal_track_statistics = Statistics::getOrderIllegalTrackStatistics($user_id, $start_date, $end_date, $group_type);
+        $this->view->setVar('data', $order_illegal_track_statistics);
+    }
+
+    /**
+     * 获取指定user_id的用户违章代缴相关总数统计的数据
+     * @param  string $user_id
+     * @param  string $start_date
+     * @param  string $end_date
+     * @return array
+     */
+    public function getOrderIllegalTrackTotalStatisticsAction($user_id, $start_date, $end_date)
+    {
+        $order_illegal_track_total_statistics = Statistics::getOrderIllegalTrackTotalStatistics($user_id, $start_date, $end_date);
+        $this->view->setVar('data', $order_illegal_track_total_statistics);
     }
 
 }

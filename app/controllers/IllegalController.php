@@ -175,4 +175,22 @@ class IllegalController extends ControllerBase
             'success' => $success
         ));
     }
+
+    /**
+     * 获取违章代缴用户相关信息列表
+     */
+    public function getOrderUserListAction()
+    {
+        $criteria = $this->request->getPost('criteria');
+        $page_num = $this->request->getPost('page');
+        $page_size = $this->request->getPost('rows');
+        $user_list = Order::getIllegalOrderUserList($criteria, $page_num, $page_size);
+        $user_total = Order::getIllegalOrderUserCount($criteria);
+
+        $this->view->setVar('data', array(
+            'rows' => $user_list,
+            'count' => count($user_list),
+            'total' => $user_total
+        ));
+    }
 }

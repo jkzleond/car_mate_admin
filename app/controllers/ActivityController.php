@@ -347,6 +347,5 @@ class ActivityController extends ControllerBase
         ));
     }
 
-
 }
 

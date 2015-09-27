@@ -17,7 +17,6 @@
         text-align: center;
         vertical-align: middle;
     }
-
 </style>
 <div class="row-fluid">
     <div class="span12">

@@ -452,7 +452,7 @@ SQL;
     }
 
     /**
-     * 获取违章代缴业务统计数据
+     * 获取违章代缴业务统计订单数据
      * @param  string $start_date
      * @param  string $end_date
      * @param  string $group_type
@@ -464,7 +464,7 @@ SQL;
     }
 
     /**
-     * 获取违章代缴业务总数
+     * 获取违章代缴业务订单总数
      * @param  string $start_date
      * @param  string $end_date
      * @return array
@@ -475,15 +475,65 @@ SQL;
     }
 
     /**
+     * 获取违章代缴业务新用户统计数据
+     * @param  string $start_date
+     * @param  string $end_date
+     * @param  string $group
+     * @return array
+     */
+    public static function getOrderIllegalNewUserStatistics($start_date=null, $end_date=null, $group=null)
+    {
+        return self::_call_statistics_process('getOrderIllegalNewUserCount', $start_date, $end_date, $group);
+    }
+
+    /**
+     * 获取违章代缴用户总数统计数据
+     * @param string $start_date
+     * @param string $end_date
+     * @return array
+     */
+    public static function getOrderIllegalUserTotalStatistics($start_date=null, $end_date=null)
+    {
+        return self::_call_statistics_process('getOrderIllegalUserTotalCount', $start_date, $end_date);
+    }
+
+    /**
+     * 获取违章代缴用户跟踪统计数据
+     * @param  string $user_id
+     * @param  string $start_date
+     * @param  string $end_date
+     * @param  string $group_type
+     * @return array
+     */
+    public static function getOrderIllegalTrackStatistics($user_id, $start_date=null, $end_date=null, $group_type=null)
+    {
+        return self::_call_statistics_process('getOrderIllegalTrackCount', $start_date, $end_date, $group_type, null, $user_id);
+    }
+
+    /**
+     * 获取违章代缴用户跟踪总数统计数据
+     * @param  string $user_id
+     * @param  string $start_date
+     * @param  string $end_date
+     * @param  string $group_type
+     * @return array
+     */
+    public static function getOrderIllegalTrackTotalStatistics($user_id, $start_date=null, $end_date=null)
+    {
+        return self::_call_statistics_process('getOrderIllegalTrackTotalCount', $start_date, $end_date, null, null, $user_id);
+    }
+
+    /**
      * 调用指定的存储过程
      * @param $proc_name 过程名称
      * @param $start_date
      * @param $end_date
      * @param null $group_type
      * @param null $province_id
+     * @param null $user_id 调用需要用户名的统计时传入
      * @return array
      */
-    protected static function _call_statistics_process($proc_name, $start_date=null, $end_date=null, $group_type=null, $province_id=null)
+    protected static function _call_statistics_process($proc_name, $start_date=null, $end_date=null, $group_type=null, $province_id=null, $user_id=null)
     {
        /*
         $sql = 'EXEC '.$process_name.' %s ';
@@ -517,7 +567,15 @@ SQL;
        */
 
         //此处调用windows服务器php脚本返回正确的存储过程调用结果
-        $url = "http://116.55.248.76/statistics/statistics.php?proc_name=$proc_name&start_date=$start_date&end_date=$end_date&group_type=$group_type&province_id=$province_id";
+        $url = '';
+        if(!$user_id)
+        {
+            $url = "http://116.55.248.76/statistics/statistics.php?proc_name=$proc_name&start_date=$start_date&end_date=$end_date&group_type=$group_type&province_id=$province_id";
+        }
+        else
+        {
+            $url = "http://116.55.248.76/statistics/statistics.php?proc_name=$proc_name&user_id=$user_id&start_date=$start_date&end_date=$end_date&group_type=$group_type&province_id=$province_id";
+        }
         $json_data = file_get_contents($url);
         $arr_data = json_decode($json_data, true);
         $data = self::_normalize_data($arr_data);

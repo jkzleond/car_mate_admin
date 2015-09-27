@@ -2,94 +2,146 @@
     .easyui-datebox {
         width:120px;
     }
+    div.datagrid * {
+        vertical-align: middle;
+    }
 </style>
 
 <div class="row-fluid">
     <div class="span12">
         <h4 class="widgettitle">查询统计-时间段</h4>
         <div class="widgetcontent nopadding">
-            <form id="user_statistics_form" class="form-inline well" >
-                <div class="row-fluid">
-                    <fieldset class="pull-left span5">
-                        <span class="label">时间</span>
-                        <input type="text" class="easyui-datebox" name="start_date" value="{{ default_start_time }}"/>
-                        <span>至</span>
-                        <input type="text" class="easyui-datebox" name="end_date" value="{{ default_end_time }}" />
-                    </fieldset>
-                    <fieldset class="pull-left span4">
-                        <span class="label">分组方式</span>
-                        <input type="radio" name="group_type" value="hours" /><span>按时间点</span>
-                        <input type="radio" name="group_type" value="days" checked /><span>按天</span>
-                        <input type="radio" name="group_type" value="months" /><span>按月</span>
-                    </fieldset>
-                    <fieldset class="pull-left span2">
-                        <span class="label">图形</span>
-                        <select id="chart_type" name="chart_type" class="span8">
-                            <option value="spline">线状图</option>
-                            <option value="column">柱状图</option>
-                        </select>
-                    </fieldset>
-                    <button id="finder_btn" class="btn btn-primary pull-right span1">确定</button>
+            <div class="row-fluid">
+                <form id="order_illegal_track_statistics_form" class="form-inline well" >
+                    <div class="row-fluid">
+                        <fieldset class="pull-left span5">
+                            <span class="label">时间</span>
+                            <input type="text" class="easyui-datebox" name="start_date" value="{{ default_start_time }}"/>
+                            <span>至</span>
+                            <input type="text" class="easyui-datebox" name="end_date" value="{{ default_end_time }}" />
+                        </fieldset>
+                        <fieldset class="pull-left span4">
+                            <span class="label">分组方式</span>
+                            <input type="radio" name="group_type" value="hours" /><span>按时间点</span>
+                            <input type="radio" name="group_type" value="days" checked /><span>按天</span>
+                            <input type="radio" name="group_type" value="months" /><span>按月</span>
+                        </fieldset>
+                        <fieldset class="pull-left span2">
+                            <span class="label">图形</span>
+                            <select id="chart_type" name="chart_type" class="span8">
+                                <option value="spline">线状图</option>
+                                <option value="column">柱状图</option>
+                            </select>
+                        </fieldset>
+                    </div>
+                </form>    
+            </div>
+            <div class="row-fluid">
+                <div id="order_illegal_user_grid_tb">
+                    <div class="row-fluid" id="order_illegal_user_search_bar">
+                        <div class="row-fluid">
+                            <div class="span4">
+                                <span class="label">用户名</span>
+                                <input type="text" name="user_id" class="input-medium" />
+                            </div>
+                            <div class="span3">
+                                <span class="label">支付订单数</span>
+                                <input type="text" name="pay_order_num" class="input-mini" />
+                            </div>
+                            <div class="span2">
+                                <button class="btn btn-primary" id="order_illegal_user_search_btn"><i class="iconfa-search"></i>查找用户</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </form>
+                <div id="order_illegal_user_grid">  
+                </div>    
+            </div>
             <div class="charts">
                 <div id="charts_container"></div>
                 <div id="charts_container2"></div>
             </div>
-            <table width="100%" >
-                <tr>
-                    <td width="39%" id="totalContainer">
-                        <div id="pie_charts"></div>
-                        <div id="pie_charts2"></div>
-                    </td>
-                    <td width="60%">
-                        <div style="padding:10px;">
-                            <table id="user_total_table" width="100%" class="table" cellpadding="0" cellspacing="1">
-                                <thead>
-                                <tr><th>成交单数</th><th>支付宝单数</th><th>微信单数</th><th>线下支付单数</th><th>Android</th><th>iPhone</th><th>iPad</th><th>iPodTouch</th><th>Windows Phone</th><th>其他</th></tr>
-                                </thead>
-                                <tbody>
-                                
-                                </tbody>
-                            </table>
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="2">
-                        <table id="user_table" width="100%" class="table" cellpadding="0" cellspacing="1">
-                            <thead>
-                            <tr><th>日期</th><th>成交单数</th><th>支付宝</th><th>微信</th><th>线下</th><th>Android</th><th>iPhone</th><th>iPad</th><th>iPodTouch</th><th>Windows Phone</th><th>其他</th><th>总违章条数</th><th>手续费合计</th><th>实际收入合计</th><th>订单环比</th></tr>
-                            </thead>
-                            <tbody>
-                            
-                            </tbody>
-                        </table>
-                    </td>
-                </tr>
-            </table>
+            <div class="row-fluid">
+                <div class="span4">
+                    <div id="pie_charts"></div>
+                    <div id="pie_charts2"></div>
+                </div>
+                <div class="span8">
+                    <table id="user_total_table" width="96%" class="table" cellpadding="0" cellspacing="1">
+                        <thead>
+                        <tr><th>成交单数</th><th>支付宝单数</th><th>微信单数</th><th>线下支付单数</th><th>Android</th><th>iPhone</th><th>iPad</th><th>iPodTouch</th><th>Windows Phone</th><th>其他</th></tr>
+                        </thead>
+                        <tbody>
+                        
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="row-fluid">
+                <div class="span12">
+                    <table id="user_table" width="100%" class="table" cellpadding="0" cellspacing="1">
+                        <thead>
+                        <tr><th>日期</th><th>成交单数</th><th>支付宝</th><th>微信</th><th>线下</th><th>Android</th><th>iPhone</th><th>iPad</th><th>iPodTouch</th><th>Windows Phone</th><th>其他</th><th>总违章条数</th><th>手续费合计</th><th>实际收入合计</th><th>订单环比</th></tr>
+                        </thead>
+                        <tbody>
+                        
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
 <script type="text/javascript">
-    (function($){
+    //页面加载时事件
+    CarMate.page.on_loaded = function(){
 
         /**
          * 控件相关
          */
         //定义日期控件
         var start_date_box = $('[name=start_date].easyui-datebox').datebox({
-            required: true
+            required: true,
+            editable: false
         });
 
         var end_date_box = $('[name=end_date].easyui-datebox').datebox({
-            required: true
+            required: true,
+            editable: false
         });
 
-        $('.datebox input').keydown(function(event){
-            event.preventDefault();
-            return false;
+        //数字控件
+        var pay_order_num_box = $('#order_illegal_user_search_bar [name=pay_order_num]').numberbox({
+            min: 0
+        });
+
+        //已提交过订单用户表格
+        var order_illegal_user_grid = $('#order_illegal_user_grid').datagrid({
+            url: '/illegal/orderUserList.json',
+            title: '违章代缴用户列表',
+            iconCls: 'icon-list',
+            width: '100%',
+            height: 'auto',
+            fitColumns: true,
+            singleSelect: true,
+            nowrap: false,///设置为true，当数据长度超出列宽时将会自动截取
+            striped: true,///显示条纹
+            pagination:true,///分页
+            pageSize:10,///（每页记录数）
+            pageNumber:1,///（当前页码）
+            toolbar: '#order_illegal_user_grid_tb',
+            columns: [[
+                {field:'user_id', title:'用户名', width:'20%', align:'center'},
+                {field:'user_name', title:'用户姓名', width:'20%', align:'center'},
+                {field:'phone', title:'手机号', width:'20%', align:'center'},
+                {field:'order_num', title:'提交订单数', width:'10%', align:'center'},
+                {field:'pay_order_num', title:'支付订单数', width:'10%', align:'center'},
+                {field:'processed_illegal_num', title:'处理条目数', width:'10%', align:'center'},
+                {field:'rownum', title:'操作', width:'10%', align:'center', formatter:function(value, row, index){
+                    return '<button class="btn btn-info illegal-track-statistics-btn" data-user-id="' + row.user_id + '" title="统计"><i class="iconfa-bar-chart"></i></button>';
+                }}
+            ]]
         });
 
         //定义charts控件
@@ -334,16 +386,24 @@
         var pie_charts = $('#pie_charts').highcharts();//查询到统计数据后的响应
         var pie_charts2 = $('#pie_charts2').highcharts();//查询到统计数据后的响应
 
+        //查找按钮点击事件
+        $('#order_illegal_user_search_btn').click(function(event){
+            var criteria = {};
+            criteria.user_id = $('#order_illegal_user_search_bar [name="user_id"]').val();
+            criteria.pay_order_num = $('#order_illegal_user_search_bar [name="pay_order_num"]').val();
+            order_illegal_user_grid.datagrid('load',{criteria: criteria});
+        });
 
-        //查询按钮事件
-        $("#finder_btn").click(function(event){
+        //统计按钮事件
+        $(document).on('click',".illegal-track-statistics-btn",function(event){
             event.preventDefault();
             var condition = {};
+            condition.user_id = $(this).attr('data-user-id');
             condition.start_date = start_date_box.datebox('getValue');
             condition.end_date = end_date_box.datebox('getValue');
-            condition.group_type = $('#user_statistics_form [name=group_type]:checked').val();
-            OrderIllegalStatistics.find(condition);
-            OrderIllegalTotalStatistics.find(condition);
+            condition.group_type = pay_order_num_box.numberbox('getValue');
+            OrderIllegalTrackStatistics.find(condition);
+            OrderIllegalTrackTotalStatistics.find(condition);
             return false;
         });
 
@@ -367,10 +427,10 @@
          * 数据相关
          */
 
-        //定义OrderIllegalStatistics(访问)模型类
-        var OrderIllegalStatistics = CarMate.Model.extend({
+        //定义OrderIllegalTrackStatistics(访问)模型类
+        var OrderIllegalTrackStatistics = CarMate.Model.extend({
             __class_props__:{
-                baseUrl: '/statistics/orderIllegalStatistics',
+                baseUrl: '/statistics/orderIllegalTrackStatistics',
                 buildUrl: function(condition){
                     if(!condition)
                     {
@@ -378,17 +438,18 @@
                     }
                     else
                     {
+                        var user_id = condition.user_id || '';
                         var start_date = condition.start_date || '';
                         var end_date = condition.end_date || '';
                         var group_type = condition.group_type || 'days';
-                        return this.baseUrl + '/' + start_date + '/' + end_date + '/' + group_type + '.json';
+                        return this.baseUrl + '/' + user_id + '/' + start_date + '/' + end_date + '/' + group_type + '.json';
                     }
                 }
             }
         });
 
         //查询到统计数据后的响应
-        OrderIllegalStatistics.on('found',function(event, models){
+        OrderIllegalTrackStatistics.on('found',function(event, models){
             var len = models.length;
             var categories = [];
             var alipay_data = [];
@@ -479,7 +540,7 @@
             charts.get('sum').setData(sum_data, false);
             //设置x轴类别
             charts.xAxis[0].setCategories(categories, false);
-            charts.setTitle(null, {text: $('#user_statistics_form [name=group_type]:checked + span').text()});
+            charts.setTitle(null, {text: $('#order_illegal_track_statistics_form [name=group_type]:checked + span').text()});
             charts.hideLoading();
             charts.redraw();
 
@@ -488,24 +549,24 @@
             charts2.get('wxpayRealIncome').setData(wxpayRealIncome_data, false);
             charts2.get('offlineRealIncome').setData(offlineRealIncome_data, false);
             charts2.xAxis[0].setCategories(categories, false);
-            charts2.setTitle(null, {text: $('#user_statistics_form [name=group_type]:checked + span').text()});
+            charts2.setTitle(null, {text: $('#order_illegal_track_statistics_form [name=group_type]:checked + span').text()});
             charts2.hideLoading();
             charts2.redraw();
 
         });
         //未查询到数据的响应
-        OrderIllegalStatistics.on('notFound',function(){
+        OrderIllegalTrackStatistics.on('notFound',function(){
             charts.hideLoading();
         });
         //查询数据之前
-        OrderIllegalStatistics.on('beforeFind', function(){
+        OrderIllegalTrackStatistics.on('beforeFind', function(){
             charts.showLoading();
         });
 
-        //定义OrderIllegalTotalStatistics模型
-        var OrderIllegalTotalStatistics = CarMate.Model.extend({
+        //定义OrderIllegalTrackTotalStatistics模型
+        var OrderIllegalTrackTotalStatistics = CarMate.Model.extend({
             __class_props__:{
-                baseUrl: '/statistics/orderIllegalTotalStatistics',
+                baseUrl: '/statistics/orderIllegalTrackTotalStatistics',
                 buildUrl: function(condition){
                     if(!condition)
                     {
@@ -513,16 +574,17 @@
                     }
                     else
                     {
+                        var user_id = condition.user_id || '';
                         var start_date = condition.start_date || '';
                         var end_date = condition.end_date || '';
-                        return this.baseUrl + '/' + start_date + '/' + end_date + '.json';
+                        return this.baseUrl + '/' + user_id + '/' + start_date + '/' + end_date + '.json';
                     }
                 }
             }
         });
 
         //查询到访问总量统计数据后的响应
-        OrderIllegalTotalStatistics.on('found',function(event, models){
+        OrderIllegalTrackTotalStatistics.on('found',function(event, models){
             //设置pie_charts
             var model = models[0];
             var series_data = [];
@@ -564,21 +626,17 @@
         });
 
         //未查询到数据的响应
-        OrderIllegalTotalStatistics.on('notFound',function(){
+        OrderIllegalTrackTotalStatistics.on('notFound',function(){
             pie_charts.hideLoading();
         });
         //查询数据之前
-        OrderIllegalTotalStatistics.on('beforeFind', function(){
+        OrderIllegalTrackTotalStatistics.on('beforeFind', function(){
             pie_charts.showLoading();
         });
 
-        //初始加载数据
-        var condition = {};
-        condition.start_date = start_date_box.datebox('getValue');
-        condition.end_date = end_date_box.datebox('getValue');
-        condition.group_type = $('#user_statistics_form [name=group_type]:checked').val();
-        OrderIllegalStatistics.find(condition);
-        OrderIllegalTotalStatistics.find(condition);
-
-    })(jQuery);
+        //页面离开时事件
+        CarMate.page.on_leave = function(){
+            $(document).off('click',".illegal-track-statistics-btn");
+        };
+    };
 </script>

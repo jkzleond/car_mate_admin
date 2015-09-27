@@ -1,7 +1,0 @@
-location / {
-    try_files $uri @ng;
-}
-
-location @ng {
-    rewrite ^(.*)$ /index.php?_url=$1 last;
-}

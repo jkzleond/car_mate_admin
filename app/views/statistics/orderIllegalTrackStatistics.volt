@@ -133,6 +133,7 @@
             toolbar: '#order_illegal_user_grid_tb',
             columns: [[
                 {field:'user_id', title:'用户名', width:'20%', align:'center'},
+                {field:'create_date', title:'注册时间', width:'20%', align:'center'},
                 {field:'user_name', title:'用户姓名', width:'20%', align:'center'},
                 {field:'phone', title:'手机号', width:'20%', align:'center'},
                 {field:'order_num', title:'提交订单数', width:'10%', align:'center'},

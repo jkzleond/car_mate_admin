@@ -359,7 +359,7 @@ SQL;
             ) ou
             $cte_condition_str
         )
-        select ou_cte.user_id, ou_cte.order_num, ou_cte.pay_order_num, ou_cte.processed_illegal_num, rownum, u.createDate as create_date, u.phone, u.uname as user_name
+        select ou_cte.user_id, ou_cte.order_num, ou_cte.pay_order_num, ou_cte.processed_illegal_num, rownum, convert(varchar(20), u.createDate, 23) as create_date, u.phone, u.uname as user_name
         from USER_CTE ou_cte
         left join IAM_USER u on u.userid = ou_cte.user_id        
         $page_condition_str

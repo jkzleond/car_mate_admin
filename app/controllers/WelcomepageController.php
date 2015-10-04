@@ -69,9 +69,60 @@ class WelcomepageController extends ControllerBase
     {
         $creates = $this->request->getPost('creates');
 
-        $adv = new Criteria($creates[0]);
+        $data = $creates[0];
 
-        $success = WelcomePage::addWelcomeAdv($adv->province_id, $adv->url, $adv->pic_data);
+        //格式化repeat_time
+        $repeat_time = '';
+        if( isset($data['repeat_month']) )
+        {
+            $repeat_time .= $data['repeat_month'];  
+        }
+
+        if( isset($data['repeat_day']) )
+        {
+            $repeat_time .= '-'.$data['repeat_day'];
+        }
+
+        if( isset($data['repeat_hour']) )
+        {
+            $repeat_time .= ' '.$data['repeat_hour'];
+        }
+
+        if( isset($data['repeat_minute']) )
+        {
+            $repeat_time .= ':'.$data['repeat_minute'];
+        }
+
+        if($repeat_time)
+        {
+            $data['repeat_time'] = ltrim($repeat_time, '-: ');
+        }
+
+        //持续时间统一转换成分钟
+        $duration = 0;
+
+        if( isset($data['duration_days']) )
+        {
+            $duration += (int)$data['duration_days'] * 24 * 60;  
+        }
+
+        if( isset($data['duration_hours']) )
+        {
+            $duration += (int)$data['duration_hours'] * 60;  
+        }
+
+        if( isset($data['duration_minutes']) )
+        {
+            $duration += (int)$data['duration_minutes'];
+        }
+
+        if($duration > 0)
+        {
+            $data['duration'] = $duration;
+        }
+
+        //print_r($data);
+        $success = WelcomePage::addWelcomeAdv($data);
 
         $this->view->setVar('data', array(
             'success' => $success

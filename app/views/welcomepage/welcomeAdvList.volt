@@ -68,8 +68,8 @@
             <div id="welcome_adv_cu_window">
                 <form id="welcome_adv_cu_form" action="">
                     <div class="row-fluid">
-                        <input name="id" type="hidden"/>
-                        <div class="span6">
+                        <div class="span12">
+                            <input name="id" type="hidden"/>
                             <span class="label">所在省份</span>
                             <select name="province_id">
                                 {% for province in province_list %}
@@ -79,21 +79,217 @@
                         </div>
                     </div>
                     <div class="row-fluid">
-                        <div class="span6">
+                        <div class="span12">
                             <span class="label">相关网址</span>
                             <input type="text" name="url"/>
                         </div>
                     </div>
                     <div class="row-fluid">
-                        <div class="span6">
+                        <div class="span12">
+                            <span class="label">定时</span>
+                            <input type="checkbox" id="welcome_adv_is_clock_checkbox">
+                        </div>
+                    </div>
+                    <div class="row-fluid welcom-adv-clock-options" style="display:none">
+                        <div class="span12">
+                            <fieldset class="well well-small">
+                                <legend>定时选项</legend>
+                                <div class="row-fluid">
+                                    <span class="label">定时类型</span>
+                                    <select name="clock_type" class="input-medium">
+                                        <option value="1" selected>一次</option>
+                                        <option value="2">每年重复</option>
+                                        <option value="3">每月重复</option>
+                                        <option value="4">每天重复</option>
+                                    </select>
+                                </div>
+                                <div id="welcome_adv_one_time_options" class="row-fluid">
+                                    <div class="span6">
+                                        <span class="label">开始时间</span>
+                                        <input type="text" name="start_time" class="input-medium">
+                                    </div>
+                                    <div class="span6">
+                                        <span class="label">结束时间</span>
+                                        <input type="text" name="end_time" class="input-medium">
+                                    </div>
+                                </div>
+                                <div id="welcome_adv_repeat_options" class="row-fluid" style="display:none">
+                                    <div class="row-fluid">
+                                        <div class="span3 welcome-adv-repeat-month">
+                                            <select name="repeat_month" class="input-mini">
+                                                <option value="01">1</option>
+                                                <option value="02">2</option>
+                                                <option value="03">3</option>
+                                                <option value="04">4</option>
+                                                <option value="05">5</option>
+                                                <option value="06">6</option>
+                                                <option value="07">7</option>
+                                                <option value="08">8</option>
+                                                <option value="09">9</option>
+                                                <option value="10">10</option>
+                                                <option value="11">11</option>
+                                                <option value="12">12</option>
+                                            </select>
+                                            <span>月</span>    
+                                        </div>
+                                        <div class="span3 welcome-adv-repeat-day">
+                                            <select name="repeat_day" class="input-mini">
+                                                <option value="01">1</option>
+                                                <option value="02">2</option>
+                                                <option value="03">3</option>
+                                                <option value="04">4</option>
+                                                <option value="05">5</option>
+                                                <option value="06">6</option>
+                                                <option value="07">7</option>
+                                                <option value="08">8</option>
+                                                <option value="09">9</option>
+                                                <option value="10">10</option>
+                                                <option value="11">11</option>
+                                                <option value="12">12</option>
+                                                <option value="13">13</option>
+                                                <option value="14">14</option>
+                                                <option value="15">15</option>
+                                                <option value="16">16</option>
+                                                <option value="17">17</option>
+                                                <option value="18">18</option>
+                                                <option value="19">19</option>
+                                                <option value="20">20</option>
+                                                <option value="21">21</option>
+                                                <option value="22">22</option>
+                                                <option value="23">23</option>
+                                                <option value="24">24</option>
+                                                <option value="25">25</option>
+                                                <option value="26">26</option>
+                                                <option value="27">27</option>
+                                                <option value="28">28</option>
+                                                <option value="29" class="month-n2-day">29</option>
+                                                <option value="30" class="month-n2-day">30</option>
+                                                <option value="31" class="month-big-day month-n2-day">31</option>
+                                            </select>
+                                            <span>日</span>    
+                                        </div>
+                                        <div class="span3 welcome-adv-repeat-hour">
+                                            <select name="repeat_hour" class="input-mini">
+                                                <option value="00">0</option>
+                                                <option value="01">1</option>
+                                                <option value="02">2</option>
+                                                <option value="03">3</option>
+                                                <option value="04">4</option>
+                                                <option value="05">5</option>
+                                                <option value="06">6</option>
+                                                <option value="07">7</option>
+                                                <option value="08">8</option>
+                                                <option value="09">9</option>
+                                                <option value="10">10</option>
+                                                <option value="11">11</option>
+                                                <option value="12">12</option>
+                                                <option value="13">13</option>
+                                                <option value="14">14</option>
+                                                <option value="15">15</option>
+                                                <option value="16">16</option>
+                                                <option value="17">17</option>
+                                                <option value="18">18</option>
+                                                <option value="19">19</option>
+                                                <option value="20">20</option>
+                                                <option value="21">21</option>
+                                                <option value="22">22</option>
+                                                <option value="23">23</option>
+                                            </select>
+                                            <span>时</span>    
+                                        </div>
+                                        <div class="span3 welcome-adv-repeat-minute">
+                                            <select name="repeat_minute" class="input-mini">
+                                                <option value="00">0</option>
+                                                <option value="01">1</option>
+                                                <option value="02">2</option>
+                                                <option value="03">3</option>
+                                                <option value="04">4</option>
+                                                <option value="05">5</option>
+                                                <option value="06">6</option>
+                                                <option value="07">7</option>
+                                                <option value="08">8</option>
+                                                <option value="09">9</option>
+                                                <option value="10">10</option>
+                                                <option value="11">11</option>
+                                                <option value="12">12</option>
+                                                <option value="13">13</option>
+                                                <option value="14">14</option>
+                                                <option value="15">15</option>
+                                                <option value="16">16</option>
+                                                <option value="17">17</option>
+                                                <option value="18">18</option>
+                                                <option value="19">19</option>
+                                                <option value="20">20</option>
+                                                <option value="21">21</option>
+                                                <option value="22">22</option>
+                                                <option value="23">23</option>
+                                                <option value="24">24</option>
+                                                <option value="25">25</option>
+                                                <option value="26">26</option>
+                                                <option value="27">27</option>
+                                                <option value="28">28</option>
+                                                <option value="29">29</option>
+                                                <option value="30">30</option>
+                                                <option value="31">31</option>
+                                                <option value="32">32</option>
+                                                <option value="33">33</option>
+                                                <option value="34">34</option>
+                                                <option value="35">35</option>
+                                                <option value="36">36</option>
+                                                <option value="37">37</option>
+                                                <option value="38">38</option>
+                                                <option value="39">39</option>
+                                                <option value="40">40</option>
+                                                <option value="41">41</option>
+                                                <option value="42">42</option>
+                                                <option value="43">43</option>
+                                                <option value="44">44</option>
+                                                <option value="45">45</option>
+                                                <option value="46">46</option>
+                                                <option value="47">47</option>
+                                                <option value="48">48</option>
+                                                <option value="49">49</option>
+                                                <option value="50">50</option>
+                                                <option value="51">51</option>
+                                                <option value="52">52</option>
+                                                <option value="53">53</option>
+                                                <option value="54">54</option>
+                                                <option value="55">55</option>
+                                                <option value="56">56</option>
+                                                <option value="57">57</option>
+                                                <option value="58">58</option>
+                                                <option value="59">59</option>
+                                            </select>
+                                            <span>分</span>
+                                        </div>    
+                                    </div>
+                                    <div class="row-fluid">
+                                        <div class="span12">
+                                            <span>持续</span>
+                                            <input type="text" name="duration_days" class="input-mini">
+                                            <span>天</span>
+                                            <input type="text" name="duration_hours" class="input-mini">
+                                            <span>小时</span>
+                                            <input type="text" name="duration_minutes" class="input-mini">
+                                            <span>分钟</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </fieldset>
+                        </div>
+                    </div>
+                    <div class="row-fluid">
+                        <div class="span12">
                             <span class="label">图片</span>
                             <input id="welcome_adv_pic_file" type="file" name="picf"/>
                         </div>
                     </div>
                     <div class="row-fluid">
-                        <div class="span12">
+                        <div class="span3"></div>
+                        <div class="span6">
                             <img id="welcome_adv_pic" src="" alt="" class="hidden-none"/>
                         </div>
+                        <div class="span3"></div>
                     </div>
                 </form>
             </div>
@@ -111,6 +307,28 @@
 
         var img_base_url = "{{ url('/welcomeAdvPic') }}";
 
+        //日期事件控件
+        var start_time_box = $('#welcome_adv_cu_form [name="start_time"]').datetimebox({
+            editable: false
+        });
+        var end_time_box = $('#welcome_adv_cu_form [name="end_time"]').datetimebox({
+            
+        });
+
+        //数字控件
+        var duration_days_number_box = $('#welcome_adv_cu_form [name="duration_days"]').numberbox({
+            min: 0,
+            value: 0
+        });
+        var duration_hours_number_box = $('#welcome_adv_cu_form [name="duration_hours"]').numberbox({
+            min: 0,
+            value: 0
+        });
+        var duration_minutes_number_box = $('#welcome_adv_cu_form [name="duration_minutes"]').numberbox({
+            min: 0,
+            value: 0
+        });
+
         var welcome_adv_grid = $('#welcome_adv_grid');
 
         //分页器
@@ -126,6 +344,18 @@
                         $('#welcome_adv_cu_form [name="province_id"]').val('');
                         $('#welcome_adv_cu_form [name="url"]').val('');
                         $('#welcome_adv_cu_form [name="picf"]').val('');
+
+                        //复位定时选项
+                        $('#welcome_adv_is_clock_checkbox').prop('checked', false).change();
+                        $('#welcome_adv_cu_form [name="repeat_month"]').val('01');
+                        $('#welcome_adv_cu_form [name="repeat_day"]').val('01');
+                        $('#welcome_adv_cu_form [name="repeat_hour"]').val('00');
+                        $('#welcome_adv_cu_form [name="repeat_minute"]').val('00');
+
+                        duration_days_number_box.numberbox('setValue', 0);
+                        duration_hours_number_box.numberbox('setValue', 0);
+                        duration_minutes_number_box.numberbox('setValue', 0);
+
                         $('#welcome_adv_pic').attr('src', '').hide();
 
                         welcome_adv_cu_dialog.data('state', 'create');
@@ -148,7 +378,7 @@
         var welcome_adv_cu_dialog = $('#welcome_adv_cu_window').dialog({
             title: '开屏广告添加',
             iconCls: 'icon-plus',
-            width: 'auto',
+            width: '400',
             height: 'auto',
             closed: true,
             shadow: false,
@@ -174,12 +404,28 @@
                             pic_data = $('#welcome_adv_pic').attr('src').match(/base64,(.*)/)[1];
                         }
 
-
                         var welcome_adv = new WelcomeAdv();
 
                         welcome_adv.set('province_id', province_id);
                         welcome_adv.set('url', url);
                         welcome_adv.set('pic_data', pic_data);
+
+                        var is_clock = $('#welcome_adv_is_clock_checkbox').prop('checked');
+
+                        if(is_clock)
+                        {
+                            $('.welcom-adv-clock-options [name]:visible').each(function(i, n){
+                                var key = $(n).attr('name');
+                                var value = $(n).val();
+                                welcome_adv.set(key, value);
+                            });
+
+                            if(welcome_adv.get('clock_type') == 1)
+                            {
+                                welcome_adv.set('start_time', start_time_box.datetimebox('getValue'));
+                                welcome_adv.set('end_time', end_time_box.datetimebox('getValue'));
+                            }
+                        }
 
                         if(win_state == 'create')
                         {
@@ -213,6 +459,85 @@
         /**
          * 事件相关
          */
+        
+        //定时复选框改变事件
+        $('#welcome_adv_is_clock_checkbox').change(function(event){
+            if( $(this).prop('checked') )
+            {
+                $('.welcom-adv-clock-options').show();
+            }
+            else
+            {
+                $('.welcom-adv-clock-options').hide();
+            }
+        });
+
+        //定时类型改变事件
+        $('#welcome_adv_cu_form [name="clock_type"]').change(function(event){
+            var clock_type = $(this).val();
+            if(clock_type == 1)
+            {
+                $('#welcome_adv_one_time_options').show();
+                $('#welcome_adv_repeat_options').hide();
+
+            }
+            else
+            {
+                $('#welcome_adv_repeat_options').show();
+                $('#welcome_adv_one_time_options').hide();
+            }
+
+            if(clock_type == 2)
+            {
+                $('.welcome-adv-repeat-month').show();
+                $('.welcome-adv-repeat-day').show();
+                $('.welcome-adv-repeat-hour').show();
+                $('.welcome-adv-repeat-minute').show();
+            }
+            else if(clock_type == 3)
+            {
+                $('.welcome-adv-repeat-month').hide();
+                $('.welcome-adv-repeat-day').show();
+                $('.welcome-adv-repeat-hour').show();
+                $('.welcome-adv-repeat-minute').show();
+            }
+            else if(clock_type == 4)
+            {
+                $('.welcome-adv-repeat-month').hide();
+                $('.welcome-adv-repeat-day').hide();
+                $('.welcome-adv-repeat-hour').show();
+                $('.welcome-adv-repeat-minute').show();
+            }
+        });
+
+        //月重复选择框改变事件
+        $('#welcome_adv_cu_form [name="repeat_month"]').change(function(event){
+            var month = $(this).val();
+
+            if(month == '02')
+            {
+                $('.month-n2-day').hide();
+            }
+            else
+            {
+                $('.month-n2-day').show();    
+            }
+
+            if(['01', '03', '05', '07', '08', '10', '12'].indexOf(month) >= 0) //大月
+            {
+                $('.month-big-day').show();
+            }
+            else //小月
+            {
+                $('.month-big-day').hide();
+            }
+
+            //修正天选择框
+            if( !$('#welcome_adv_cu_form [name="repeat_day"]').find('option:selected').is(':visible') )
+            {
+                $('#welcome_adv_cu_form [name="repeat_day"]').val('01');
+            }
+        });
 
         //图片选择器改变事件
         $('#welcome_adv_pic_file').change(function(event){
@@ -279,6 +604,75 @@
             $('#welcome_adv_cu_form [name="url"]').val(adv.url);
             $('#welcome_adv_cu_form [name="picf"]').val('');
             $('#welcome_adv_pic').attr('src', img_base_url + '/' + adv.id + '?' + Date.now()).show();
+
+            if(adv.clockType)
+            {
+                $('#welcome_adv_is_clock_checkbox').prop('checked', true).change();
+                $('#welcome_adv_cu_form [name="clock_type"]').val(adv.clockType).change();
+
+                if(adv.clockType == 1)
+                {
+                    start_time_box.datetimebox('setValue', adv.startTime);
+                    end_time_box.datetimebox('setValue', adv.endTime);
+                }
+                else 
+                {
+                    //填写重复时间
+                    var datetime_parts = adv.repeatTime.split(' ');
+                    var date_parts = null;
+                    var time_parts = null;
+                    var month_part = null;
+                    var day_part = null;
+                    var hour_part = null;
+                    var minute_part = null;
+
+                    if(adv.clockType == 2)
+                    {
+                        date_parts = datetime_parts[0].split('-');
+                        time_parts = datetime_parts[1].split(':');
+                        month_part = date_parts[0];
+                        day_part = date_parts[1];
+                        hour_part = time_parts[0];
+                        minute_part = time_parts[1];
+                    }
+                    else if(adv.clockType == 3)
+                    {
+                        date_parts = datetime_parts[0].split('-');
+                        time_parts = datetime_parts[1].split(':');
+                        day_part = date_parts[0];
+                        hour_part = time_parts[0];
+                        minute_part = time_parts[1];
+                    }
+                    else if(adv.clockType == 4)
+                    {
+                        time_parts = datetime_parts[0].split(':');
+                        hour_part = time_parts[0];
+                        minute_part = time_parts[1];
+                    }
+
+                    $('#welcome_adv_cu_form [name=repeat_month]').val(month_part || '01');
+                    $('#welcome_adv_cu_form [name=repeat_day]').val(day_part || '01');
+                    $('#welcome_adv_cu_form [name=repeat_hour]').val(hour_part || '00');
+                    $('#welcome_adv_cu_form [name=repeat_minute]').val(minute_part || '00');
+
+                    //填写持续时间
+                    var duration = adv.duration || 0;
+                    var duration_days = Math.floor(duration / (24 * 60));
+                    duration = duration % (24 * 60);
+
+                    var duration_hours = Math.floor(duration / 60);
+                    duration = duration % 60;
+
+                    var duration_minutes = duration;
+                    duration_days_number_box.numberbox('setValue', duration_days);
+                    duration_hours_number_box.numberbox('setValue', duration_hours);
+                    duration_minutes_number_box.numberbox('setValue', duration_minutes);
+                }
+            }
+            else
+            {
+                $('#welcome_adv_is_clock_checkbox').prop('checked', false).change();   
+            }
 
             welcome_adv_cu_dialog.data('state', 'update');
             var opt = welcome_adv_cu_dialog.dialog('options');
@@ -408,6 +802,59 @@
                 else
                 {
                     tools_bottom += '<i title="使用" class="iconfa-star-empty welcome-adv-pic-tool welcome-adv-enable-btn" data-id="' + row.id +'"></i>'
+                }
+
+
+                if(row.clockType)
+                {
+                    var clock_type_des = null;
+                    if(row.clockType == 1)
+                    {
+                        clock_type_des = row.startTime + '至' + (row.endTime || 'forever');
+                    }
+                    else if(row.clockType == 2)
+                    {
+                        clock_type_des = '每年' + row.repeatTime;
+                    }
+                    else if(row.clockType == 3)
+                    {
+                        clock_type_des = '每月' + row.repeatTime;
+                    }
+                    else if(row.clockType)
+                    {
+                        clock_type_des = '每天' + row.repeatTime;
+                    }
+
+                    var duration_des = '';
+                    if(row.clockType > 1 && row.duration)
+                    {
+                        var duration = row.duration || 0;
+                        var duration_days = Math.floor(duration / (24 * 60));
+                        duration = duration % (24 * 60);
+                        if(duration_days)
+                        {
+                            duration_des += duration_days + '天';
+                        }
+
+                        var duration_hours = Math.floor(duration / 60);
+                        duration = duration % 60;
+                        if(duration_hours)
+                        {
+                            duration_des += duration_hours + '小时';
+                        }
+
+                        if(duration)
+                        {
+                            duration_des += duration + '分钟';
+                        }
+
+                        if(duration_des)
+                        {
+                            duration_des = '持续' + duration_des;
+                        }
+                    }
+
+                    tools_bottom += '<i title="' + clock_type_des + duration_des +'" class="iconfa-time welcome-adv-pic-tool" data-id="' + row.id + '">';
                 }
 
                 $('#welcome_adv_grid').append(

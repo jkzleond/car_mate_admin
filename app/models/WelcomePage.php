@@ -46,7 +46,7 @@ class WelcomePage extends ModelEx
 
         $sql = <<<SQL
         with WELADV_CTE as(
-          select w.id,w.isState,w.createTime,w.provinceId,w.url,p.name provinceName, ROW_NUMBER() over (order by w.id desc) as rownum
+          select w.id,w.isState,w.createTime,w.provinceId,w.url,w.clockType, convert(varchar(20),w.startTime,20) as startTime, convert(varchar(20),w.endTime,20) as endTime,w.repeatTime,w.duration,p.name provinceName, ROW_NUMBER() over (order by w.id desc) as rownum
 		  from WelAdv w
 		  left join Province p on p.id = w.provinceId
 		  $cte_condition_str
@@ -97,18 +97,23 @@ SQL;
 
     /**
      * 添加开屏广告
-     * @param $province_id
-     * @param $url
-     * @param $pic_data
+     * @param array $criteria
      * @return bool
      */
-    public static function addWelcomeAdv($province_id, $url, $pic_data)
+    public static function addWelcomeAdv(array $criteria)
     {
-        $sql = 'insert into WelAdv (provinceId, url, pic) values (:province_id, :url, :pic_data)';
+        $crt = new Criteria($criteria);
+
+        $sql = 'insert into WelAdv (provinceId, url, pic, clockType, startTime, endTime, duration, repeatTime, isState) values (:province_id, :url, :pic_data, :clock_type, :start_time, :end_time, :duration, :repeat_time, 0)';
         $bind = array(
-            'province_id' => $province_id,
-            'url' => $url,
-            'pic_data' => $pic_data
+            'province_id' => $crt->province_id,
+            'url' => $crt->url,
+            'pic_data' => $crt->pic_data,
+            'clock_type' => $crt->clock_type,
+            'start_time' => $crt->start_time,
+            'end_time' => $crt->end_time,
+            'duration'=> $crt->duration,
+            'repeat_time' => $crt->repeat_time
         );
 
         return self::nativeExecute($sql, $bind);
@@ -162,6 +167,25 @@ SQL;
         {
             $field_str .= 'pic = :pic_data, ';
             $bind['pic_data'] = $crt->pic_data;
+        }
+
+        if($crt->clock_type)
+        {
+            $field_str .= 'clockType = :clock_type, ';
+            $bind['clock_type'] = $crt->clock_type;
+
+            if($crt->clock_type == 1)
+            {
+                $field_str .= 'startTime = :start_time, endTime = :end_time, repeatTime = null, duration = null, ';
+                $bind[':start_time'] = $crt->start_time;
+                $bind[':end_time'] = $crt->end_time ? $crt->end_time : null;
+            }
+            else
+            {
+                $field_str .= 'startTime = null, endTime = null,repeatTime = :repeat_time, duration = :duration, ';
+                $bind['repeat_time'] = $crt->repeat_time;
+                $bind['duration'] = $crt->duration;
+            }
         }
 
         if(!$field_str)

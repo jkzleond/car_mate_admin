@@ -162,10 +162,60 @@ class WelcomepageController extends ControllerBase
     {
         $updates = $this->request->getPut('updates');
 
-        $adv = $updates[0];
-        $id = $adv['id'];
+        $data = $updates[0];
+        $id = $data['id'];
 
-        $success = WelcomePage::updateWelcomeAdv($id, $adv);
+        //格式化repeat_time
+        $repeat_time = '';
+        if( isset($data['repeat_month']) )
+        {
+            $repeat_time .= $data['repeat_month'];  
+        }
+
+        if( isset($data['repeat_day']) )
+        {
+            $repeat_time .= '-'.$data['repeat_day'];
+        }
+
+        if( isset($data['repeat_hour']) )
+        {
+            $repeat_time .= ' '.$data['repeat_hour'];
+        }
+
+        if( isset($data['repeat_minute']) )
+        {
+            $repeat_time .= ':'.$data['repeat_minute'];
+        }
+
+        if($repeat_time)
+        {
+            $data['repeat_time'] = ltrim($repeat_time, '-: ');
+        }
+
+        //持续时间统一转换成分钟
+        $duration = 0;
+
+        if( isset($data['duration_days']) )
+        {
+            $duration += (int)$data['duration_days'] * 24 * 60;  
+        }
+
+        if( isset($data['duration_hours']) )
+        {
+            $duration += (int)$data['duration_hours'] * 60;  
+        }
+
+        if( isset($data['duration_minutes']) )
+        {
+            $duration += (int)$data['duration_minutes'];
+        }
+
+        if($duration > 0)
+        {
+            $data['duration'] = $duration;
+        }
+
+        $success = WelcomePage::updateWelcomeAdv($id, $data);
 
         //如果更新了图片数据就删除旧的缓存
         if($success and isset($adv['pic_data']))

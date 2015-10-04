@@ -417,13 +417,46 @@
                             $('.welcom-adv-clock-options [name]:visible').each(function(i, n){
                                 var key = $(n).attr('name');
                                 var value = $(n).val();
+
+                                if(key == 'start_time')
+                                {
+                                    value = start_time_box.datetimebox('getValue');
+                                }
+                                else if(key == 'end_time')
+                                {
+                                    value = end_time_box.datetimebox('getValue');
+                                }
+                                else if(key == 'duration_days')
+                                {
+                                    value = duration_days_number_box.numberbox('getValue');
+                                }
+                                else if(key == 'duration_hours')
+                                {
+                                    value = duration_hours_number_box.numberbox('getValue');
+                                }
+                                else if(key == 'duration_minutes')
+                                {
+                                    value = duration_minutes_number_box.numberbox('getValue');
+                                }
+                                else
+                                {
+                                    value = $(n).val();
+                                }
+
                                 welcome_adv.set(key, value);
                             });
-
-                            if(welcome_adv.get('clock_type') == 1)
+                            
+                            var clock_type = welcome_adv.get('clock_type');
+                            if(clock_type == 1)
                             {
                                 welcome_adv.set('start_time', start_time_box.datetimebox('getValue'));
                                 welcome_adv.set('end_time', end_time_box.datetimebox('getValue'));
+                            }
+                            else
+                            {
+                                welcome_adv.set('duration_days', duration_days_number_box.numberbox('getValue'));
+                                welcome_adv.set('duration_hours', duration_hours_number_box.numberbox('getValue'));
+                                welcome_adv.set('duration_minutes', duration_minutes_number_box.numberbox('getValue'));
                             }
                         }
 

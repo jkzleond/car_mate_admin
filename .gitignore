@@ -1,3 +1,7 @@
-/app/config/config.php
-/app/cache/*
-/public/*
+app/config/config.php
+app/cache/**
+public/**
+*.sublime-project
+*.sublime-workspace
+.idea/**
+.tag*

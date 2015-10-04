@@ -169,23 +169,20 @@ SQL;
             $bind['pic_data'] = $crt->pic_data;
         }
 
-        if($crt->clock_type)
-        {
-            $field_str .= 'clockType = :clock_type, ';
-            $bind['clock_type'] = $crt->clock_type;
+        $field_str .= 'clockType = :clock_type, ';
+        $bind['clock_type'] = $crt->clock_type;    
 
-            if($crt->clock_type == 1)
-            {
-                $field_str .= 'startTime = :start_time, endTime = :end_time, repeatTime = null, duration = null, ';
-                $bind[':start_time'] = $crt->start_time;
-                $bind[':end_time'] = $crt->end_time ? $crt->end_time : null;
-            }
-            else
-            {
-                $field_str .= 'startTime = null, endTime = null,repeatTime = :repeat_time, duration = :duration, ';
-                $bind['repeat_time'] = $crt->repeat_time;
-                $bind['duration'] = $crt->duration;
-            }
+        if($crt->clock_type and $crt->clock_type == 1)
+        {
+            $field_str .= 'startTime = :start_time, endTime = :end_time, repeatTime = null, duration = null, ';
+            $bind[':start_time'] = $crt->start_time;
+            $bind[':end_time'] = $crt->end_time ? $crt->end_time : null;
+        }
+        elseif($crt->clock_type)
+        {
+            $field_str .= 'startTime = null, endTime = null,repeatTime = :repeat_time, duration = :duration, ';
+            $bind['repeat_time'] = $crt->repeat_time;
+            $bind['duration'] = $crt->duration;
         }
 
         if(!$field_str)

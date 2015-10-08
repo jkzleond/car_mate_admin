@@ -1375,7 +1375,7 @@ SQL;
 
         $sql = <<<SQL
         with COMP_CTE as (
-          select companyId, discount, companyName, ename, gift, gift2,
+          select companyId, discount, carPriceDiscount, companyName, shortName, ename, gift, gift2, gift3,
           ROW_NUMBER() OVER ( order by isOrder asc ) as rownum
           from Insurance_Discount
         )
@@ -1402,25 +1402,25 @@ SQL;
 
     /**
      * 添加保险公司
-     * @param null $company_name
-     * @param null $ename
-     * @param null $discount
-     * @param null $gift
-     * @param null $gift2
+     * @param array|null $data
      * @return bool
      */
-    public static function addInsuranceCompany($company_name=null, $ename=null,$discount=null, $gift=null, $gift2=null)
+    public static function addInsuranceCompany(array $data=null)
     {
+        $crt = new Criteria($data);
         $sql = <<<SQL
-        insert into Insurance_Discount(discount,companyName,ename,gift,gift2)
-		values(:discount,:company_name,:ename,:gift,:gift2)
+        insert into Insurance_Discount(companyName,shortName,ename,discount,carPriceDiscount,gift,gift2,gift3)
+		values(:company_name,:short_name,:ename,:discount,:car_price_discount,:gift,:gift2,:gift3)
 SQL;
         $bind = array(
-            'discount' => $discount,
-            'company_name' => $company_name,
-            'ename' => $ename,
-            'gift' => $gift,
-            'gift2' => $gift2
+            'company_name' => $crt->company_name,
+            'short_name' => $crt->short_name,
+            'ename' => $crt->ename,
+            'discount' => $crt->discount,
+            'car_price_discount' => $crt->car_price_discount,
+            'gift' => $crt->gift,
+            'gift2' => $crt->gift2,
+            'gift3' => $crt->gift3
         );
 
         return self::nativeExecute($sql, $bind);
@@ -1429,50 +1429,62 @@ SQL;
     /**
      * 更新保险公司
      * @param $id
-     * @param array $criteria
+     * @param array|null $data
      * @return bool
      */
-    public static function updateInsuranceCompany($id, $criteria=array())
+    public static function updateInsuranceCompany($id, $data=null)
     {
-        $sql ='update Insurance_Discount set %s where companyId = :id';
+        $crt = new Criteria($data);
         $bind = array('id' => $id);
 
         $field_str = '';
 
-        $discount = isset($criteria['discount']) ? $criteria['discount'] : null;
-        $company_name = isset($criteria['company_name']) ? $criteria['company_name'] : null;
-        $ename = isset($criteria['ename']) ? $criteria['ename'] : null;
-        $gift = isset($criteria['gift']) ? $criteria['gift'] : null;
-        $gift2 = isset($criteria['gift2']) ? $criteria['gift2'] : null;
-
-        if($discount)
+        if($crt->company_name)
         {
-            $field_str .= 'discount = :discount, ';
-            $bind['discount'] = $discount;
+          $field_str .= 'companyName = :company_name, ';
+          $bind['company_name'] = $crt->company_name;
         }
 
-        if($company_name)
+        if($crt->short_name)
         {
-            $field_str .= 'companyName = :company_name, ';
-            $bind['company_name'] = $company_name;
+          $field_str .= 'shortName = :short_name, ';
+          $bind['short_name'] = $crt->short_name;
         }
 
-        if($ename)
+        if($crt->ename)
         {
-            $field_str .= 'ename = :ename, ';
-            $bind['ename'] = $ename;
+          $field_str .= 'ename = :ename, ';
+          $bind['ename'] = $crt->ename;
         }
 
-        if($gift)
+        if($crt->discount)
         {
-            $field_str .= 'gift = :gift, ';
-            $bind['gift'] = $gift;
+          $field_str .= 'discount = :discount, ';
+          $bind['discount'] = $crt->discount; 
         }
 
-        if($gift2)
+        if($crt->car_price_discount)
         {
-            $field_str .= 'gift2 = :gift2, ';
-            $bind['gift2'] = $gift2;
+          $field_str .= 'carPriceDiscount = :car_price_discount, ';
+          $bind['car_price_discount'] = $crt->car_price_discount; 
+        }
+
+        if($crt->gift)
+        {
+          $field_str .= 'gift = :gift, ';
+          $bind['gift'] = $crt->gift;
+        }
+
+        if($crt->gift2)
+        {
+          $field_str .= 'gift2 = :gift2, ';
+          $bind['gift2'] = $crt->gift2;
+        }
+
+        if($crt->gift3)
+        {
+          $field_str .= 'gift3 = :gift3, ';
+          $bind['gift3'] = $crt->gift3;
         }
 
         if($field_str)
@@ -1480,7 +1492,7 @@ SQL;
             $field_str = rtrim($field_str, ', ');
         }
 
-        $sql = sprintf($sql, $field_str);
+        $sql ="update Insurance_Discount set $field_str where companyId = :id";
 
         return self::nativeExecute($sql, $bind);
     }

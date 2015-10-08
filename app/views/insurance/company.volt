@@ -21,6 +21,12 @@
                     </div>
                 </div>
                 <div class="control-group">
+                    <span class="control-label">简称</span>
+                    <div class="controls">
+                        <input name="short_name" type="text"/>
+                    </div>
+                </div>
+                <div class="control-group">
                     <span class="control-label">英文名称</span>
                     <div class="controls">
                         <input name="ename" type="text"/>
@@ -33,6 +39,12 @@
                     </div>
                 </div>
                 <div class="control-group">
+                    <span class="control-label">车价折扣</span>
+                    <div class="controls">
+                        <input class="numberspinner-float" name="car_price_discount" type="text"/>
+                    </div>
+                </div>
+                <div class="control-group">
                     <span class="control-label">礼包1</span>
                     <div class="controls">
                         <input class="numberspinner-float" name="gift" type="text"/>
@@ -42,6 +54,12 @@
                     <span class="control-label">礼包2</span>
                     <div class="controls">
                         <input class="numberspinner-float" name="gift2" type="text"/>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <span class="control-label">礼包3</span>
+                    <div class="controls">
+                        <input class="numberspinner-float" name="gift3" type="text"/>
                     </div>
                 </div>
             </form>
@@ -57,6 +75,16 @@
         //spinner
 
         var discount_spinner = $('#insurance_company_cu_form [name="discount"]').numberspinner({
+            precision: 2,
+            max: 1,
+            min: 0.01,
+            value: 0.5,
+            increment: 0.01,
+            width: 60,
+            height: 30
+        });
+
+        var car_price_discount_spinner = $('#insurance_company_cu_form [name="car_price_discount"]').numberspinner({
             precision: 2,
             max: 1,
             min: 0.01,
@@ -86,12 +114,22 @@
             height: 30
         });
 
+        var gift3_spinner = $('#insurance_company_cu_form [name="gift3"]').numberspinner({
+            precision: 2,
+            max: 1,
+            min: 0.00,
+            value: 0.5,
+            increment: 0.01,
+            width: 60,
+            height: 30
+        });
+
         //窗口
         $('#insurance_company_cu_dialog').dialog({
             title: '保险公司添加',
             iconCls: 'icon-plus',
             width: 500,
-            height: 350,
+            height: 'auto',
             closed: true,
             shadow: false,
             modal: true,
@@ -107,16 +145,22 @@
                         var company = new InsuranceCompany();
                         var compamy_id = $('#insurance_company_cu_form [name="company_id"]').val();
                         var company_name = $('#insurance_company_cu_form [name="company_name"]').val();
+                        var short_name = $('#insurance_company_cu_form [name="short_name"]').val();
                         var ename = $('#insurance_company_cu_form [name="ename"]').val();
                         var discount = discount_spinner.numberspinner('getValue');
+                        var car_price_discount = car_price_discount_spinner.numberspinner('getValue');
                         var gift = gift_spinner.numberspinner('getValue');
                         var gift2 = gift2_spinner.numberspinner('getValue');
+                        var gift3 = gift3_spinner.numberspinner('getValue');
 
                         company.set('company_name', company_name);
+                        company.set('short_name', short_name);
                         company.set('ename', ename);
                         company.set('discount', discount);
+                        company.set('car_price_discount', car_price_discount);
                         company.set('gift', gift);
                         company.set('gift2', gift2);
+                        company.set('gift3', gift3);
 
                         if ( btn_state == 'update' )
                         {
@@ -163,10 +207,14 @@
                     //打开窗口前,需要清空表单
                     $('#insurance_company_cu_form [name="company_id"]').val('');
                     $('#insurance_company_cu_form [name="company_name"]').val('');
+                    $('#insurance_company_cu_form [name="short_name"]').val('');
                     $('#insurance_company_cu_form [name="ename"]').val('');
                     discount_spinner.numberspinner('setValue', 0.5);
+                    car_price_discount_spinner.numberspinner('setValue', 0.5);
                     gift_spinner.numberspinner('setValue', 0.5);
                     gift2_spinner.numberspinner('setValue', 0.5);
+                    gift3_spinner.numberspinner('setValue', 0.5);
+                    //设置窗口状态,并打开
                     //设置窗口状态,并打开
                     $('#insurance_company_cu_dialog').data('state', 'create');
 
@@ -179,12 +227,15 @@
                 }
             }],
             columns:[[
-                {field:'companyName', title:'公司名称', width:'20%', align:'center'},
-                {field:'ename',title:'英文名称',width:'20%',align:'center'},
-                {field:'discount',title:'折扣',width:'15%',align:'center'},
-                {field:'gift',title:'礼包',width:'15%',align:'center'},
-                {field:'gift2',title:'礼包2',width:'15%',align:'center'},
-                {field:'companyId',title:'操作',width:'15%',align:'center', formatter: function(value, row, index){
+                {field:'companyName', title:'公司名称', width:'15%', align:'center'},
+                {field:'shortName', title:'简称', width:'10%', align:'center'},
+                {field:'ename',title:'英文名称',width:'15%',align:'center'},
+                {field:'discount',title:'折扣',width:'10%',align:'center'},
+                {field:'carPriceDiscount',title:'车价折扣',width:'10%',align:'center'},
+                {field:'gift',title:'礼包',width:'10%',align:'center'},
+                {field:'gift2',title:'礼包2',width:'10%',align:'center'},
+                {field:'gift3',title:'礼包3',width:'10%',align:'center'},
+                {field:'companyId',title:'操作',width:'12%',align:'center', formatter: function(value, row, index){
                     return '<div class="btn-group"><button class="btn btn-warning insurance-company-edit-btn"><i class="icon-edit"></i></button><button class="btn btn-danger insurance-company-del-btn" data-id="' + value + '"><i class="icon-trash"></i></button></div>';
                 }}
             ]]
@@ -200,10 +251,13 @@
 
             $('#insurance_company_cu_form [name="company_id"]').val(company.companyId);
             $('#insurance_company_cu_form [name="company_name"]').val(company.companyName);
+            $('#insurance_company_cu_form [name="short_name"]').val(company.shortName);
             $('#insurance_company_cu_form [name="ename"]').val(company.ename);
             discount_spinner.numberspinner('setValue', company.discount);
+            car_price_discount_spinner.numberspinner('setValue', company.carPriceDiscount);
             gift_spinner.numberspinner('setValue', company.gift);
             gift2_spinner.numberspinner('setValue', company.gift2);
+            gift3_spinner.numberspinner('setValue', company.gift3);
 
             $('#insurance_company_cu_dialog').data('state', 'update');
 

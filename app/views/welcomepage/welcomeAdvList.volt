@@ -460,6 +460,8 @@
                             }
                         }
 
+                        welcome_adv.set('is_clock', is_clock);
+
                         if(win_state == 'create')
                         {
                             welcome_adv.create();

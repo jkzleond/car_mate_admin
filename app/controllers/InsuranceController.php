@@ -322,16 +322,9 @@ class InsuranceController extends ControllerBase
     public function addInsuranceCompanyAction()
     {
         $creates = $this->request->getPost('creates');
-
         $data = $creates[0];
 
-        $company_name = $data['company_name'];
-        $ename = $data['ename'];
-        $discount = $data['discount'];
-        $gift = $data['gift'];
-        $gift2 = $data['gift2'];
-
-        $success = Insurance::addInsuranceCompany($company_name, $ename, $discount, $gift, $gift2);
+        $success = Insurance::addInsuranceCompany($data);
 
         $this->view->setVar('data', array(
             'success' => $success
@@ -345,11 +338,11 @@ class InsuranceController extends ControllerBase
     {
         $updates = $this->request->getPut('updates');
 
-        $criteria = $updates[0];
+        $data = $updates[0];
 
-        $id = $criteria['id'];
+        $id = $data['id'];
 
-        $success = Insurance::updateInsuranceCompany($id, $criteria);
+        $success = Insurance::updateInsuranceCompany($id, $data);
 
         $this->view->setVar('data', array(
             'success' => $success
@@ -369,7 +362,13 @@ class InsuranceController extends ControllerBase
         ));
     }
 
+    /**
+     * 保险预约页面
+     */
+    public function insuranceReservationAction()
+    {
 
+    }
 
 }
 

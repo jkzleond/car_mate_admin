@@ -131,7 +131,7 @@ SQL;
 
         $sql = <<<SQL
         WITH USER_CTE AS ( select u.*,uname,phone,sex,idcardno,province,city,area,
-		address,sinaWeibo,weixin,hphm,hpzl,people,p.id as payId, o.id as orderId, a.name as aname,astate,needPay,
+		address,sinaWeibo,weixin,hphm,hpzl,people,p.id as payId, o.id as orderId, o.payType as orderPayType, o.payTime as orderPayTime, a.name as aname,astate,needPay,
 		needNotice, i.qqNum,
 		ROW_NUMBER() OVER (ORDER BY u.%s desc) AS rownum from ActivityUser u
 		left join ( select
@@ -144,7 +144,7 @@ SQL;
 		left join (select max(id) as id,userId,orderName from PayList where state='TRADE_FINISHED' group by userId, orderName
 		) p on p.userId=u.userid and p.orderName=a.name
         left join (
-            select id, relId from PayList where orderType = 'activity'    
+            select id, relId, payType, state, payTime from PayList where orderType = 'activity'    
         ) o on o.relId = u.id
 		%s
 		)

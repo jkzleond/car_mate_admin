@@ -181,13 +181,13 @@
                 {
                     $('#activity_user_grid_tb [name=pay_state]').parent().show();
                     $('#activity_user_grid_tb [name=pay_type]').parent().show();
-                    user_grid.datagrid('getColumnOption', 'payType').hidden = false;
+                    user_grid.datagrid('getColumnOption', 'orderPayType').hidden = false;
                 }
                 else
                 {
                     $('#activity_user_grid_tb [name=pay_state]').parent().hide();
                     $('#activity_user_grid_tb [name=pay_type]').parent().hide();
-                    user_grid.datagrid('getColumnOption', 'payType').hidden = true;
+                    user_grid.datagrid('getColumnOption', 'orderPayType').hidden = true;
                 }
 
                 //更具活动要求登记的用户信息显示活动参与用户表格的字段
@@ -397,40 +397,35 @@
                     var open_qq_url = 'http://wpa.qq.com/msgrd?v=3&uin=' + value + '&site=qq&menu=yes';
                     return '<span>' + value + '</span><a target="_blank" href="' + open_qq_url + '"><img src="http://pub.idqqimg.com/qconn/wpa/button/button_121.gif" alt="点击联系该用户"/></a>';
                 }},
-                {field:'payType',title:'缴费情况',width:'10%',align:'center', hidden: true, formatter: function(value, row, index){
+                {field:'orderPayType',title:'缴费情况',width:'10%',align:'center', hidden: true, formatter: function(value, row, index){
                     if(!value) return;
                     var type = null;
 
                     switch(value)
                     {
-                        case 'POS':
-                            type = '线下POS机';
+                        case 'alipay':
+                            type = '支付宝';
                             break;
-                        case 'CASH':
-                            type = '线下现金';
+                        case 'wxpay':
+                            type = '微信支付';
                             break;
-                        case 'ONLINE':
-                            type = '在线支付';
-                            break;
-                        case 'TRANSFER':
-                            type = '支付宝转账';
+                        case 'offline':
+                            type = '线下支付';
                             break;
                         default:
-                            type = '未知类型';
+                            type = '其他';
                             break;
                     }
 
                     var state = null;
 
-                    if(row.payState == 1 || row.onlinePay)
+                    if(row.payState == 1)
                     {
-                        var conv = CarMate.utils.date.mssqlToJs(row.payTime);
-                        var time = CarMate.utils.date('Y-m-d H:i:s', conv);
-                        state = '[完成]' + time;
+                        state = '[支付成功]';
                     }
                     else
                     {
-                        state = '[未完成]';
+                        state = '[未支付]';
                     }
 
                     return type + state;

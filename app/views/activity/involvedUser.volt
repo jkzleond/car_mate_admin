@@ -701,6 +701,7 @@
         $(document).off('click', '.activity-user-notice-btn');
         $(document).off('click', '.activity-user-gain-btn');
         $(document).off('click', '.activity-user-pay-btn');
+        $(document).off('click', '.activity-user-order-detail-btn');
     };
 
 </script>

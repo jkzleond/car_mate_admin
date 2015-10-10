@@ -184,7 +184,7 @@
         <td>
             <button class="pay-user-view btn btn-info" title="查看在线支付详情" data-id="{{ activity.id }}">
                 <i class="iconfa-credit-card"></i>
-                {{ activity.orderNum }}
+                {{ activity.payNum }}
             </button>
         </td>
     </tr>

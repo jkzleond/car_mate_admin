@@ -1579,4 +1579,157 @@ SQL;
 
         return self::fetchOne($sql, $bind);
     }
+
+    /**
+     * 获取保险预约数据列表
+     * @param  array|null $criteria
+     * @param  integer|null    $page_num
+     * @param  integer|null    $page_size
+     * @return array
+     */
+    public static function getInsuranceReservationList(array $criteria=null, $page_num=null, $page_size=null)
+    {
+        $crt = new Criteria($criteria);
+        $cte_condition_arr = array();
+        $cte_condition_str = '';
+        $page_condition_str = '';
+        $bind = array();
+
+        if($crt->user_id)
+        {
+            $cte_condition_arr[] = 'r.user_id = :user_id';
+            $bind['user_id'] = $crt->user_id;
+        }
+
+        if($crt->phone)
+        {
+            $cte_condition_arr[] = 'r.phone = :phone';
+            $bind['phone'] = $crt->phone;
+        }
+
+        if($crt->offer_date)
+        {
+            $cte_condition_arr[] = 'r.offer_date = :offer_date';
+            $bind['offer_date'] = $crt->offer_date;
+        }
+
+        if($crt->start_date)
+        {
+            $cte_condition_arr[] = 'r.create_date >= :start_date';
+            $bind['start_date'] = $crt->start_date;
+        }
+
+        if($crt->end_date)
+        {
+            $cte_condition_arr[] = 'r.create_date <= :end_date';
+            $bind['end_date'] = $crt->end_date;
+        }
+
+        if($crt->user_name)
+        {
+            $cte_condition_arr[] = 'u.uname = :user_name';
+            $bind['user_name'] = $crt->user_name;
+        }
+
+        if($crt->hphm)
+        {
+            $cte_condition_arr[] = 'c.hphm = :hphm';
+            $bind['hphm'] = $crt->hphm;
+        }
+
+        if(!empty($cte_condition_arr))
+        {
+            $cte_condition_str = 'where '.implode(' and ', $cte_condition_arr);
+        }
+
+        if($page_num)
+        {
+            $page_condition_str = 'where rownum between :from and :to';
+            $bind['from'] = ($page_num - 1)*$page_size + 1;
+            $bind['to'] = $page_num*$page_size;
+        }
+
+        $sql = <<<SQL
+        with RSV_CTE as (
+          select r.id, r.user_id, r.phone, convert(varchar(20), r.offer_date, 20) as offer_date, convert(varchar(20), r.create_date, 20) as create_date, u.uname, c.hphm, c.autoname as auto_name, c.frameNumber as frame_number, c.engineNumber as engine_number, row_number() over(order by createDate desc) as rownum 
+          from Insurance_Reservation r
+          left join IAM_USER u on u.userid = r.user_id
+          left join CarInfo c on c.id = r.car_info_id
+          $cte_condition_str
+        )
+        select * from RSV_CTE
+        $page_condition_str
+SQL;
+        return self::nativeQuery($sql, $bind);
+    }
+
+    /**
+     * 获取保险预约总数
+     * @param  array|null $criteria
+     * @return mixed
+     */
+    public static function getInsuranceReservationCount(array $criteria=null)
+    {
+        $crt = new Criteria($criteria);
+        $condition_arr = array();
+        $condition_str = '';
+        $bind = array();
+
+        if($crt->user_id)
+        {
+            $condition_arr[] = 'r.user_id = :user_id';
+            $bind['user_id'] = $crt->user_id;
+        }
+
+        if($crt->phone)
+        {
+            $condition_arr[] = 'r.phone = :phone';
+            $bind['phone'] = $crt->phone;
+        }
+
+        if($crt->offer_date)
+        {
+            $condition_arr[] = 'r.offer_date = :offer_date';
+            $bind['offer_date'] = $crt->offer_date;
+        }
+
+        if($crt->start_date)
+        {
+            $condition_arr[] = 'r.create_date >= :start_date';
+            $bind['start_date'] = $crt->start_date;
+        }
+
+        if($crt->end_date)
+        {
+            $condition_arr[] = 'r.create_date <= :end_date';
+            $bind['end_date'] = $crt->end_date;
+        }
+
+        if($crt->user_name)
+        {
+            $condition_arr[] = 'u.uname = :user_name';
+            $bind['user_name'] = $crt->user_name;
+        }
+
+        if($crt->hphm)
+        {
+            $condition_arr[] = 'c.hphm = :hphm';
+            $bind['hphm'] = $crt->hphm;
+        }
+
+        if(!empty($condition_arr))
+        {
+            $condition_str = 'where '.implode(' and ', $condition_arr);
+        }
+
+        $sql = <<<SQL
+        select count(1)
+        from Insurance_Reservation r
+        left join IAM_USER u on u.userid = r.user_id
+        left join CarInfo c on c.id = r.car_info_id
+        $condition_str
+SQL;
+        $result = self::nativeQuery($sql, $bind, null, Db::FETCH_NUM);
+        return $result[0];
+    }
 }

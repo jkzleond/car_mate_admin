@@ -331,6 +331,21 @@ $insurance->addDelete('/insuranceCompany/{id:\d+}.json', array(
     'action' => 'delInsuranceCompany'
 ));
 
+//保险预约页面
+$insurance->addGet('/insuranceReservation', array(
+    'action' => 'insuranceReservation'
+));
+
+//获取保险数据列表
+$insurance->add('/insuranceReservationList.json', array(
+    'action' => 'getInsuranceReservationList'
+));
+
+//处理保险预约(标记已报价状态)
+$insurance->addPut('/insuranceReservationProcess.json', array(
+    'action' => 'processInsuranceReservation'
+));
+
 $router->mount($insurance);
 
 /**
@@ -550,6 +565,11 @@ $activity->add('/activityUserGain/{ids:(\d+(,\d+)*)}.json', array(
 //用户付款
 $activity->add('/activityUserPay/{ids:(\d+(,\d+)*)}.json', array(
     'action' => 'userPay'
+));
+
+//活动参与用户订单明细
+$activity->addGet('/activityUserOrderDetail/{order_id:\d+}', array(
+    'action' => 'orderDetail'
 ));
 
 //付款活动订单管理页面

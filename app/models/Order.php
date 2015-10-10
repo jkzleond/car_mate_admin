@@ -504,4 +504,41 @@ SQL;
 
         return self::nativeExecute($sql, $bind);
     }
+
+    /**
+     * 获取指定ID活动订单信息
+     * @param  string|int $order_id
+     * @return array
+     */
+    public static function getActivityOrderInfoById($order_id)
+    {
+        $sql = <<<SQL
+        select o.orderNo as order_no, o.tradeNo as trade_no, convert(varchar(20), o.createTime, 20) as create_date,
+        convert(varchar(20), o.payTime, 20) as pay_time, o.payType as pay_type, o.state as pay_state, o.money as order_fee, o.userId as user_id, u.uname as user_name, u.phone
+        from PayList o
+        left join IAM_USER u on u.userid = o.userId
+        where o.id = :order_id
+SQL;
+        $bind = array(
+            'order_id' => $order_id
+        );
+
+        return self::fetchOne($sql, $bind);
+    }
+
+    /**
+     * 获取指定ID活动订单付款项目
+     * @param  string|int $order_id
+     * @return array
+     */
+    public static function getActivityOrderItems($order_id)
+    {
+        $sql = <<<SQL
+        select o2g.number, o2g.price, g.name from OrderToGoods o2g
+        left join Hui_Goods g on g.id = o2g.goods_id
+        where o2g.order_id = :order_id
+SQL;
+        $bind = array('order_id' => $order_id);
+        return self::nativeQuery($sql, $bind);
+    }
 }

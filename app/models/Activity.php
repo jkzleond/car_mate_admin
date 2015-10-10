@@ -23,7 +23,7 @@ class Activity extends ModelEx
         $sql = <<<SQL
         with USER_CTE as
         (
-          select aid,count(aid) as num, sum(state) as gainNum
+          select aid,count(aid) as num, sum(state) as gainNum, sum(payState) as payNum
 		  from ActivityUser where ISNULL(abandon, 0) !=1
 		  group by aid
         ),
@@ -33,24 +33,17 @@ class Activity extends ModelEx
 		  Max(shortNames) as shortNames, Max(depositList) as depositList, Max(createTime) as createTime
           from ActivitySelect
           group by aid
-        ),
-        ORDER_CTE as
-        (
-          select orderName, count(orderName) as num from PayList
-		  group by orderName
         )
 
         select a.id,a.name,place,ISNULL(url,0) url,a.createDate,startDate,endDate,
-		autoStart,a.state,isnull(u.num,0) num,isnull(u.gainNum,0) gainNum,
+		autoStart,a.state,isnull(u.num,0) num,isnull(u.gainNum,0) gainNum, u.payNum,
 		[option],needCheckIn,t.name as typeName, t.id as typeId, a.awardStart, a.awardEnd, a.awardState,
 		a.infos, a.[option], a.needPay, a.needNotice, a.deposit, a.payTypes,
-		s.name as sname, s.optionList, s.shortNames, s.depositList,
-		isnull(o.num, 0) as orderNum
+		s.name as sname, s.optionList, s.shortNames, s.depositList
 		from Activity a
 		left join USER_CTE u on a.id=u.aid
 		left join ActivityType t on t.id=a.type
 		left join AS_CTE s on s.aid = a.id
-        left join ORDER_CTE o on o.orderName = a.name
 		where ISNULL(a.abandon,0)!=1 and a.id = :id
 SQL;
 
@@ -335,7 +328,7 @@ SQL;
 
         if($aid || $aid == 0)
         {
-            $aid_condition = 'where a.id = :aid';
+            $aid_condition = 'where au.aid = :aid';
             $bind['aid'] = $aid;
         }
 
@@ -350,17 +343,21 @@ SQL;
 
         $sql = <<<SQL
         with PAY_CTE as (
-          select p.orderNo, p.orderName, p.money, p.state, p.userId,
-          p.payTime, p.buyerName, p.createTime, ROW_NUMBER() OVER (order by p.createTime desc,
-          p.state desc ) as rownum from PayList as p
-          left join Activity as a on a.name = p.orderName
+          select o.orderNo, o.orderName, o.money, o.state, o.userId,
+          o.payTime, o.createTime, u.uname as buyerName, ROW_NUMBER() OVER (order by o.createTime desc) as rownum
+          from (
+            select orderNo, orderName, money, state, userId,
+            payTime, buyerName, createTime, relId from PayList
+            where orderType = 'activity' and ( state = 'TRADE_SUCCESS' or state = 'TRADE_FINISHED')
+          ) as o
+          left join ActivityUser as au on au.id = o.relId
+          left join IAM_USER as u on u.userid = au.userId
           %s
         )
         select * from PAY_CTE p
         %s
 SQL;
         $sql = sprintf($sql, $aid_condition, $page_condition);
-
         return self::nativeQuery($sql, $bind);
     }
 
@@ -373,7 +370,7 @@ SQL;
 
         if($aid)
         {
-            $field_str .= 'a.id = :aid';
+            $field_str .= 'au.aid = :aid';
             $bind['aid'] = $aid;
         }
 
@@ -383,8 +380,12 @@ SQL;
         }
 
         $sql = <<<SQL
-        select count(p.id) from dbo.PayList p
-		left join Activity as a on a.name = p.orderName
+        select count(1) from (
+            select orderNo, orderName, money, state, userId,
+            payTime, buyerName, createTime, relId from PayList
+            where orderType = 'activity' and ( state = 'TRADE_SUCCESS' or state = 'TRADE_FINISHED')
+        ) o
+        left join ActivityUser as au on au.id = o.relId
 		%s
 SQL;
 

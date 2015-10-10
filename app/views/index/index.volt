@@ -182,6 +182,7 @@
                         {% if 'insurance' in auth %}
                         <li><a href="/insuranceList">保险列表</a></li>
                         <li><a href="/insuranceCompany">保险公司管理</a></li>
+                        <li><a href="/insuranceReservation">保险预约管理</a></li>
                         {% endif %}
 
                     </ul>

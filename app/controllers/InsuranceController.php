@@ -370,5 +370,31 @@ class InsuranceController extends ControllerBase
 
     }
 
+    /**
+     * 获取保险预约列表
+     */
+    public function getInsuranceReservationListAction()
+    {
+        $page_num = $this->request->getPost('page');
+        $page_size = $this->request->getPost('rows');
+        $criteria = $this->request->getPost('criteria');
+
+        $insurance_reservation_list = Insurance::getInsuranceReservationList($criteria, $page_num, $page_size);
+        $insurance_reservation_total = Insurance::getInsuranceReservationCount();
+
+        $this->view->setVar('data', array(
+            'total' => $insurance_reservation_total,
+            'count' => count($insurance_reservation_list),
+            'rows' => $insurance_reservation_list
+        ));
+    }
+
+    /**
+     * 处理保险预约
+     */
+    public function processInsuranceReservationAction()
+    {
+
+    }
 }
 

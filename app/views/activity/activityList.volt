@@ -726,7 +726,6 @@
             pageNumber: 1,///（当前页码）
             columns: [[
                 {field:'orderNo', title:'订单号', width:'15%', align:'center'},
-                {field:'orderName', title:'商品名称', width:'15%', align:'center'},
                 {field:'userId', title:'用户ID', width:'15%', align:'center'},
                 {field:'buyerName', title:'用户名', width:'15%', align:'center'},
                 {field:'money', title:'金额', width:'5%', align:'center'},

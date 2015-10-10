@@ -107,6 +107,7 @@
         <div id="activity_user_window">
             <iframe src="" frameborder="0" style="width: 100%; height:100%"></iframe>
         </div>
+        <div id="activity_user_order_detail_window"></div>
     </div>
 </div>
 
@@ -320,7 +321,7 @@
             //pageList:[50,100,150,200],
             toolbar: '#activity_user_grid_tb',
             frozenColumns: [[
-                {field:'id',title:'操作',width:'10%',align:'center', formatter: function(value, row, index){
+                {field:'id',title:'操作',width:'15%',align:'center', formatter: function(value, row, index){
                     var edit_url = 'http://116.55.248.76:8080/car/userInfo.do?userid=' + row.userid + '&aid=' + row.aid;
                     var edit_btn = '<button class="btn btn-warning activity-user-edit-btn" title="用户编辑" data-url="' + edit_url + '"><i class="icon-edit"></i></button>';
 
@@ -328,15 +329,20 @@
 
                     if( row.needNotice == 1 && ( row.isNoticed == 0 || !row.isNoticed ) )
                     {
-                        other_btn = '<button class="btn btn-info activity-user-notice-btn" title="通知用户" data-id="' + value + '"><i class="icon-bell"></i></button>';
+                        other_btn = '<button class="btn btn-primary activity-user-notice-btn" title="通知用户" data-id="' + value + '"><i class="icon-bell"></i></button>';
                     }
                     else if( (row.isNoticed == 1 || row.needNotice == 0) && row.needPay == 1 && row.payState == 0 && !row.onlinePay )
                     {
-                        other_btn = '<button class="btn btn-info activity-user-pay-btn " title="用户付款" data-id="' + value + '"><i class="iconfa-credit-card" style="color:#000"></i></button>';
+                        other_btn = '<button class="btn btn-primary activity-user-pay-btn " title="用户付款" data-id="' + value + '"><i class="iconfa-credit-card" style="color:#000"></i></button>';
                     }
                     else if( row.state == 0 )
                     {
-                        other_btn = '<button class="btn btn-info activity-user-gain-btn " title="领取" data-id="' + value + '"><i class="iconfa-gift" style="color:#000"></i></button>';
+                        other_btn = '<button class="btn btn-primary activity-user-gain-btn " title="领取" data-id="' + value + '"><i class="iconfa-gift" style="color:#000"></i></button>';
+                    }
+
+                    if(row.needPay == 1 && ( row.orderId === '0' || row.orderId ))
+                    {
+                        other_btn += '<button class="btn btn-info activity-user-order-detail-btn" title="订单明细" data-order-id="' + row.orderId + '"><i class="icon-list"></i></button>';
                     }
 
                     return '<div class="btn-group">' + edit_btn + other_btn + '</div>';
@@ -451,6 +457,58 @@
             openAnimation: 'fade'
         });
 
+        //订单明细窗口
+        var order_detail_window = $('#activity_user_order_detail_window').window({
+            title: '活动订单明细',
+            iconCls: 'icon-info-sign',
+            width: '90%',
+            height: 'auto',
+            closed: true,
+            shadow: false,
+            modal: true,
+            openAnimation: 'fade',
+            onOpen: function(){
+                $(this).window('resize', {
+                    width: 'auto',
+                    height: 'auto'
+                });
+                $(this).window('center');
+            },
+            onLoad: function(){
+
+                var resize_width = 'auto';
+                var resize_height = 'auto';
+
+                var $panel = $(this).window('panel');
+                var panel_width = $panel.outerWidth();
+                var panel_height = $panel.outerHeight();
+                var client_width = window.innerWidth;
+                var client_height = window.innerHeight;
+
+                if(client_width < panel_width)
+                {
+                    resize_width = Math.round(client_width * 0.8);
+                }
+
+                if(client_height < panel_height)
+                {
+                    resize_height = Math.round(client_height * 0.8);
+                }
+
+                $(this).window('resize', {
+                    width: resize_width,
+                    height: resize_height
+                });
+
+                $(this).window('center');
+
+                $(document).trigger('pageLoad:activityUserOrderDetail');
+            },
+            onBeforeClose: function(){
+                $(document).trigger('pageLeave:activityUserOrderDetail');
+            }
+        });
+
 
 
         /**
@@ -553,6 +611,17 @@
             var id = $(this).attr('data-id');
             var url = '/activityUserPay/' + id + '.json';
             single_process('付款', url);
+        });
+
+        //订单明细按钮点击事件
+        $(document).on('click', '.activity-user-order-detail-btn', function(event){
+            var order_id = $(this).attr('data-order-id');
+            var opt = order_detail_window.window('options');
+            opt.href = '/activityUserOrderDetail/' + order_id;
+            order_detail_window
+                .window(opt)
+                .window('setTitle', '活动订单明细')
+                .window('open');
         });
 
         /**

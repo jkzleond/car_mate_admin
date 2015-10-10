@@ -347,5 +347,18 @@ class ActivityController extends ControllerBase
         ));
     }
 
+    /**
+     * 活动参与用户订单明细
+     * @param $order_id 活动ID
+     */
+    public function orderDetailAction($order_id)
+    {
+        $order_info = Order::getActivityOrderInfoById($order_id);
+        $order_items = Order::getActivityOrderItems($order_id);
+        $order_info->items = $order_items;
+
+        $this->view->setVar('order', $order_info);
+    }
+
 }
 

@@ -1651,7 +1651,7 @@ SQL;
 
         $sql = <<<SQL
         with RSV_CTE as (
-          select r.id, r.user_id, r.phone, convert(varchar(20), r.offer_date, 20) as offer_date, convert(varchar(20), r.create_date, 20) as create_date, u.uname, c.hphm, c.autoname as auto_name, c.frameNumber as frame_number, c.engineNumber as engine_number, row_number() over(order by createDate desc) as rownum 
+          select r.id, r.user_id, r.phone, r.mark, convert(varchar(20), r.offer_date, 20) as offer_date, convert(varchar(20), r.create_date, 20) as create_date, u.uname, c.hphm, c.autoname as auto_name, c.frameNumber as frame_number, c.engineNumber as engine_number, row_number() over(order by createDate desc) as rownum 
           from Insurance_Reservation r
           left join IAM_USER u on u.userid = r.user_id
           left join CarInfo c on c.id = r.car_info_id
@@ -1731,5 +1731,28 @@ SQL;
 SQL;
         $result = self::nativeQuery($sql, $bind, null, Db::FETCH_NUM);
         return $result[0];
+    }
+
+    /**
+     * 更新指定ID保险预约数据
+     * @param  int|string $id
+     * @param  array|null $criteria
+     * @return bool
+     */
+    public static function updateInsuranceReservation($id, array $criteria=null)
+    {
+        $crt = new Criteria($criteria);
+        $field_str = '';
+        $bind = array('id' => $id);
+
+        if($crt->mark)
+        {
+            $field_str .= 'mark = :mark';
+            $bind['mark'] = $crt->mark;
+        }
+
+        $sql = "update Insurance_Reservation set $field_str where id =:id";
+
+        return self::nativeExecute($sql, $bind);
     }
 }

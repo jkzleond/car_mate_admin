@@ -44,20 +44,8 @@
                 </tr>
                 {% endfor %}
             </table>
-
-
-
-
-
-
-
-
-
         </div>
-
         <br />
-
-
     </div><!--span8-->
 
     <div id="dashboard-right" style="margin-top:37px;" class="span4">

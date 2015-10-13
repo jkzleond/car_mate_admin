@@ -342,7 +342,7 @@ $insurance->add('/insuranceReservationList.json', array(
 ));
 
 //处理保险预约(标记已报价状态)
-$insurance->addPut('/insuranceReservationProcess.json', array(
+$insurance->addPut('/insuranceReservationProcess/{reservation_id:\d+}.json', array(
     'action' => 'processInsuranceReservation'
 ));
 

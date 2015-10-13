@@ -380,6 +380,7 @@
             {
                 options.dataFilter = function(data_str){
                     var data_object = JSON.parse(data_str);
+                    console.log(data_object);
                     if(!data_object.rows || data_object.rows.length < 1) return data_str;
                   
                     $.each(data_object.rows, function(index, item){

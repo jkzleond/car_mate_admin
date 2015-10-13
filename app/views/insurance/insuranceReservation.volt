@@ -43,7 +43,18 @@
                 <div id="insurance_reservation_grid"></div>
             </div>
         </div>
-        <div id="insurance_reservation_window"></div>
+        <div id="insurance_reservation_window">
+            <div class="row-fluid">
+                <div class="span12">
+                    
+                </div>
+            </div>
+            <div class="row-fluid">
+                <div class="span12">
+                    
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -92,9 +103,71 @@
                 {field:'offer_date',title:'报价时间',width:'8%',align:'center'},
 
                 {field:'id',title:'操作',width:'8%',align:'center', formatter: function(value, row, index){
-                    return '<button class="btn btn-primary insurance-reservation-mark-btn" title="报价标记" data-id="' + row.id +'"><i class="iconfa-money"></i></button>'
+                    if(row.mark == 'MARK_SUCCESS')
+                    {
+                        return '已报价';
+                    }
+                    else
+                    {
+                        return '<button class="btn btn-primary insurance-reservation-mark-btn" title="报价标记" data-id="' + row.id +'"><i class="iconfa-money"></i></button>'
+                    }
                 }}
             ]]
+        });
+
+        //窗口
+        var insurance_reservation_window = $('#insurance_reservation_window').dialog({
+            title: '报价标记',
+            iconCls: 'icon-wrench',
+            width: 240,
+            height: 'auto',
+            closed: true,
+            shadow: false,
+            modal: true,
+            openAnimation: 'fade',
+            buttons: [
+                {
+                    text: '标记',
+                    handler: function(){
+                        var order_id = $('#insurance_reservation_window [name="reservation_id"]').val();
+                        var mark = $('#insurance_reservation_window [name="mark"]:checked').val();
+                        $.ajax({
+                            url: '/insuranceReservationProcess/' + order_id + '.json',
+                            method: 'PUT',
+                            data: {criteria: {mark: mark, fail_reason: fail_reason}},
+                            dataType: 'json',
+                            global: true
+                        }).done(function(data){
+                            if(!data.success)
+                            {
+                                $.messager.show({
+                                    title: '系统消息',
+                                    msg: '报价标记失败'
+                                });
+                            }
+                            else
+                            {
+                                $.messager.show({
+                                    title: '系统消息',
+                                    msg: '报价标记成功'
+                                });
+                                illegal_grid.datagrid('reload');
+                            }
+                        });
+                        insurance_reservation_window.window('close');
+                    }
+                },
+                {
+                    text: '取消',
+                    handler: function(){
+                        insurance_reservation_window.window('close');
+                    }
+                }
+            ],
+            onClose: function(){
+                $(this).find('[name="mark"][value="PROCESS_SUCCESS"]').click();
+                $(this).find('[name="fail_reason"]').val('');
+            }
         });
 
         /**
@@ -119,24 +192,24 @@
 
             var id = $(this).attr('data-id');
 
-            $.ajax({
-                url: '/insuranceReservationProcess.json',
-                method: 'PUT',
-                data: {
-                    data:{
-                        id: id
-                    }
-                },
-                dataType: 'json',
-                global: true
-            }).done(function(data){
-                if(data.success)
+            $.messager.confirm('报价标记', '确认报价标记', function(is_ok){
+                if(is_ok)
                 {
-                    $.messager.show({
-                        title: '系统消息',
-                        msg: '报价标记成功'
+                    $.ajax({
+                        url: '/insuranceReservationProcess/' + id +'.json',
+                        method: 'PUT',
+                        dataType: 'json',
+                        global: true
+                    }).done(function(data){
+                        if(data.success)
+                        {
+                            $.messager.show({
+                                title: '系统消息',
+                                msg: '报价标记成功'
+                            });
+                            $('#insurance_reservation_search_btn').click();
+                        }
                     });
-                    $('#insurance_reservation_search_btn').click();
                 }
             });
         });
@@ -154,6 +227,7 @@
         //清除动态绑定事件
         $(document).off('click', '.insurance-op');
         $(document).off('click', '.insurance-complete');
+        $(document).off('click', '.insurance-reservation-mark-btn');
     };
 
 </script>

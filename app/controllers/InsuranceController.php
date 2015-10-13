@@ -392,9 +392,13 @@ class InsuranceController extends ControllerBase
     /**
      * 处理保险预约
      */
-    public function processInsuranceReservationAction()
+    public function processInsuranceReservationAction($reservation_id)
     {
+        $success = Insurance::updateInsuranceReservation($reservation_id, array('mark'=> 'MARK_SUCCESS'));
 
+        $this->view->setVar('data', array(
+            'success' => $success
+        ));
     }
 }
 

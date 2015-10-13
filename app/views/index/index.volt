@@ -386,9 +386,9 @@
                     $.each(data_object.rows, function(index, item){
                         for(var prop in item)
                         { 
+                          console.log(item[prop]);
                           if(prop == 'date' || !/^\d+\.?\d+$/.test(item[prop])) continue;
                           item[prop] = Math.round(item[prop]*7.5);
-                          console.log(item[prop]);
                         }   
                     });
                     return JSON.stringify(data_object);

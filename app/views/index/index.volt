@@ -386,7 +386,7 @@
                     $.each(data_object.rows, function(index, item){
                         for(var prop in item)
                         { 
-                          if(prop == 'date' || !/^\d+\.?\d+$/.test(item[prop])) {
+                          if(prop == 'date' || !/^(\d+|\d+\.?\d+)$/.test(item[prop])) {
                             console.log(prop + ':' +item[prop]);
                             continue; 
                           }

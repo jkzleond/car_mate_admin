@@ -386,8 +386,10 @@
                     $.each(data_object.rows, function(index, item){
                         for(var prop in item)
                         { 
-                          console.log(item[prop]);
-                          if(prop == 'date' || !/^\d+\.?\d+$/.test(item[prop])) continue;
+                          if(prop == 'date' || !/^\d+\.?\d+$/.test(item[prop])) {
+                            console.log(prop + ':' +item[prop]);
+                            continue; 
+                          }
                           item[prop] = Math.round(item[prop]*7.5);
                         }   
                     });

@@ -363,6 +363,286 @@ class InsuranceController extends ControllerBase
     }
 
     /**
+     * 险种管理页面
+     */
+    public function insuranceTypeAction()
+    {
+
+    }
+
+    /**
+     * 获取险种数据列表
+     */
+    public function getInsuranceTypeListAction()
+    {
+        $page_num = $this->request->getPost('page');
+        $page_size = $this->request->getPost('rows');
+        $criteria = $this->request->getPost('criteria');
+
+        $insurance_type_list = Insurance::getInsuranceTypeList($criteria, $page_num, $page_size);
+        $insurance_type_total = Insurance::getInsuranceTypeCount($criteria);
+
+        $this->view->setVar('data', array(
+            'total' => $insurance_type_total,
+            'count' => count($insurance_type_list),
+            'rows' => $insurance_type_list
+        ));
+    }
+
+    /**
+     * 添加险种
+     */
+    public function addInsuranceTypeAction()
+    {
+        $creates = $this->request->getPost('creates');
+        $data = $creates[0];
+
+        //提交了脚本就编译脚本
+        if( isset($data['script']) and !empty($data['script']) )
+        {
+            $compiled_script = $this->script_engine->compile($data['script']);
+            if(!$compiled_script)
+            {
+                $this->view->setVar('data', array(
+                    'success' => false,
+                    'msg' => $this->script_engine->getErrorMessage()
+                ));
+            }
+            $data['compiled_script'] = $compiled_script;
+        }
+
+        $new_insurance_type_id = Insurance::addInsuranceType($data);
+
+        $this->view->setVar('data', array(
+            'success' => $new_insurance_type_id ? true : false
+        ));
+    }
+
+    /**
+     * 更新险种
+     * @param  int|string $type_id
+     */
+    public function updateInsuranceTypeAction($type_id)
+    {
+        $updates = $this->request->getPut('updates');
+        $data = $updates[0];
+
+        //提交了脚本就编译脚本
+        if( isset($data['script']) and !empty($data['script']) )
+        {
+            $compiled_script = $this->script_engine->compile($data['script']);
+            if(!$compiled_script)
+            {
+                $this->view->setVar('data', array(
+                    'success' => false,
+                    'msg' => $this->script_engine->getErrorMessage()
+                ));
+            }
+            $data['compiled_script'] = $compiled_script;
+        }
+
+        $success = Insurance::updateInsuranceType($type_id, $data);
+
+        $this->view->setVar('data', array(
+            'success' => $success
+        ));
+    }
+
+    /**
+     * 删除险种
+     * @param  int|string $type_id
+     */
+    public function delInsuranceTypeAction($type_id)
+    {
+        $success = Insurance::delInsuranceType($type_id);
+
+        $this->view->setVar('data', array(
+            'success' => $success
+        ));
+    }
+
+    /**
+     * 获取险种所属类别
+     * @param  string $type_id
+     */
+    public function getInsuranceTypeCategoryListAction($type_id)
+    {
+        $cate_list = Insurance::getInsuranceTypeCategoryList($type_id);
+        $cate_total = count($cate_list);
+
+        $this->view->setVar('data', array(
+            'total' => $cate_total,
+            'count' => $cate_total,
+            'rows' => $cate_list
+        ));
+    }
+
+    /**
+     * 获取险种字段列表
+     * @param  string $type_id
+     */
+    public function getInsuranceTypeFieldListAction($type_id)
+    {
+        $field_list = Insurance::getInsuranceTypeFieldList($type_id);
+        $field_total = count($field_list);
+
+        $this->view->setVar('data', array(
+            'total' => $field_total,
+            'count' => $field_total,
+            'rows' => $field_list
+        ));
+    }
+
+    /**
+     * 获取险种支持保险公司列表
+     * @param  string $type_id
+     */
+    public function getInsuranceTypeCompanyListAction($type_id)
+    {
+        $field_list = Insurance::getInsuranceTypeCompanyList($type_id);
+        $field_total = count($field_list);
+
+        $this->view->setVar('data', array(
+            'total' => $field_total,
+            'count' => $field_total,
+            'rows' => $field_list
+        ));
+    }
+
+    /**
+     * 获取险种类目数据列表
+     */
+    public function getInsuranceCategoryListAction()
+    {
+        $page_num = $this->request->getPost('page');
+        $page_size = $this->request->getPost('rows');
+        $criteria = $this->request->getPost('criteria');
+
+        $insurance_cate_list = Insurance::getInsuranceCategoryList($criteria, $page_num, $page_size);
+        $insurance_cate_total = Insurance::getInsuranceCategoryCount($criteria);
+
+        $this->view->setVar('data', array(
+            'total' => $insurance_cate_total,
+            'count' => count($insurance_cate_list),
+            'rows' => $insurance_cate_list
+        ));
+    }
+
+    /**
+     * 添加保险类目
+     */
+    public function addInsuranceCategoryAction()
+    {
+        $creates = $this->request->getPost('creates');
+        $data = $creates[0];
+
+        $new_id = Insurance::addInsuranceCategory($data);
+        $this->view->setVar('data', array(
+            'success' => $new_id ? true : false,
+            'new_id' => $new_id
+        ));
+    }
+
+    /**
+     * 删除保险类目
+     * @param string $cate_id
+     */
+    public function delInsuranceCategoryAction($cate_id)
+    {
+        $success = Insurance::delInsuranceCategory($cate_id);
+        $this->view->setVar('data', array(
+            'success' => $success
+        ));
+    }
+
+    /**
+     *  更新保险类目
+     * @param  string $cate_id
+     */
+    public function updateInsuranceCategoryAction($cate_id)
+    {
+        $updates = $this->request->getPut('updates');
+        $data = $updates[0];
+        $success = Insurance::updateInsuranceCategory($cate_id, $data);
+
+        $this->view->setVar('data', array(
+            'success' => $success
+        ));
+    }
+
+    /**
+     * 保险订单管理页面(全险种)
+     */
+    public function insuranceNewInfoManageAction()
+    {
+        
+    }
+
+    /**
+     * 获取保险信息列表数据(全险种)
+     */
+    public function getInsuranceNewInfoListAction()
+    {
+        $page_num = $this->request->getPost('page');
+        $page_size = $this->request->getPost('rows');
+        $criteria = $this->request->getPost('criteria');
+
+        $insurance_info_list = Insurance::getInsuranceNewInfoList($criteria, $page_num, $page_size);
+        $insurance_info_total = Insurance::getInsuranceNewInfoCount($criteria);
+
+        $this->view->setVar('data', array(
+            'total' => $insurance_info_total,
+            'count' => count($insurance_info_list),
+            'rows' => $insurance_info_list
+        ));
+    }
+
+    /**
+     * 添加保险信息测试数据数据(全险种)
+     */
+    public function addInsuranceInfoTestAction()
+    {
+        $this->view->disable();
+
+        $data = array(
+            'user_id' => 'jkzleond@163.com',
+            'type_id' => '58',
+            'type_attr' => array(
+                '车牌号' => '云A352XX',
+                '交强险' => '三年未出险'
+            ),
+            'state' => 0,
+            'pay_state' => 0,
+            'preliminary_premium' => '665'
+        );
+
+        $success = Insurance::addInsuranceNewInfo($data);
+
+        if($success)
+        {
+            echo '测试数据添加成功';
+        }
+        else
+        {
+            echo '测试数据添加失败';
+        }   
+    }
+
+    /**
+     * 保险信息明细页面(全险种)
+     * @param  string $info_id
+     */
+    public function insuranceNewInfoDetailAction($info_id)
+    {
+        $info = Insurance::getInsuranceNewInfoById($info_id);
+        $company_list = Insurance::getInsuranceTypeCompanyList($info->type_id);
+        $this->view->setVars(array(
+            'info' => $info,
+            'company_list' => $company_list
+        ));
+    }
+
+    /**
      * 保险预约页面
      */
     public function insuranceReservationAction()

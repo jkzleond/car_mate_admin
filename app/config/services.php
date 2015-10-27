@@ -9,6 +9,7 @@ use Phalcon\Mvc\View\Engine\Volt as VoltEngine;
 use Phalcon\Mvc\Model\Metadata\Memory as MetaDataAdapter;
 use Phalcon\Session\Adapter\Files as SessionAdapter;
 use Phalcon\Translate\Adapter\NativeArray as Translation;
+use \Palm\Utils\ScriptEngine;
 
 /**
  * The FactoryDefault Dependency Injector automatically register the right services providing a full stack framework
@@ -124,6 +125,15 @@ $di->setShared('trans', function() use($di) {
     $language = strtolower($language);
     $messages = include __DIR__.'/../messages/'.$language.'.php';
     return new Translation(array('content' => $messages));
+});
+
+/**
+ * 设置脚本引擎(用于全险种)
+ */
+$di->setShared('script_engine', function() use ($config){ 
+    $engine = new ScriptEngine();
+    $engine->setTmpPath($config->application->cacheDir);
+    return $engine;
 });
 
 

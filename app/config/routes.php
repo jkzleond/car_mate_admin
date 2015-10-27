@@ -331,6 +331,81 @@ $insurance->addDelete('/insuranceCompany/{id:\d+}.json', array(
     'action' => 'delInsuranceCompany'
 ));
 
+//险种管理页面
+$insurance->addGet('/insuranceType', array(
+    'action' => 'insuranceType'
+));
+
+//获取险种数据列表
+$insurance->add('/insurance/insuranceTypeList.json', array(
+    'action' => 'getInsuranceTypeList'
+));
+
+//添加险种
+$insurance->addPost('/insurance/insuranceType.json', array(
+    'action' => 'addInsuranceType'
+));
+
+//更新险种
+$insurance->addPut('/insurance/insuranceType/{type_id:\d+}.json', array(
+    'action' => 'updateInsuranceType'
+));
+
+//删除险种
+$insurance->addDelete('/insurance/insuranceType/{type_id:\d+}.json', array(
+    'action' => 'delInsuranceType'
+));
+
+//获取险种所属类目列表
+$insurance->addGet('/insurance/insuranceType/{type_id:\d+}/categoryList.json', array(
+    'action' => 'getInsuranceTypeCategoryList'
+));
+
+//获取险种字段列表
+$insurance->addGet('/insurance/insuranceType/{type_id:\d+}/fieldList.json', array(
+    'action' => 'getInsuranceTypeFieldList'
+));
+
+//获取险种支持公司列表
+$insurance->addGet('/insurance/insuranceType/{type_id:\d+}/companyList.json', array(
+    'action' => 'getInsuranceTypeCompanyList'
+));
+
+//获取险种类目数据
+$insurance->add('/insurance/insuranceCategoryList.json', array(
+    'action' => 'getInsuranceCategoryList'
+));
+
+//添加保险类目
+$insurance->addPost('/insurance/insuranceCategory.json', array(
+    'action' => 'addInsuranceCategory'
+));
+
+//更新保险类目
+$insurance->addPut('/insurance/insuranceCategory/{cate_id:\d+}.json', array(
+    'action' => 'updateInsuranceCategory'
+));
+
+//删除保险类目
+$insurance->addDelete('/insurance/insuranceCategory/{cate_id:\d+}.json', array(
+    'action' => 'delInsuranceCategory'
+));
+
+//保险订单管理页面
+$insurance->addGet('/insuranceNewInfoManage', array(
+    'action' => 'insuranceNewInfoManage'
+));
+
+//获取保险订单列表数据
+$insurance->add('/insurance/newInfoList.json', array(
+    'action' => 'getInsuranceNewInfoList'
+));
+
+//保险订单明细页面(全险种)
+$insurance->addGet('/insurance/newInfoDetail/{info_id:\d+}', array(
+    'action' => 'insuranceNewInfoDetail'
+));
+
 //保险预约页面
 $insurance->addGet('/insuranceReservation', array(
     'action' => 'insuranceReservation'
@@ -1014,3 +1089,36 @@ $router->addDelete('/appException/{id:\d+}.json', array(
     'controller' => 'feedback',
     'action' => 'delAppException'
 ));
+
+/*其他*/
+
+/**
+ * 字段
+ */
+$field = new \Phalcon\Mvc\Router\Group(array(
+    'controller' => 'field'
+));
+
+$field->setPrefix('/field');
+
+//获取字段数据列表
+$field->add('/fieldList.json', array(
+    'action' => 'getFieldList'
+));
+
+//添加字段
+$field->addPost('/field.json', array(
+    'action' => 'addField'
+));
+
+//更新字段
+$field->addPut('/field/{id:\d+}.json', array(
+    'action' => 'updateField'
+));
+
+//删除字段
+$field->addDelete('/field/{id:\d+}.json', array(
+    'action' => 'delField'
+));
+
+$router->mount($field);

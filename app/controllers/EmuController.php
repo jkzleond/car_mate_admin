@@ -238,6 +238,32 @@ class EmuController extends ControllerBase
         echo $res;
     }
 
+    public function seTestAction()
+    {
+        $this->view->disable();
+
+        $code = <<<CODE
+        set a = 0
+        set b = ['name': 1, 'haha':2]
+        for name, value in p.name
+            
+        endfor
+        if 1 == 1
+            return b
+        endif
+CODE;
+
+        $compiled_script = $this->script_engine->compile($code);
+        //echo $compiled_script;
+        if(!$compiled_script){
+            echo $this->script_engine->getErrorMessage();
+            return;
+        }
+
+        $new_func = create_function('$p', $compiled_script);
+        print_r($new_func(new Criteria(array('name'=> array('haha'=> 'haha')))));
+    }
+
     private function _doGet($url, $headers=array(), $cookies='')
     {
         $ch = curl_init();
@@ -248,7 +274,7 @@ class EmuController extends ControllerBase
             CURLOPT_RETURNTRANSFER => 1,
             CURLOPT_COOKIE => $cookies
         ));
-        $result =  curl_exec($ch);
+        $result = curl_exec($ch);
         curl_close($ch);
         return $result;
     }
@@ -268,7 +294,7 @@ class EmuController extends ControllerBase
             CURLOPT_COOKIE => $cookies
         ));
         $result =  curl_exec($ch);
-        curl_close($ch);spl_autoload_extensions();
+        curl_close($ch);
         return $result;
     }
 

@@ -1581,8 +1581,1177 @@ SQL;
     }
 
     /**
-     * 获取保险预约数据列表
+     * 获取险种列表
+     * @param  array $criteria
+     * @param  int   $page_size
+     * @param  int   $page_num
+     * @return array
+     */
+    public static function getInsuranceTypeList(array $criteria=null, $page_num=null, $page_size=null)
+    {
+        $crt = new Criteria($criteria);
+        $cte_str = ''; //用于构造递归查询的CTE语句
+        $cte_condition_str = '';
+        $cte_condition_arr = array();
+        $page_condition_str = '';
+        $bind = array();
+
+        if($crt->name)
+        {
+            $cte_condition_arr[] = 'name like :name';
+            $bind['name'] = '%'.$crt->name.'%';
+        }
+
+        if($crt->ename)
+        {
+            $cte_condition_arr[] = 'ename like :ename';
+            $bind['ename'] = '%'.$crt->ename.'%';
+        }
+
+
+        if($crt->price_type)
+        {
+            $cte_condition_arr[] = 'price_type = :price_type';
+            $bind['price_type'] = $crt->price_type;
+        }
+
+        if($crt->is_push || $crt->is_push === '0' || $crt->is_push === 0)
+        {
+            $cte_condition_arr[] = 'is_push = :is_push';
+            $bind['is_push'] = $crt->is_push;
+        }
+
+        if($crt->p_type)
+        {
+            $cte_condition_arr[] = 'pid = :p_type';
+            $bind['p_type'] = $crt->p_type;
+        }
+
+        if($crt->cate_id)
+        {
+            $cte_str = <<<CTE
+            CATE_CTE as (
+              select id, pid from Insurance_Category as cate where pid = :cate_id or id = :cate_id
+              union all
+              select c.id, c.pid from CATE_CTE as cc
+              inner join Insurance_Category c on c.pid = cc.id
+            ),
+CTE;
+            $cte_condition_arr[] = <<<SQL
+            type.id in
+            (
+              select t2c.type_id from CATE_CTE c
+              left join Insurance_TypeToCategory t2c on t2c.cate_id = c.id
+            )
+SQL;
+            $bind['cate_id'] = $crt->cate_id;
+        }
+
+        if($crt->company_id)
+        { 
+            $cte_condition_arr[] = '[type].id in (select type_id from Insurance_TypeToCompany t2com2 where t2com2.company_id = :company_id)';
+            $bind['company_id'] = $crt->company_id;
+        }
+
+        if(!empty($cte_condition_arr))
+        {
+            $cte_condition_str = 'where '.implode(' and ', $cte_condition_arr);
+        }
+
+        if($page_num)
+        {
+            $page_condition_str = 'where rownum between :from and :to';
+            $bind['from'] = ($page_num - 1) * $page_size + 1;
+            $bind['to'] = $page_num * $page_size; 
+        }
+
+        $sql = <<<SQL
+        with
+        $cte_str
+        INS_TYPE_CTE as (
+          select id, name, price_type, script, price, des, is_push,
+              stuff(
+                  (
+                    select ',' + name from Insurance_Category c
+                    left join Insurance_TypeToCategory t2c on t2c.cate_id = c.id
+                    where t2c.type_id = type.id
+                    for xml path('')
+                  ), 1, 1, ''
+                ) as cates,
+              stuff(
+                (
+                  select ',' + shortName from Insurance_Discount com
+                  left join Insurance_TypeToCompany t2com on t2com.company_id = com.companyId
+                  where t2com.type_id = type.id
+                  for xml path('')
+                ), 1, 1, ''
+              ) as companise,
+              isnull(f.field_num, 0) as field_num,
+              row_number() over (order by type.id) as rownum
+          from Insurance_Type type
+          left join (
+            select type_id, count(1) as field_num from Insurance_TypeToField
+            group by type_id
+          ) f on f.type_id = type.id
+          $cte_condition_str
+        )
+        select * from INS_TYPE_CTE
+        $page_condition_str
+SQL;
+        //echo $sql; exit;
+        return self::nativeQuery($sql, $bind);
+    }
+
+    /**
+     * 获取险种总数
      * @param  array|null $criteria
+     * @return int|mixed
+     */
+    public static function getInsuranceTypeCount(array $criteria=null)
+    {
+        $crt = new Criteria($criteria);
+        $cte_str = '';
+        $condition_str = '';
+        $condition_arr = array();
+        $bind = array();
+
+        if($crt->name)
+        {
+            $condition_arr[] = 'name like :name';
+            $bind['name'] = '%'.$crt->name.'%';
+        }
+
+        if($crt->ename)
+        {
+            $condition_arr[] = 'ename like :ename';
+            $bind['ename'] = '%'.$crt->ename.'%';
+        }
+
+        if($crt->price_type)
+        {
+            $condition_arr[] = 'price_type = :price_type';
+            $bind['price_type'] = $crt->price_type;
+        }
+
+        if($crt->is_push || $crt->is_push === '0' || $crt->is_push === 0)
+        {
+            $condition_arr[] = 'is_push = :is_push';
+            $bind['is_push'] = $crt->is_push;
+        }
+
+        if($crt->p_type)
+        {
+            $cte_condition_arr[] = 'pid = :p_type';
+            $bind['p_type'] = $crt->p_type;
+        }
+
+        if($crt->cate_id)
+        {
+            $cte_str = <<<CTE
+            with CATE_CTE as (
+              select id, pid from Insurance_Category as cate where pid = :cate_id or id = :cate_id
+              union all
+              select c.id, c.pid from CATE_CTE as cc
+              inner join Insurance_Category c on c.pid = cc.id
+            )
+CTE;
+            $condition_arr[] = <<<SQL
+            id in
+            (
+              select t2c.type_id from CATE_CTE c
+              left join Insurance_TypeToCategory t2c on t2c.cate_id = c.id
+            )
+SQL;
+            $bind['cate_id'] = $crt->cate_id;
+        }
+
+        if($crt->company_id)
+        { 
+            $condition_arr[] = <<<SQL
+            id in (select type_id from Insurance_TypeToCompany where company_id = :company_id)
+SQL;
+            $bind['company_id'] = $crt->company_id;
+        }
+
+        if(!empty($condition_arr))
+        {
+            $condition_str = 'where '.implode(' and ', $condition_arr);
+        }
+
+        $sql = <<<SQL
+        $cte_str
+        select count(1) from Insurance_Type
+        $condition_str
+SQL;
+        $result = self::fetchOne($sql, $bind, null, Db::FETCH_NUM);
+        return $result[0];
+    }
+
+    /**
+     * 添加险种
+     * @param array|null $data
+     * @return int       last_insert_id
+     */
+    public static function addInsuranceType(array $data=null)
+    {
+        $crt = new Criteria($data);
+
+
+        $add_type_sql = 'insert into Insurance_Type (name, price_type, price, script, compiled_script, des) values (:name, :price_type, :price, :script, :compiled_script, :des)';
+
+        $add_type_bind = array(
+          'name' => $crt->name,
+          'price_type' => $crt->price_type,
+          'price' => round($crt->price, 2),
+          'script' => $crt->script,
+          'compiled_script' => $crt->compiled_script,
+          'des' => $crt->des
+        );
+
+        $connection = self::_getConnection();
+
+        $connection->begin();
+
+        self::nativeExecute($add_type_sql, $add_type_bind);
+
+        $new_insurance_type_id = $connection->lastInsertId();
+
+        if(!$new_insurance_type_id)
+        {
+            $connection->rollback();
+            return false;
+        }
+
+        $cates = $crt->cates; //Criteria代理类,cates属性实际不存在empty返回true
+        if(is_array($cates) and !empty($cates))
+        {
+            $add_type_cate_success = self::addInsuranceTypeCategory($new_insurance_type_id, $cates);
+            if(!$add_type_cate_success)
+            {
+                $connection->rollback();
+                return false;
+            }
+        }
+
+        $fields = $crt->fields;
+        if(is_array($fields) and !empty($fields))
+        {
+            $add_type_field_success = self::addInsuranceTypeField($new_insurance_type_id, $fields);
+            if(!$add_type_field_success)
+            {
+                $connection->rollback();
+                return false;
+            }
+        }
+
+        $companise = $crt->companise;
+        if(is_array($companise) and !empty($companise))
+        {
+            $add_type_companise_success = self::addInsuranceTypeCompany($new_insurance_type_id, $companise);
+            if(!$add_type_companise_success)
+            {
+                $connection->rollback();
+                return false;
+            }
+        }
+
+        return $connection->commit() ? $new_insurance_type_id : false;
+    }
+
+    /**
+     * 跟新险种
+     * @param  int|string $type_id
+     * @param  array|null $data
+     * @return bool
+     */
+    public static function updateInsuranceType($type_id, array $criteria=null)
+    {
+        $update_type_crt = new Criteria($criteria);
+        $update_type_field_str = '';
+        $update_type_bind = array('id' => $type_id);
+
+        if($update_type_crt->name)
+        {
+            $update_type_field_str .= 'name = :name, ';
+            $update_type_bind['name'] = $update_type_crt->name;
+        }
+
+        if($update_type_crt->price_type)
+        {
+            $update_type_field_str .= 'price_type = :price_type, ';
+            $update_type_bind['price_type'] = $update_type_crt->price_type;
+        }
+
+        if($update_type_crt->price)
+        {
+            $update_type_field_str .= 'price = :price, ';
+            $update_type_bind['price'] = $update_type_crt->price;
+        }
+
+        if($update_type_crt->script)
+        {
+            $update_type_field_str .= 'script = :script, ';
+            $update_type_bind['script'] = $update_type_crt->script;
+        }
+
+        if($update_type_crt->compiled_script)
+        {
+            $update_type_field_str .= 'compiled_script = :compiled_script, ';
+            $update_type_bind['compiled_script'] = $update_type_crt->compiled_script;
+        }
+
+        if($update_type_crt->des)
+        {
+            $update_type_field_str .= 'des = :des, ';
+            $update_type_bind['des'] = $update_type_crt->des;
+        }
+
+        if($update_type_crt->is_push || $update_type_crt->is_push === '0' || $update_type_crt->is_push === 0)
+        {
+            $update_type_field_str .= 'is_push = :is_push, ';
+            $update_type_bind['is_push'] = $update_type_crt->is_push;
+        }
+
+        $update_type_field_str = rtrim($update_type_field_str, ', ');
+
+        $update_type_sql = <<<SQL
+        update Insurance_Type set $update_type_field_str where id = :id
+SQL;
+        $connection = self::_getConnection();
+        $connection->begin();
+
+        $update_type_success =  self::nativeExecute($update_type_sql, $update_type_bind);
+        if(!$update_type_success)
+        {
+            $connection->rollback();
+            return false;
+        }
+
+        $cates = $update_type_crt->cates; //Criteria代理类,cates属性实际不存在empty返回true
+        if(is_array($cates) and !empty($cates))
+        {
+            $del_type_cate_success = self::delInsuranceTypeCategory($type_id);
+            if(!$del_type_cate_success)
+            {
+                $connection->rollback();
+                return false;
+            }
+
+            $add_type_cate_success = self::addInsuranceTypeCategory($type_id, $cates);
+
+            if(!$add_type_cate_success)
+            {
+                $connection->rollback();
+                return false;
+            }
+        }
+
+        $fields = $update_type_crt->fields;
+        if(is_array($fields) and !empty($fields))
+        {
+            $del_type_field_success = self::delInsuranceTypeField($type_id);
+            if(!$del_type_field_success)
+            {
+                $connection->rollback();
+                return false;
+            }
+
+            $add_type_field_success = self::addInsuranceTypeField($type_id, $fields);
+            if(!$add_type_field_success)
+            {
+                $connection->rollback();
+                return false;
+            }
+        }
+
+        $companise = $update_type_crt->companise;
+        if(is_array($companise) and !empty($companise))
+        {
+            $del_type_companise_success = self::delInsuranceTypeCompany($type_id);
+            if(!$del_type_companise_success)
+            {
+                $connection->rollback();
+                return false;
+            }
+
+            $add_type_companise_success = self::addInsuranceTypeCompany($type_id, $companise);
+            if(!$add_type_companise_success)
+            {
+                $connection->rollback();
+                return false;
+            }
+        }
+
+        return $connection->commit();
+    }
+
+    /**
+     * 删除指定ID险种
+     * @param  int|string $type_id
+     * @return bool
+     */
+    public static function delInsuranceType($type_id)
+    {
+        $sql = 'delete from Insurance_Type where id = :type_id';
+        $bind = array('type_id' => $type_id);
+
+        return self::nativeExecute($sql, $bind);
+    }
+
+    /**
+     * 获取指定ID险种所属类目列表
+     * @param  int|string $type_id
+     * @return array
+     */
+    public static function getInsuranceTypeCategoryList($type_id)
+    {
+        $sql = 'select cate_id as id from Insurance_TypeToCategory where type_id = :type_id';
+        $bind = array('type_id' => $type_id);
+
+        return self::nativeQuery($sql, $bind);
+    }
+
+    /**
+     * 获取指定ID险种字段列表
+     * @param  int|string $type_id
+     * @return array
+     */
+    public static function getInsuranceTypeFieldList($type_id)
+    {
+        $sql = <<<SQL
+        select f.id, f.name, f.ename, f.[type], f.[values], f.[default], f.prefix, f.suffix, f.des,
+        t2f.links, t2f.parts, t2f.default_disabled, t2f.default_visible
+        from Insurance_TypeToField t2f
+        left join Field f on f.id = t2f.field_id
+        where type_id = :type_id
+SQL;
+        $bind = array('type_id' => $type_id);
+
+        return self::nativeQuery($sql, $bind);
+    }
+
+    /**
+     * 获取指定ID险种支持保险公司列表
+     * @param  int|string $type_id
+     * @return array
+     */
+    public static function getInsuranceTypeCompanyList($type_id)
+    {
+        $sql = <<<SQL
+        select com.companyId, com.companyName, com.ename, com.shortName,
+        t2com.discount_type, t2com.discount_percent, t2com.discount_setting
+        from Insurance_TypeToCompany t2com
+        left join Insurance_Discount com on com.companyId = t2com.company_id
+        where type_id = :type_id
+SQL;
+        $bind = array('type_id' => $type_id);
+
+        return self::nativeQuery($sql, $bind);
+    }
+
+    /**
+     * 添加险种类目
+     * @param int|string $type_id
+     * @param array  $cate_ids
+     * @return bool
+     */
+    public static function addInsuranceTypeCategory($type_id, array $cate_ids)
+    {
+        $values_str = '';
+        $bind = array('type_id' => $type_id);
+
+        foreach($cate_ids as $index => $cate_id)
+        {
+            $values_str .= '(:type_id,'.':cate_id_'.$index.'), ';
+            $bind['cate_id_'.$index] = $cate_id;
+        }
+
+        $values_str = rtrim($values_str, ', ');
+
+        $sql = "insert into Insurance_TypeToCategory (type_id, cate_id) values $values_str";
+
+        return self::nativeExecute($sql, $bind);
+    }
+
+    /**
+     * 添加险种字段
+     * @param int|string $type_id
+     * @param array  $fields
+     * @return bool
+     */
+    public static function addInsuranceTypeField($type_id, array $fields)
+    {
+        $values_str = '';
+        $bind = array('type_id' => $type_id);
+
+        foreach($fields as $index => $field)
+        {
+            $field_crt = new Criteria($field);
+            $values_str .= "(:type_id, :field_id_$index, :parts_$index, :links_$index, :default_disabled_$index, :default_visible_$index), ";
+            $bind['field_id_'.$index] = $field_crt->id;
+            $bind['parts_'.$index] = $field_crt->parts;
+
+            $links = $field_crt->links;
+            $bind['links_'.$index] = ( is_array($links) and !empty($links) ) ? json_encode($links) : '[]';
+            $bind['default_disabled_'.$index] = $field_crt->default_disabled;
+            $bind['default_visible_'.$index] = $field_crt->default_visible;
+        }
+
+        $values_str = rtrim($values_str, ', ');
+
+        $sql = "insert into Insurance_TypeToField (type_id, field_id, parts, links, default_disabled, default_visible) values $values_str";
+
+        return self::nativeExecute($sql, $bind);
+    }
+
+    /**
+     * 添加险种支持公司
+     * @param int|string $type_id
+     * @param array  $companise
+     * @return bool
+     */
+    public static function addInsuranceTypeCompany($type_id, array $companise)
+    {
+        $values_str = '';
+        $bind = array('type_id' => $type_id);
+
+        foreach($companise as $index => $company)
+        {
+            $company_crt = new Criteria($company);
+            $values_str .= "(:type_id, :company_id_$index, :discount_type_$index, :discount_percent_$index, :discount_setting_$index), ";
+            $bind["company_id_$index"] = $company_crt->id;
+            $bind["discount_type_$index"] = $company_crt->discount_type;
+            $bind["discount_percent_$index"] = (int) $company_crt->discount_percent;
+            $bind["discount_setting_$index"] = $company_crt->discount_setting;
+        }
+
+        $values_str = rtrim($values_str, ', ');
+
+        $sql = "insert into Insurance_TypeToCompany (type_id, company_id, discount_type, discount_percent, discount_setting) values $values_str";
+        return self::nativeExecute($sql, $bind);
+    }
+
+    /**
+     * 删除指定ID险种关联的类目
+     * @param  int $type_id
+     * @return bool
+     */
+    public static function delInsuranceTypeCategory($type_id)
+    {
+        $sql = 'delete from Insurance_TypeToCategory where type_id = :type_id';
+        $bind = array('type_id' => $type_id);
+
+        return self::nativeExecute($sql, $bind);
+    }
+
+    /**
+     * 删除指定ID险种字段
+     * @param  int $type_id
+     * @return bool
+     */
+    public static function delInsuranceTypeField($type_id)
+    {
+        $sql = 'delete from Insurance_TypeToField where type_id = :type_id';
+        $bind = array('type_id' => $type_id);
+
+        return self::nativeExecute($sql, $bind);
+    }
+
+    /**
+     * 删除指定ID险种类保险公司
+     * @param  int $type_id
+     * @return bool
+     */
+    public static function delInsuranceTypeCompany($type_id)
+    {
+        $sql = 'delete from Insurance_TypeToCompany where type_id = :type_id';
+        $bind = array('type_id' => $type_id);
+
+        return self::nativeExecute($sql, $bind);
+    }
+
+    /**
+     * 获取保险类目数据列表
+     * @param  array  $criteria
+     * @param  int    $page_num
+     * @param  int    $page_size
+     * @return array
+     */
+    public static function getInsuranceCategoryList(array $criteria=null, $page_num=null, $page_size=null)
+    {
+        $crt = new Criteria($criteria);
+        $cte_condition_str = '';
+        $cte_condition_arr = array();
+        $page_condition_str = '';
+        $bind = array();
+
+        if($crt->name)
+        {
+            $cte_condition_arr[] = 'name like :name';
+            $bind['name'] = '%'.$crt->name.'%';
+        }
+
+        if($crt->p_cate)
+        {
+            $cte_condition_arr[] = 'pid = :p_cate';
+            $bind['p_cate'] = $crt->p_cate;
+        }
+
+        if(!empty($cte_condition_arr))
+        {
+            $cte_condition_str = 'where '.implode(' and ', $cte_condition_arr);
+        }
+
+        if($page_num)
+        {
+            $page_condition_str = 'where rownum between :from and :to';
+            $bind['from'] = ($page_num - 1) * $page_size + 1;
+            $bind['to'] = $page_num * $page_size; 
+        }
+
+        $sql = <<<SQL
+        with INS_CATE_CTE as (
+          select id, name, des, pid, row_number() over(order by display_order asc) as rownum from Insurance_Category
+          $cte_condition_str
+        )
+        select * from INS_CATE_CTE
+        $page_condition_str
+SQL;
+        return self::nativeQuery($sql, $bind);
+    }
+
+    /**
+     * 获取保险类目总数
+     * @param  array|null $criteria
+     * @return int|string
+     */
+    public static function getInsuranceCategoryCount(array $criteria=null)
+    {
+        $crt = new Criteria($criteria);
+        $condition_str = '';
+        $condition_arr = array();
+        $bind = array();
+
+        if($crt->name)
+        {
+            $condition_arr[] = 'name like :name';
+            $bind['name'] = '%'.$crt->name.'%';
+        }
+
+        if($crt->p_cate)
+        {
+            $cte_condition_arr[] = 'pid = :p_type';
+            $bind['p_type'] = $crt->p_type;
+        }
+
+        if(!empty($condition_arr))
+        {
+            $condition_str = 'where '.implode(' and ', $condition_arr);
+        }
+
+        $sql = <<<SQL
+        select count(1) from Insurance_Category
+        $condition_str
+SQL;
+        $result = self::fetchOne($sql, $bind, null, Db::FETCH_NUM);
+        return $result[0];
+    }
+
+    /**
+     * 添加保险类目
+     * @param array|null $data
+     */
+    public static function addInsuranceCategory(array $data=null)
+    {
+        $crt = new Criteria($data);
+
+        $sql = 'insert into Insurance_Category (name, pid, des) values (:name, :pid, :des)';
+        $bind = array(
+          'name' => $crt->name,
+          'pid' => $crt->pid,
+          'des' => $crt->des
+        );
+
+        $success = self::nativeExecute($sql, $bind);
+
+        if(!$success) return false;
+
+        $connection = self::_getConnection();
+
+        return $connection->lastInsertId();
+    }
+
+    /**
+     * 更新险种类目
+     * @param  int|string $cate_id
+     * @param  array $criteria
+     * @return bool
+     */
+    public static function updateInsuranceCategory($cate_id, array $criteria=null)
+    {   
+        $crt = new Criteria($criteria);
+        $field_str = '';
+        $bind = array('id' => $cate_id);
+
+        if($crt->name)
+        {
+            $field_str .= 'name = :name, ';
+            $bind['name'] = $crt->name;
+        }
+
+        if($crt->pid)
+        {
+            $field_str .= 'pid = :pid, ';
+            $bind['pid'] = $crt->pid;
+        }
+
+        if($crt->display_order)
+        {
+            $field_str .= 'display_order = :display_order, ';
+            $bind['display_order'] = $crt->display_order;
+        }
+
+        if($field_str)
+        {
+            $field_str = rtrim($field_str, ', ');
+        }
+
+        $sql = <<<SQL
+        update Insurance_Category set $field_str where id = :id
+SQL;
+        return self::nativeExecute($sql, $bind);
+    }
+
+    /**
+     * 删除险种类目
+     * @param  int|string $cate_id
+     * @return bool
+     */
+    public static function delInsuranceCategory($cate_id)
+    {
+        $sql = "delete from Insurance_Category where id = :id";
+        $bind = array('id' => $cate_id);
+        return self::nativeExecute($sql, $bind);
+    }
+
+    /**
+     * 获取保险信息列表(全险种)
+     * @param  array|null $criteria
+     * @param  [type]     $page_num
+     * @param  [type]     $page_size
+     * @return [type]
+     */
+    public static function getInsuranceNewInfoList(array $criteria=null, $page_num=null, $page_size=null)
+    {
+        $crt = new Criteria($criteria);
+        $cte_condition_arr = array();
+        $cte_condition_str = '';
+        $page_condition_str = '';
+
+        if($crt->user_id)
+        {
+            $cte_condition_arr[] = 'i.user_id like :user_id';
+            $bind['user_id'] = '%'.$crt->user_id.'%';
+        }
+
+        if($crt->phone)
+        {
+            $cte_condition_arr[] = 'u.phone like :phone';
+            $bind['phone'] = '%'.$crt->phone.'%';
+        }
+
+        if($crt->company_id)
+        {
+            $cte_condition_arr[] = 'i.company_id = :company_id';
+            $bind['company_id'] = $crt->company_id;
+        }
+
+        if($crt->type_id)
+        {
+            $cte_condition_arr[] = 'i.type_id = :type_id';
+            $bind['type_id'] = $crt->type_id;
+        }
+
+        if($crt->state)
+        {
+            $cte_condition_arr[] = 'i.state = :state';
+            $bind['state'] = $crt->state;
+        }
+
+        if($crt->pay_state)
+        {
+            $cte_condition_arr[] = 'i.pay_state = :pay_state';
+            $bind['pay_state'] = $crt->pay_state;
+        }
+
+        if($crt->policy_no)
+        {
+            $cte_condition_arr[] = 'i.policy_no = :policy_no';
+            $bind['policy_no'] = $crt->policy_no;
+        }
+
+        if($crt->start_date)
+        {
+            $cte_condition_arr[] = 'datediff(dd, :start_date, i.create_date) >= 0';
+            $bind['start_date'] = $crt->start_date;
+        }
+
+        if($crt->end_date)
+        {
+            $cte_condition_arr[] = 'datediff(dd, i.create_date, :end_date) >= 0';
+            $bind['end_date'] = $crt->end_date;
+        }
+
+        if(!empty($cte_condition_arr))
+        {
+            $cte_condition_str = 'where '.implode(' and ', $cte_condition_arr);
+        }
+
+        if($page_num)
+        {
+            $page_condition_str = 'where rownum between :from and :to';
+            $bind['from'] = ($page_num - 1) * $page_size + 1;
+            $bind['to'] = $page_num * $page_size; 
+        }
+
+        $sql = <<<SQL
+        with INFO_CTE as (
+          select i.id, i.user_id, i.preliminary_premium, i.policy_fee, i.state, i.pay_state, i.policy_no, convert(varchar(20),
+          i.create_date, 20) as create_date, convert(varchar(20), i.pay_date, 20) as pay_date,
+          u.uname as user_name, u.phone, t.name as type_name, c.companyName as company_name,
+          row_number() over (order by i.create_date desc) as rownum
+          from Insurance_NewInfo i
+          left join IAM_USER u on u.userid = i.user_id
+          left join Insurance_Type t on t.id = i.type_id
+          left join Insurance_Discount c on c.companyId = i.company_id
+          $cte_condition_str
+        )
+        select * from INFO_CTE
+        $page_condition_str
+SQL;
+        return self::nativeQuery($sql, $bind);
+    }
+
+    /**
+     * 获取保险信息数据总数(全险种)
+     * @param  array|null $criteria
+     * @return int
+     */
+    public static function getInsuranceNewInfoCount(array $criteria=null)
+    {
+        $crt = new Criteria($criteria);
+        $condition_arr = array();
+        $condition_str = '';
+        $bind = array();
+
+        if($crt->user_id)
+        {
+            $condition_arr[] = 'i.user_id like :user_id';
+            $bind['user_id'] = '%'.$crt->user_id.'%';
+        }
+
+        if($crt->phone)
+        {
+            $condition_arr[] = 'u.phone like :phone';
+            $bind['phone'] = '%'.$crt->phone.'%';
+        }
+
+        if($crt->company_id)
+        {
+            $condition_arr[] = 'i.company_id = :company_id';
+            $bind['company_id'] = $crt->company_id;
+        }
+
+        if($crt->type_id)
+        {
+            $condition_arr[] = 'i.type_id = :type_id';
+            $bind['type_id'] = $crt->type_id;
+        }
+
+        if($crt->state)
+        {
+            $condition_arr[] = 'i.state = :state';
+            $bind['state'] = $crt->state;
+        }
+
+        if($crt->pay_state)
+        {
+            $condition_arr[] = 'i.pay_state = :pay_state';
+            $bind['pay_state'] = $crt->pay_state;
+        }
+
+        if($crt->policy_no)
+        {
+            $condition_arr[] = 'i.policy_no = :policy_no';
+            $bind['policy_no'] = $crt->policy_no;
+        }
+
+        if($crt->start_date)
+        {
+            $condition_arr[] = 'datediff(dd, :start_date, i.create_date) >= 0';
+            $bind['start_date'] = $crt->start_date;
+        }
+
+        if($crt->end_date)
+        {
+            $condition_arr[] = 'datediff(dd, i.create_date, :end_date) >= 0';
+            $bind['end_date'] = $crt->end_date;
+        }
+
+        if(!empty($condition_arr))
+        {
+            $condition_str = 'where '.implode(' and ', $condition_arr);
+        }
+
+        $sql = <<<SQL
+        select count(1)
+        from Insurance_NewInfo i
+        left join IAM_USER u on u.userid = i.user_id
+        left join Insurance_Type t on t.id = i.type_id
+        left join Insurance_Discount c on c.companyId = i.company_id
+        $condition_str
+SQL;
+
+        $result = self::fetchOne($sql, $bind, null, Db::FETCH_NUM);
+
+        return $result[0];
+    }
+
+    /**
+     * 获取指定保险信息(全险种)
+     * @param  int|string $id
+     * @return object
+     */
+    public static function getInsuranceNewInfoById($info_id)
+    {
+        $sql = <<<SQL
+        select i.id, i.user_id, i.type_id, i.company_id, i.state, i.pay_state, i.policy_no,
+        i.preliminary_premium, i.policy_fee, i.type_attr, i.preliminary_result, 
+        convert(varchar(20), i.create_date, 20) as create_date,
+        convert(varchar(20), i.pay_date, 20) as pay_date,
+        u.uname as user_name, u.phone,
+        t.name as type_name, t.price_type as type_price_type, c.companyName as company_name
+        from Insurance_NewInfo i
+        left join IAM_USER u on u.userid = i.user_id
+        left join Insurance_Type t on t.id = i.type_id
+        left join Insurance_Discount c on c.companyId = i.company_id
+        where i.id = :info_id
+SQL;
+        $bind = array('info_id' => $info_id);
+
+        $info = self::fetchOne($sql, $bind);
+
+        if(!empty($info->type_attr))
+        {
+            $info->type_attr = json_decode($info->type_attr, true);
+        }
+        else
+        {
+            $info->type_attr = array();
+        }
+
+        if(!empty($info->preliminary_result))
+        {
+            $info->preliminary_result = json_decode($info->preliminary_result, true);
+        }
+        else
+        {
+            $info->preliminary_result = array();
+        }
+
+        return $info;
+    }
+
+    /**
+     * 添加保险信息(全险种)
+     * @param array $data
+     */
+    public static function addInsuranceNewInfo(array $data)
+    {
+        $crt = new Criteria($data);
+
+        //险种属性
+        $type_attr = $crt->type_attr;
+        if(is_array($type_attr) && !empty($type_attr))
+        {
+            $crt->type_attr = json_encode($type_attr);
+        }
+
+        //初算结果
+        $preliminary_result = $crt->preliminary_result;
+        if(is_array($preliminary_result) && !empty($preliminary_result))
+        {
+            $crt->preliminary_result = json_encode($preliminary_result);
+        }
+
+        $sql = 'insert into Insurance_NewInfo (user_id, type_id, type_attr, state, pay_state, preliminary_result, preliminary_premium) values (:user_id, :type_id, :type_attr, :state, :pay_state, :preliminary_result, :preliminary_premium)';
+
+        $bind = array(
+            'user_id' => $crt->user_id,
+            'type_id' => $crt->type_id,
+            'type_attr' => $crt->type_attr,
+            'state' => $crt->state ? $crt->state : 0,
+            'pay_state' => $crt->pay_state ? $crt->pay_state : 0,
+            'preliminary_result' => $crt->preliminary_result,
+            'preliminary_premium' => $crt->preliminary_premium
+        );
+
+        return self::nativeExecute($sql, $bind);
+    }
+
+    /**
+     * 获取保险产品数据列表
+     * @param  array|null $criteria
+     * @param  int        $page_num
+     * @param  int        $page_size
+     * @return array
+     */
+    public static function getInsuranceGoodsList(array $criteria=null, $page_num=null, $page_size=null)
+    {
+        $crt = new Criteria($criteria);
+        $cte_condition_str = '';
+        $cte_condition_arr = array();
+        $page_condition_str = '';
+        $bind = array();
+
+        if($crt->name)
+        {
+            $cte_condition_arr[] = 'name like :name';
+            $bind['name'] = '%'.$crt->name.'%';
+        }
+
+        if(!empty($cte_condition_arr))
+        {
+            $cte_condition_str = 'where '.implode(' and ', $cte_condition_arr);
+        }
+
+        if($page_num)
+        {
+            $page_condition_str = 'where rownum between :from and :to';
+            $bind['from'] = ($page_num - 1) * $page_size + 1;
+            $bind['to'] = $page_num * $page_size; 
+        }
+
+        $sql = <<<SQL
+        with INS_GOODS_CTE as (
+          select * from Insurance_Goods
+          $cte_condition_str
+        )
+        select * from INS_GOODS_CTE
+        $page_condition_str
+SQL;
+        return self::nativeQuery($sql, $bind);
+    }
+
+    /**
+     * 获取保险产品条目数
+     * @param  array|null $criteria
+     * @return int
+     */
+    public static function getInsuranceGoodsCount(array $criteria=null)
+    {
+        $crt = new Criteria($criteria);
+        $condition_str = '';
+        $condition_arr = array();
+        $bind = array();
+
+        if($crt->name)
+        {
+            $condition_arr[] = 'name like :name';
+            $bind['name'] = '%'.$crt->name.'%';
+        }
+
+        if(!empty($condition_arr))
+        {
+            $condition_str = 'where '.implode(' and ', $condition_arr);
+        }
+
+        $sql = <<<SQL
+        select count(1) from Insurance_Goods
+        $condition_str
+SQL;
+        $result = self::nativeQuery($sql, $bind, null, Db::FETCH_NUM);
+        return $result[0];
+    }
+
+    /**
+     * 获取投保方案数据列表
+     * @param  array|null $criteria
+     * @param  int        $page_num
+     * @param  int        $page_size
+     * @return array
+     */
+    public static function getInsuranceSchemeList($criteria=null, $page_num=null, $page_size=null)
+    {
+        $crt = new Criteria($criteria);
+        $cte_condition_str = '';
+        $cte_condition_arr = array();
+        $page_condition_str = '';
+        $bind = array();
+
+        if($crt->name)
+        {
+            $cte_condition_arr[] = 'name like :name';
+            $bind['name'] = '%'.$crt->name.'%';
+        }
+
+        if(!empty($cte_condition_arr))
+        {
+            $cte_condition_str = 'where '.implode(' and ', $cte_condition_arr);
+        }
+
+        if($page_num)
+        {
+            $page_condition_str = 'where rownum between :from and :to';
+            $bind['from'] = ($page_num - 1) * $page_size + 1;
+            $bind['to'] = $page_num * $page_size; 
+        }
+
+        $sql = <<<SQL
+        with INS_SCHEME_CTE as (
+          select * from Insurance_Scheme
+          $cte_condition_str
+        )
+        select * from INS_SCHEME_CTE
+        $page_condition_str
+SQL;
+        return self::nativeQuery($sql, $bind);
+    }
+
+    /**
+     * 获取投保方案总数
+     * @param  array|null $criteria
+     * @return int
+     */
+    public static function getInsuranceSchemeCount(array $criteria=null)
+    {
+        $crt = new Criteria($criteria);
+        $condition_str = '';
+        $condition_arr = array();
+        $bind = array();
+
+        if($crt->name)
+        {
+            $condition_arr[] = 'name like :name';
+            $bind['name'] = '%'.$crt->name.'%';
+        }
+
+        if(!empty($condition_arr))
+        {
+            $condition_str = 'where '.implode(' and ', $condition_arr);
+        }
+
+        $sql = <<<SQL
+        select count(1) from Insurance_Scheme
+        $condition_str
+SQL;
+        $result = self::nativeQuery($sql, $bind, null, Db::FETCH_NUM);
+        return $result[0];
+    }
+
+    /**
+     * 获取保险预约数据列表
+     * @param  array|null      $criteria
      * @param  integer|null    $page_num
      * @param  integer|null    $page_size
      * @return array

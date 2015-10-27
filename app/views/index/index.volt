@@ -180,8 +180,10 @@
                 <li class="dropdown"><a href=""><span class="iconfa-briefcase"></span> 保险系统</a>
                     <ul>
                         {% if 'insurance' in auth %}
-                        <li><a href="/insuranceList">保险列表</a></li>
+                        <li><a href="/insuranceList">车险列表</a></li>
                         <li><a href="/insuranceCompany">保险公司管理</a></li>
+                        <li><a href="/insuranceType">险种管理</a></li>
+                        <li><a href="/insuranceNewInfoManage">保险订单管理(全险种)</a></li>
                         <li><a href="/insuranceReservation">保险预约管理</a></li>
                         {% endif %}
 

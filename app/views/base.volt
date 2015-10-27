@@ -15,6 +15,8 @@
         <script type="text/javascript" src="{{ url('/js/bootstrap.min.js') }}"></script>
         <script type="text/javascript" src="{{ url('/js/jquery.cookie.js') }}"></script>
         <script type="text/javascript" src="{{ url('/js/custom.js') }}"></script>
+        <script type="text/javascript" src="{{ url('/js/underscore.js') }}"></script>
+
         {% endblock %}
 	</head>
 	<body>

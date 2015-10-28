@@ -39,15 +39,14 @@ class ScriptEngine extends Injectable
 		}
 		catch (\Phalcon\Mvc\View\Exception $e)
 		{
+			unlink($mid_file_path); //删除中间代码文件
 			$msg = $e->getMessage();
 			preg_match('/on line (\d+)/', $msg, $matches);
 			$this->_error_msg = '脚本第'.$matches[1].'行存在错误';
 			return false;
 		}
-		finally
-		{
-			unlink($mid_file_path);
-		}
+
+		unlink($mid_file_path); //删除中间代码文件
 		
 		$compiled_string = file_get_contents($compiled_file_path);
 		unlink($compiled_file_path);

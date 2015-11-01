@@ -7,6 +7,7 @@
         {% block head_assets %}
         <link rel="stylesheet" href="{{ url('/css/style.default.css') }}" type="text/css" />
         <script type="text/javascript" src="{{ url('/js/jquery-easyui/jquery.min.js') }}"></script>
+        <script type="text/javascript" src="{{ url('/js/jquery.pin.js') }}"></script>
 
 <!--        <script type="text/javascript" src="{{ url('/js/jquery-1.9.1.min.js') }}"></script>-->
         <script type="text/javascript" src="{{ url('/js/jquery-migrate-1.1.1.min.js') }}"></script>
@@ -16,6 +17,7 @@
         <script type="text/javascript" src="{{ url('/js/jquery.cookie.js') }}"></script>
         <script type="text/javascript" src="{{ url('/js/custom.js') }}"></script>
         <script type="text/javascript" src="{{ url('/js/underscore.js') }}"></script>
+        <script type="text/javascript" src="{{ url('/js/iScroll/iscroll.js') }}"></script>
 
         {% endblock %}
 	</head>

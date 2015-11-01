@@ -976,6 +976,48 @@ $router->addGet('/welcomeAdvList', array(
     'action' => 'welcomeAdvList'
 ));
 
+//汽车服务内容管理页面
+$router->addGet('/carService/manage', array(
+    'controller' => 'carservice',
+    'action' => 'manage'
+));
+
+//获取汽车服务列表数据
+$router->add('/carService/list.json', array(
+    'controller' => 'carservice',
+    'action' => 'getCarServiceList'
+));
+
+//获取汽车服务图标
+$router->addGet('/carService/img/{id:\d+}.png', array(
+    'controller' => 'carservice',
+    'action' => 'getCarServiceImg'
+));
+
+//添加汽车服务
+$router->addPost('/carService.json', array(
+    'controller' => 'carservice',
+    'action' => 'addCarService'
+));
+
+//更新汽车服务
+$router->addPut('/carService/{id:\d+}.json', array(
+    'controller' => 'carservice',
+    'action' => 'updateCarService'
+));
+
+//删除汽车服务
+$router->addDelete('/carService/{id:\d+}.json', array(
+    'controller' => 'carservice',
+    'action' => 'delCarService'
+));
+
+//添加汽车服务
+$router->addPost('/carService.json', array(
+    'controller' => 'carservice',
+    'action' => 'addCarService'
+));
+
 //获取开屏广告列表
 $router->add('/welcomeAdvList.json', array(
     'controller' => 'welcomepage',

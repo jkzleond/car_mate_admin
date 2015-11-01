@@ -45,7 +45,7 @@ class ScriptEngine extends Injectable
 			$this->_error_msg = '脚本第'.$matches[1].'行存在错误';
 			return false;
 		}
-
+		
 		unlink($mid_file_path); //删除中间代码文件
 		
 		$compiled_string = file_get_contents($compiled_file_path);

@@ -102,7 +102,7 @@
                                 <select name="local_favour_id" id="scroll_local_favour"></select>
                             </div>
                             <div style="display: none">
-                                <input id="scroll_link" name="link" type="text"" />
+                                <input id="scroll_link" name="link" type="text" />
                             </div>
                         </div>
                     </div>

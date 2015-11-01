@@ -249,6 +249,7 @@
                     <ul>
                         {% if 'welAdv' in auth %}
                         <li class="dropdown"><a href="/welcomeAdvList">开屏广告管理</a></li>
+                        <li class="dropdown"><a href="/carService/manage">汽车服务内容</a></li>
                         {% endif %}
                         {% if 'notice' in auth %}
                         <li class="dropdown"><a href="/noticeManage">公告管理</a></li>

@@ -1,5 +1,6 @@
 app/config/config.php
 app/cache/**
+public/temp/**
 public/ckfinder/**
 public/upload/**
 public/uploads/**

@@ -375,6 +375,7 @@
                         {
                             addCarService(car_service, function(data){
                                 car_service_grid.datagrid('reload');
+                                loadCarService();
                             });
                         }
                         else if(state == 'update')
@@ -385,17 +386,18 @@
                             car_service.content_id = content_id;
                             updateCarService(car_service, function(data){
                                 car_service_grid.datagrid('reload');
+                                loadCarService();
                             });
                         }
 
-                        create_car_service_window.dialog('close', true);
+                        create_car_service_window.dialog('close');
                     }
                 },
                 {
                     text: '取消',
                     iconCls: 'icon-remove',
                     handler: function(){
-                        create_car_service_window.dialog('close', true);
+                        create_car_service_window.dialog('close');
                     }
                 }
             ]
@@ -614,6 +616,7 @@
                 if(!is_ok) return;
                 delCarService({id: car_service_id}, function(data){
                     car_service_grid.datagrid('reload');
+                    loadCarService();
                 });
             });
         });
@@ -708,13 +711,17 @@
         /**
          * 数据相关
          */
+        loadCarService();
         //获取使用列表
-        getCarServiceList({is_use:true}, function(data){
-            $(data.rows).each(function(i, n){
-                renderCarserviceUseList(n);
+        function loadCarService()
+        {
+            getCarServiceList({is_use:true}, function(data){
+                $('#car_service_use_list').empty();
+                $(data.rows).each(function(i, n){
+                    renderCarserviceUseList(n);
+                });
             });
-        })
-
+        }
         
         function getCarServiceList(criteria, callback)
         {

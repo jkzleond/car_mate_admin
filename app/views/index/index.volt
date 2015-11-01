@@ -23,34 +23,7 @@
 <script type="text/javascript" src="{{ url('/js/ckfinder/ckfinder.js') }}"></script>
 <script type="text/javascript" src="{{ url('/js/ckeditor/ckeditor.js') }}"></script>
 <style type="text/css">
-    #menu_container {
-        position:absolute;
-        top:0px;
-        bottom:0px;
-        left: 0;
-        width: 100%;
-        overflow: hidden;
-    }
-    #scoller {
-        position: absolute;
-        -webkit-tap-highlight-color: rgba(0,0,0,0);
-        width: 100%;
-        -webkit-transform: translateZ(0);
-        -moz-transform: translateZ(0);
-        -ms-transform: translateZ(0);
-        -o-transform: translateZ(0);
-        transform: translateZ(0);
-        -webkit-touch-callout: none;
-        -webkit-user-select: none;
-        -moz-user-select: none;
-        -ms-user-select: none;
-        user-select: none;
-        -webkit-text-size-adjust: none;
-        -moz-text-size-adjust: none;
-        -ms-text-size-adjust: none;
-        -o-text-size-adjust: none;
-        text-size-adjust: none;
-    }
+    
 </style>
 
 {% endblock %}
@@ -165,163 +138,161 @@
         </div>
     </div>
 
-    <div class="leftpanel" style="position:relative">
+    <div class="leftpanel">
 
-        <div id="menu_container" class="leftmenu pin-menu">
-            <div id="scroller">
-                <ul class="nav nav-tabs nav-stacked">
-                    <li class="nav-header">导航</li>
-                    <li class="active"><a href=""><span class="iconfa-laptop"></span>功能菜单</a></li>
-                    <li class="dropdown" id="menu_to_main"><a href=""><span class="iconfa-hand-up"></span> 首页</a>
-                        <ul>
-                            <li><a href="/status">查看链接</a></li>
-                            <li><a href="/ranks">APP排行</a></li>
+        <div class="leftmenu pin-menu">
+            <ul class="nav nav-tabs nav-stacked">
+                <li class="nav-header">导航</li>
+                <li class="active"><a href=""><span class="iconfa-laptop"></span>功能菜单</a></li>
+                <li class="dropdown" id="menu_to_main"><a href=""><span class="iconfa-hand-up"></span> 首页</a>
+                    <ul>
+                        <li><a href="/status">查看链接</a></li>
+                        <li><a href="/ranks">APP排行</a></li>
 
-                        </ul>
-                    </li>
+                    </ul>
+                </li>
 
-                    <li class="dropdown"><a href=""><span class="iconfa-pencil"></span> 统计</a>
-                        <ul>
-                            {% if 'queryStatistics' in auth %}
-                            <li><a href="/statistics/queryStatistics">访问统计</a></li>
-                            {% endif %}
-                            {% if 'userStatistics' in auth %}
-                            <li><a href="/statistics/userStatistics">注册用户统计</a></li>
-                            {% endif%}
-                            {% if 'actStatistics' in auth %}
-                            <li><a href="/statistics/actStatistics">操作统计</a></li>
-                            {% endif %}
-                            {% if 'totalStatistics' in auth%}
-                            <li><a href="/statistics/quTotalStatistics">总访问/用户统计</a></li>
-                            {% endif %}
-                            {% if 'userActivity' in auth%}
-                            <li><a href="/statistics/userActivityStatistics">用户活跃度统计</a></li>
-                            {% endif %}
-                            {% if 'insuranceActStatistics' in auth %}
-                            <li><a href="/statistics/firstPreliminaryCalculationStatistics">每日新增用户数(保险)</a></li>
-                            <li><a href="/statistics/insuranceActStatistics">保险系统行为统计</a></li>
-                            {% endif %}
-                            {% if 'totalStatistics' in auth%}
-                            <li><a href="/statistics/orderIllegalStatistics">违章代缴业务订单统计</a></li>
-                            <li><a href="/statistics/orderIllegalUserStatistics">违章代缴业务用户统计</a></li>
-                            <li><a href="/statistics/orderIllegalTrackStatistics">违章代缴业务追踪统计</a></li>
-                            {% endif %}
-                        </ul>
-                    </li>
-                    <li class="dropdown"><a href=""><span class="iconfa-briefcase"></span> 保险系统</a>
-                        <ul>
-                            {% if 'insurance' in auth %}
-                            <li><a href="/insuranceList">车险列表</a></li>
-                            <li><a href="/insuranceCompany">保险公司管理</a></li>
-                            <li><a href="/insuranceType">险种管理</a></li>
-                            <li><a href="/insuranceNewInfoManage">保险订单管理(全险种)</a></li>
-                            <li><a href="/insuranceReservation">保险预约管理</a></li>
-                            {% endif %}
+                <li class="dropdown"><a href=""><span class="iconfa-pencil"></span> 统计</a>
+                    <ul>
+                        {% if 'queryStatistics' in auth %}
+                        <li><a href="/statistics/queryStatistics">访问统计</a></li>
+                        {% endif %}
+                        {% if 'userStatistics' in auth %}
+                        <li><a href="/statistics/userStatistics">注册用户统计</a></li>
+                        {% endif%}
+                        {% if 'actStatistics' in auth %}
+                        <li><a href="/statistics/actStatistics">操作统计</a></li>
+                        {% endif %}
+                        {% if 'totalStatistics' in auth%}
+                        <li><a href="/statistics/quTotalStatistics">总访问/用户统计</a></li>
+                        {% endif %}
+                        {% if 'userActivity' in auth%}
+                        <li><a href="/statistics/userActivityStatistics">用户活跃度统计</a></li>
+                        {% endif %}
+                        {% if 'insuranceActStatistics' in auth %}
+                        <li><a href="/statistics/firstPreliminaryCalculationStatistics">每日新增用户数(保险)</a></li>
+                        <li><a href="/statistics/insuranceActStatistics">保险系统行为统计</a></li>
+                        {% endif %}
+                        {% if 'totalStatistics' in auth%}
+                        <li><a href="/statistics/orderIllegalStatistics">违章代缴业务订单统计</a></li>
+                        <li><a href="/statistics/orderIllegalUserStatistics">违章代缴业务用户统计</a></li>
+                        <li><a href="/statistics/orderIllegalTrackStatistics">违章代缴业务追踪统计</a></li>
+                        {% endif %}
+                    </ul>
+                </li>
+                <li class="dropdown"><a href=""><span class="iconfa-briefcase"></span> 保险系统</a>
+                    <ul>
+                        {% if 'insurance' in auth %}
+                        <li><a href="/insuranceList">车险列表</a></li>
+                        <li><a href="/insuranceCompany">保险公司管理</a></li>
+                        <li><a href="/insuranceType">险种管理</a></li>
+                        <li><a href="/insuranceNewInfoManage">保险订单管理(全险种)</a></li>
+                        <li><a href="/insuranceReservation">保险预约管理</a></li>
+                        {% endif %}
 
-                        </ul>
-                    </li>
-                    <li class="dropdown"><a href=""><span class="iconfa-th-list"></span>本地惠</a>
-                        <ul>
-                            {% if 'localFavourPush' in auth %}
-                            <li><a href="/localFavourPush">本地惠发布</a></li>
-                            {% endif %}
-                            {% if 'localFavourIndex' in auth %}
-                            <li><a href="/localFavourAdvList">首页推广</a></li>
-                            {% endif %}
-                            {% if 'localFavourSub' in auth %}
-                            <li><a href="/localFavourSubList">本地惠稿件管理</a></li>
-                            <li><a href="/localFavourScrollAd">滚动广告管理</a></li>
-                            <li><a href="">汽车信息校对</a></li>
-                            {% endif %}
-                        </ul>
-                    </li>
-                    <li class="dropdown"><a href=""><span class="iconfa-picture"></span>活动营销</a>
-                        <ul>
-                            {% if 'activityMng' in auth %}
-                            <li><a href="/activityList">活动管理</a></li>
-                            {% endif %}
-                            {% if 'activityUserMng' in auth %}
-                            <li><a href="/activityUser">参与用户列表</a></li>
-                            {% endif %}
-                            {% if 'awardListMng' in auth %}
-                            <li><a href="/awardList">抽奖奖品</a></li>
-                            {% endif %}
-                            {% if 'awardGainMng' in auth %}
-                            <li><a href="/awardGainManage">中奖管理</a></li>
-                            {% endif %}
-                            {% if 'voteListMng' in auth %}
-                            <li><a href="/voteList">投票管理</a></li>
-                            {% endif %}
-                        </ul>
-                    </li>
-                    <li class="dropdown"><a href=""><span class="iconfa-book"></span>积分商城</a>
-                        <ul>
-                            {% if 'itemMng' in auth %}
-                            <li><a href="/itemManage">商品管理</a></li>
-                            {% endif %}
-                            {% if 'transactionList' in auth %}
-                            <li><a href="/transactionList">流水记录</a></li>
-                            {% endif %}
-                            {% if 'dealList' in auth %}
-                            <li><a href="/dealManage">订单管理</a></li>
-                            {% endif %}
-                        </ul>
-                    </li>
-                    <li class="dropdown"><a href=""><span class="iconfa-truck"></span>违章代缴</a>
-                        <ul>
-                            {% if 'dealList' in auth %}
-                            <li><a href="/illegal/orderMng">订单管理</a></li>
-                            <li><a href="/illegal/driverInfoMng">驾驶员信息</a></li>
-                            <li><a href="/illegal/transactionList">流水列表</a></li>
-                            {% endif %}
-                        </ul>
-                    </li>
-                    <li class="dropdown"><a href=""><span  class="iconfa-signal"></span>系统</a>
-                        <ul>
-                            {% if 'welAdv' in auth %}
-                            <li class="dropdown"><a href="/welcomeAdvList">开屏广告管理</a></li>
-                            <li class="dropdown"><a href="/carService/manage">汽车服务内容</a></li>
-                            {% endif %}
-                            {% if 'notice' in auth %}
-                            <li class="dropdown"><a href="/noticeManage">公告管理</a></li>
-                            {% endif %}
-                            {% if 'oilPrice' in auth %}
-                            <li class="dropdown"><a href="">油价管理</a></li>
-                            {% endif %}
-                            {% if 'talkInfo' in auth %}
-                            <li class="dropdown"><a href="">车友互动</a></li>
-                            {% endif %}
-                            {% if 'interaction' in auth %}
-                            <li class="dropdown"><a href="">路况管理</a></li>
-                            {% endif %}
-                            {% if 'iosPush' in auth %}
-                            <li class="dropdown"><a href="">消息推送</a></li>
-                            {% endif %}
-                            {% if 'feedBack' in auth %}
-                            <li class="dropdown"><a href="">意见反馈</a></li>
-                            <li class="dropdown"><a href="/appException">异常信息</a></li>
-                            {% endif %}
-                            {% if 'logQuery' in auth %}
-                            <li class="dropdown"><a href="">查看日志</a></li>
-                            {% endif %}
-                            {% if 'userManager' in auth %}
-                            <li class="dropdown"><a href="">注册用户管理</a></li>
-                            {% endif %}
-                            {% if 'baiduMap' in auth %}
-                            <li class="dropdown"><a href="">查看地图</a></li>
-                            <li class="dropdown"><a href="">周边信息审核</a></li>
-                            {% endif %}
-                        </ul>
-                    </li>
-                    {% if 'adminUserManager' in auth %}
-                    <li class="dropdown"><a href=""><span class="iconfa-th-list"></span>后台管理</a>
-                        <ul>
-                            <li><a href="">管理员</a></li>
-                        </ul>
-                    </li>
-                    {% endif %}
-                </ul>
-            </div>
+                    </ul>
+                </li>
+                <li class="dropdown"><a href=""><span class="iconfa-th-list"></span>本地惠</a>
+                    <ul>
+                        {% if 'localFavourPush' in auth %}
+                        <li><a href="/localFavourPush">本地惠发布</a></li>
+                        {% endif %}
+                        {% if 'localFavourIndex' in auth %}
+                        <li><a href="/localFavourAdvList">首页推广</a></li>
+                        {% endif %}
+                        {% if 'localFavourSub' in auth %}
+                        <li><a href="/localFavourSubList">本地惠稿件管理</a></li>
+                        <li><a href="/localFavourScrollAd">滚动广告管理</a></li>
+                        <li><a href="">汽车信息校对</a></li>
+                        {% endif %}
+                    </ul>
+                </li>
+                <li class="dropdown"><a href=""><span class="iconfa-picture"></span>活动营销</a>
+                    <ul>
+                        {% if 'activityMng' in auth %}
+                        <li><a href="/activityList">活动管理</a></li>
+                        {% endif %}
+                        {% if 'activityUserMng' in auth %}
+                        <li><a href="/activityUser">参与用户列表</a></li>
+                        {% endif %}
+                        {% if 'awardListMng' in auth %}
+                        <li><a href="/awardList">抽奖奖品</a></li>
+                        {% endif %}
+                        {% if 'awardGainMng' in auth %}
+                        <li><a href="/awardGainManage">中奖管理</a></li>
+                        {% endif %}
+                        {% if 'voteListMng' in auth %}
+                        <li><a href="/voteList">投票管理</a></li>
+                        {% endif %}
+                    </ul>
+                </li>
+                <li class="dropdown"><a href=""><span class="iconfa-book"></span>积分商城</a>
+                    <ul>
+                        {% if 'itemMng' in auth %}
+                        <li><a href="/itemManage">商品管理</a></li>
+                        {% endif %}
+                        {% if 'transactionList' in auth %}
+                        <li><a href="/transactionList">流水记录</a></li>
+                        {% endif %}
+                        {% if 'dealList' in auth %}
+                        <li><a href="/dealManage">订单管理</a></li>
+                        {% endif %}
+                    </ul>
+                </li>
+                <li class="dropdown"><a href=""><span class="iconfa-truck"></span>违章代缴</a>
+                    <ul>
+                        {% if 'dealList' in auth %}
+                        <li><a href="/illegal/orderMng">订单管理</a></li>
+                        <li><a href="/illegal/driverInfoMng">驾驶员信息</a></li>
+                        <li><a href="/illegal/transactionList">流水列表</a></li>
+                        {% endif %}
+                    </ul>
+                </li>
+                <li class="dropdown"><a href=""><span  class="iconfa-signal"></span>系统</a>
+                    <ul>
+                        {% if 'welAdv' in auth %}
+                        <li class="dropdown"><a href="/welcomeAdvList">开屏广告管理</a></li>
+                        <li class="dropdown"><a href="/carService/manage">汽车服务内容</a></li>
+                        {% endif %}
+                        {% if 'notice' in auth %}
+                        <li class="dropdown"><a href="/noticeManage">公告管理</a></li>
+                        {% endif %}
+                        {% if 'oilPrice' in auth %}
+                        <li class="dropdown"><a href="">油价管理</a></li>
+                        {% endif %}
+                        {% if 'talkInfo' in auth %}
+                        <li class="dropdown"><a href="">车友互动</a></li>
+                        {% endif %}
+                        {% if 'interaction' in auth %}
+                        <li class="dropdown"><a href="">路况管理</a></li>
+                        {% endif %}
+                        {% if 'iosPush' in auth %}
+                        <li class="dropdown"><a href="">消息推送</a></li>
+                        {% endif %}
+                        {% if 'feedBack' in auth %}
+                        <li class="dropdown"><a href="">意见反馈</a></li>
+                        <li class="dropdown"><a href="/appException">异常信息</a></li>
+                        {% endif %}
+                        {% if 'logQuery' in auth %}
+                        <li class="dropdown"><a href="">查看日志</a></li>
+                        {% endif %}
+                        {% if 'userManager' in auth %}
+                        <li class="dropdown"><a href="">注册用户管理</a></li>
+                        {% endif %}
+                        {% if 'baiduMap' in auth %}
+                        <li class="dropdown"><a href="">查看地图</a></li>
+                        <li class="dropdown"><a href="">周边信息审核</a></li>
+                        {% endif %}
+                    </ul>
+                </li>
+                {% if 'adminUserManager' in auth %}
+                <li class="dropdown"><a href=""><span class="iconfa-th-list"></span>后台管理</a>
+                    <ul>
+                        <li><a href="">管理员</a></li>
+                    </ul>
+                </li>
+                {% endif %}
+            </ul>
         </div><!--leftmenu-->
 
     </div><!-- leftpanel -->
@@ -454,17 +425,6 @@
          */
         $('.pin-menu').pin({
             containerSelector: '.pin-container'
-        });
-
-        /**
-         * 菜单栏滚动条
-         */
-        this.menuScroll = new IScroll('#menu_container', {
-            scrollbars: true,
-            mouseWheel: true,
-            interactiveScrollbars: true,
-            shrinkScrollbars: 'scale',
-            fadeScrollbars: true
         });
 
         /**

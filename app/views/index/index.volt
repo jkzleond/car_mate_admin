@@ -267,7 +267,7 @@
                         <li class="dropdown"><a href="">路况管理</a></li>
                         {% endif %}
                         {% if 'iosPush' in auth %}
-                        <li class="dropdown"><a href="">消息推送</a></li>
+                        <li class="dropdown"><a href="/push_message">消息推送</a></li>
                         {% endif %}
                         {% if 'feedBack' in auth %}
                         <li class="dropdown"><a href="">意见反馈</a></li>

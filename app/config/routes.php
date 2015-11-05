@@ -9,24 +9,24 @@
 $router = $di->getShared('router');
 
 /**
- * 用户
+ * 系统用户
  */
 
-$user = new \Phalcon\Mvc\Router\Group(array(
+$admin = new \Phalcon\Mvc\Router\Group(array(
     'controller' => 'adminuser'
 ));
 
 //登录
-$user->add('/login', array(
+$admin->add('/login', array(
     'action' => 'login'
 ));
 
 //登出
-$user->add('/logout', array(
+$admin->add('/logout', array(
     'action' => 'logout'
 ));
 
-$router->mount($user);
+$router->mount($admin);
 
 /**
  * 首页
@@ -1108,10 +1108,28 @@ $router->addPut('/noticeExtend/{id:\d+}.json', array(
     'action' => 'noticeExtend'
 ));
 
-//公告取消首页推广
+//公告取消首页推
 $router->addPut('/noticeUnextend/{id:\d+}.json', array(
     'controller' => 'notice',
     'action' => 'noticeUnextend'
+));
+
+//消息推送页面
+$router->addGet('/push_message', array(
+    'controller' => 'pushmessage',
+    'action' => 'index'
+));
+
+//消息推送
+$router->addPost('/push_message.json', array(
+    'controller' => 'pushmessage',
+    'action' => 'pushMessage'
+));
+
+//获取用户数据列表
+$router->add('/user/list.json', array(
+    'controller' => 'user',
+    'action' => 'getUserList'
 ));
 
 //异常信息页面

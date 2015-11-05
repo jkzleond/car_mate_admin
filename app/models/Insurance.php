@@ -746,7 +746,7 @@ SQL;
 		     ,afterDiscountSelfIgnition
 		     ,singleNotDeductibleSelfIgnition
 		     ,business
-             ,giftMoney
+         ,giftMoney
 		 FROM Insurance_Result where id = :id
 SQL;
 

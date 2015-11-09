@@ -176,6 +176,10 @@
                     {
                         return '微信支付';
                     }
+                    if(value == 'offline')
+                    {
+                        return '线下支付';
+                    }
                 }},
                 {field:'pay_state', title:'支付状态', width:'6%', align:'center', formatter: function(value, row, index){
                     if(value == 'TRADE_SUCCESS' || value == 'TRADE_FINISHED')

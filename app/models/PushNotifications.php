@@ -181,10 +181,11 @@ SQL;
     	$connection = self::_getConnection();
     	$connection->begin();
 
-    	$add_push_msg_sql = 'insert into PushList (title, contents, addTime, type) values (:title, :content, getdate(), 0)';
+    	$add_push_msg_sql = 'insert into PushList (title, contents, addTime, type) values (:title, :content, getdate(), :msg_type)';
     	$add_push_msg_bind = array(
     		'title' => $crt->title,
-    		'content' => $crt->content 
+    		'content' => $crt->content,
+    		'msg_type' =>  ($crt->msg_type or $crt->msg_type === 0 or $crt->msg_type === '0') ? $crt->msg_type : 3 //默认系统消息
     	);
 
     	$add_push_msg_success = self::nativeExecute($add_push_msg_sql, $add_push_msg_bind);

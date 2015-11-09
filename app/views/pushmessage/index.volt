@@ -72,10 +72,9 @@
                         <div class="span12">
                             <span class="label">消息类别</span>
                             <select name="msg_type">
-                                <option value="">热门活动</option>
-                                <option value="">订单消息</option>
-                                <option value="">系统消息</option>
-                                <option value="">私信</option>
+                                <option value="1">热门活动</option>
+                                <option value="2">订单消息</option>
+                                <option value="3">系统消息</option>
                             </select>
                         </div>
                     </div>
@@ -172,6 +171,7 @@
                     handler: function(){
                         var title = $('#push_window [name="title"]').val();
                         var content = content_editor.getData();
+                        var msg_type = $('#push_window [name="msg_type"]').val();
 
                         var user_criteria = {};
                         user_criteria.user_id = $('#push_search_bar [name="user_id"]').val();
@@ -185,7 +185,7 @@
                         $.ajax({
                             url: '/push_message.json',
                             method: 'POST',
-                            data: {criteria: {title: title, content: content}, user_criteria: user_criteria},
+                            data: {criteria: {title: title, content: content, msg_type: msg_type}, user_criteria: user_criteria},
                             dataType: 'json',
                             global: true
                         }).done(function(data){

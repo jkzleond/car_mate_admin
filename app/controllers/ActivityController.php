@@ -69,7 +69,8 @@ class ActivityController extends ControllerBase
         $sign_end_date = isset($data['sign_end_date']) ? $data['sign_end_date'] : null;
         $trip_line = isset($data['trip_line']) ? $data['trip_line'] : null;
         $auto_start = $data['auto_start'];
-        $info = isset($data['info']) ? implode(', ', $data['info']) : null;
+        $info_arr = isset($data['info']) ? $data['info'] : null;
+        $data['info'] = isset($data['info']) ? implode(', ', $data['info']) : null;
         $option = isset($data['option']) ? $data['option'] : null;
         $type_id = $data['type_id'];
         $need_check_in = $data['need_check_in'];
@@ -81,12 +82,13 @@ class ActivityController extends ControllerBase
 
         $deposit = $data['deposit'];
         $pay_types = isset($data['pay_types']) ? implode(', ', $data['pay_types']) : null;
+        $data['pay_types'] = $pay_types;
         $group_column = $data['group_column'];
 
         $pic_data = isset($data['pic_data']) ? $data['pic_data'] : null;
         $contents = isset($data['contents']) ? $data['contents'] : null;
 
-        $success = Activity::addActivity($name, $place, $url, $start_date, $end_date, $sign_start_date, $sign_end_date, $trip_line, $auto_start, $info, $option, $type_id, $need_check_in, $need_notice, $award_start, $award_end, $need_pay, $deposit, $pay_types, $group_column, $pic_data, $contents);
+        $success = Activity::addActivity($data);
 
         $aid = $success;
 
@@ -95,7 +97,7 @@ class ActivityController extends ControllerBase
             Activity::addPayItems($aid, $pay_items);
         }
 
-        if(isset($data['info']) && in_array('select', $data['info']) && $success)
+        if(!empty($info_arr) && in_array('select', $info_arr) && $success)
         {
             $sel_name = $data['sel_name'];
             $option_list = isset($data['sel_options']) ? implode(', ', $data['sel_options']) : '';
@@ -108,7 +110,7 @@ class ActivityController extends ControllerBase
         {
             $id = $success;
             $url = 'http://116.55.248.76:8080/car/userInfo.do?userid={loginname}&aid='.$id;
-            Activity::updateActivity($id, null, null, null, null, $url);
+            Activity::updateActivity($id, array('url' => $url));
         }
 
         $success = $success !== false ? true : false;
@@ -144,33 +146,12 @@ class ActivityController extends ControllerBase
         foreach($updates as $data)
         {
             $id = isset($data['id']) ? $data['id'] : null;
-            $name = isset($data['name']) ? $data['name'] : null;
-            $pic_data = isset($data['pic_data']) ? $data['pic_data'] : null;
-            $contents = isset($data['contents']) ? $data['contents'] : null;
-            $place = isset($data['place']) ? $data['place'] : null;
-            $url = isset($data['url']) ? $data['url'] : null;
-            $auto_start = isset($data['auto_start']) ? $data['auto_start'] : null;
-            $start_date = isset($data['start_date']) ? $data['start_date'] : null;
-            $trip_line = isset($data['trip_line']) ? $data['trip_line'] : null;
-            $end_date = isset($data['end_date']) ? $data['end_date'] : null;
-            $sign_start_date = isset($data['sign_start_date']) ? $data['sign_start_date'] : null;
-            $sign_end_date = isset($data['sign_end_date']) ? $data['sign_end_date'] : null;
-            $state = isset($data['state']) ? $data['state'] : null;
-            $info = isset($data['info']) ? implode(', ', $data['info']) : null;
-            $option = isset($data['option']) ? $data['option'] : null;
-            $type_id = isset($data['type_id']) ? $data['type_id'] : null;
-            $need_check_in = isset($data['need_check_in']) ? $data['need_check_in'] : null;
-            $award_start = isset($data['award_start']) ? $data['award_start'] : null;
-            $award_end = isset($data['award_end']) ? $data['award_end'] : null;
-            $award_state = isset($data['award_state']) ? $data['award_state'] : null;
-            $need_pay = isset($data['need_pay']) ? $data['need_pay'] : null;
             $pay_items = isset($data['pay_items']) ? $data['pay_items'] : null;
-            $deposit = isset($data['deposit']) ? $data['deposit'] : null;
-            $need_notice = isset($data['need_notice']) ? $data['need_notice'] : null;
-            $pay_types = isset($data['pay_types']) ? implode(', ',$data['pay_types']) : null;
-            $group_column = isset($data['group_column']) ? $data['group_column'] : null;
+            $info_arr = isset($data['info']) ? $data['info'] : null;
+            $data['info'] = isset($data['info']) ? implode(',', $data['info']) : null;
+            $data['pay_items'] = isset($data['pay_items']) ? $data['pay_items'] : null;
 
-            $rst = Activity::updateActivity($id, $name, $pic_data, $contents, $place, $url, $auto_start, $start_date, $end_date, $sign_start_date, $sign_end_date, $trip_line, $state, $info, $option, $type_id, $need_check_in, $award_start, $award_end, $award_state, $need_pay, $deposit, $need_notice, $pay_types, $group_column);
+            $rst = Activity::updateActivity($id, $data);
 
             //更新付款项目
 
@@ -215,7 +196,7 @@ class ActivityController extends ControllerBase
 
 
             //更新ActivitySelect
-            if(isset($data['info']) && in_array('select', $data['info']))
+            if(!empty($info_arr) && in_array('select', $info_arr))
             {
                 $aid = $id;
                 $sel_name = $data['sel_name'];
@@ -234,6 +215,148 @@ class ActivityController extends ControllerBase
         $this->view->setVar('data', array(
             'success' => $success,
             'update' => $updated
+        ));
+    }
+
+    /**
+     * 抽奖时段管理页面
+     * $param int|string $aid
+     */
+    public function drawPeriodAction($aid)
+    {
+        $activity = Activity::getActivityById($aid);
+
+        $this->view->setVars(array(
+            'activity' => $activity
+        ));
+    }
+
+    /**
+     * 获取抽奖时段列表
+     * @param  int|string $aid
+     */
+    public function getDrawPeriodListAction($aid)
+    {
+        $period_list = Activity::getDrawPeriodList($aid);
+        $period_total = count($period_list);
+
+        $this->view->setVar('data', array(
+            'total' => $period_total,
+            'count' => $period_total,
+            'rows' => $period_list
+        ));
+    }
+
+    /**
+     * 添加抽奖时段
+     * @param int|string $aid
+     */
+    public function addDrawPeriodAction($aid)
+    {
+        $creates = $this->request->getPost('creates');
+        $data = $creates[0];
+        $success = Activity::addDrawPeriod($aid, $data);
+
+        $this->view->setVar('data', array(
+            'success' => $success
+        ));
+    }
+
+    /**
+     * 更新抽奖时段
+     * @param  int|string $id
+     */
+    public function updateDrawPeriodAction($id)
+    {
+        $updates = $this->request->getPut('updates');
+        $data = $updates[0];
+        $success = Activity::updateDrawPeriod($id, $data);
+
+        $this->view->setVar('data', array(
+            'success' => $success
+        ));
+    }
+
+    /**
+     * 删除抽奖时段
+     * @param  int|string $id
+     */
+    public function delDrawPeriodAction($id)
+    {
+        $success = Activity::delDrawPeriod($id);
+
+        $this->view->setVar('data', array(
+            'success' => $success
+        ));
+    }
+
+    /**
+     * 抽奖时段奖品管理页面
+     * @param  int|string $period_id
+     */
+    public function drawPeriodAwardAction($period_id)
+    {
+        $period = Activity::getDrawPeriodById($period_id);
+        $activity = Activity::getActivityById($period->aid);
+
+        $this->view->setVars(array(
+            'period' => $period,
+            'activity' => $activity
+        ));
+    }
+
+    /**
+     * 获取指定ID抽奖时段奖品列表
+     * @param  int|string $period_id
+     */
+    public function getDrawPeriodAwardListAction($period_id)
+    {
+        $award_list = Award::getDrawPeriodAwardList($period_id);
+        $award_total = Award::getDrawPeriodAwardCount($period_id);
+
+        $this->view->setVar('data', array(
+            'total' => $award_total,
+            'count' => count($award_list),
+            'rows' => $award_list
+        ));
+    }
+
+    /**
+     * 为指定时段添加奖品
+     * @param int|string $period_id
+     */
+    public function addDrawPeriodAwardAction($period_id)
+    {
+        $creates = $this->request->getPost('creates');
+        $data = $creates[0];
+        $success = Award::addDrawPeriodAward($period_id, $data);
+
+        $this->view->setVar('data', array(
+            'success' => $success
+        ));
+    }
+
+    /**
+     * 删除时段的某个奖品
+     * @param int|string $id
+     */
+    public function delDrawPeriodAwardAction($id)
+    {
+        $success = Award::delDrawPeriodAward($id);
+        $this->view->setVar('data', array(
+            'success' => $success
+        ));
+    }
+
+    /**
+     * 抽奖奖品管理页面
+     */
+    public function awardManageAction($aid)
+    {
+        $period_list = Activity::getDrawPeriodList($aid);
+
+        $this->view->setVars(array(
+            'period_list' => $period_list
         ));
     }
 

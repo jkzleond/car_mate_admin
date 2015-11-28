@@ -16,6 +16,11 @@ class AwardController extends ControllerBase
 
     }
 
+    public function awardManage()
+    {
+        
+    }
+
     /**
      * 获取抽奖类型活动列表
      */
@@ -104,6 +109,17 @@ class AwardController extends ControllerBase
         $this->view->setVar('data', array(
             'success' => $success
         ));
+    }
+
+    /**
+     * 获取指定ID奖品的图片
+     * @param  int|string $award_id
+     */
+    public function getAwardPicAction($award_id)
+    {
+        $this->view->disable();
+        $this->response->setContentType('image/jpeg');
+        echo base64_decode(Award::getAwardPic($award_id));
     }
 
     /**

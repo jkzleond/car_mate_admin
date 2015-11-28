@@ -416,6 +416,88 @@
             }    
         });
     }
+
+    CarMate.viewManager = {
+        _windows: {},
+        _curUrl: null,
+        _viewObjMap: {},
+        onLoad: null,
+        open: function(url){
+            var win = this._windows[url];
+            if(win)
+            {
+                win.window('open');
+                return;
+            }
+            var win_id = Date.now();
+            $('body').append('<div id="' + win_id + '" data-view-url="' + url + '"><div>');
+            win = $('#'+win_id).window({
+                width: '80%',
+                height: '80%',
+                closed: true,
+                shadow: false,
+                modal: false,
+                openAnimation: 'fade',
+                onOpen: function(){
+                    $(this).window('center');
+                },
+                onLoad: function(){
+                    var opt = $(this).window('options');
+                    var resize_width = opt.width;
+                    var resize_height = opt.height;
+
+                    var $panel = $(this).window('panel');
+                    var panel_width = $panel.outerWidth();
+                    var panel_height = $panel.outerHeight();
+                    var client_width = window.innerWidth;
+                    var client_height = window.innerHeight;
+
+                    if(client_width < panel_width)
+                    {
+                        resize_width = Math.round(client_width * 0.8);
+                    }
+
+                    if(client_height < panel_height)
+                    {
+                        resize_height = Math.round(client_height * 0.8);
+                    }
+
+                    $(this).window('resize', {
+                        width: resize_width,
+                        height: resize_height
+                    });
+
+
+                    if(typeof CarMate.viewManager.onLoad == 'function')
+                    {
+                        CarMate.viewManager.onLoad($(this));
+                    }
+
+                    if(typeof CarMate.viewManager.onLeave == 'function')
+                    {
+                        var onLeave = CarMate.viewManager.onLeave;
+                        var opt = $(this).window('options');
+                        opt.onBeforeClose = function(){
+                            onLeave.call($(this));
+                        };
+                        $(this).window(opt);
+                    }
+
+                    $(this).window('center').window('open', true);
+                },
+                onClose: function(){
+                    $(this).window('destroy');
+                    CarMate.viewManager.dispose(url);
+                }
+            });
+            this._windows[url] = win;
+            win.window('refresh', url);
+        },
+        dispose: function(url)
+        {
+            delete this._windows[url];
+        }
+    };
 </script>
 <script type="text/javascript">
 

@@ -444,7 +444,7 @@ SQL;
      */
     public static function getIllegalOrderItems($order_id)
     {
-        $sql = 'select des, wfjfs, fkje, hphm from OrderToIllegal where orderId = :order_id';
+        $sql = 'select des, wfjfs, fkje, hphm, znj from OrderToIllegal where orderId = :order_id';
         $bind = array('order_id' => $order_id);
 
         return self::nativeQuery($sql, $bind);

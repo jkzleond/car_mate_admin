@@ -607,6 +607,56 @@ $activity->addGet('/activityDetail/{id:\d+}', array(
     'action' => 'detail'
 ));
 
+//抽奖时段页面
+$activity->addGet('/activity/drawPeriod/{aid:\d+}', array(
+    'action' => 'drawPeriod'
+));
+
+//获取抽奖时段列表数据
+$activity->add('/activity/{aid:\d+}/periodList.json', array(
+    'action' => 'getDrawPeriodList'
+));
+
+//添加抽奖时段列表数据
+$activity->addPost('/activity/{aid:\d+}/period.json', array(
+    'action' => 'addDrawPeriod'
+));
+
+//编辑抽奖时段数据
+$activity->addPut('/activity/period/{id:\d+}.json', array(
+    'action' => 'updateDrawPeriod'
+));
+
+//删除抽奖时段数据
+$activity->addDelete('/activity/period/{id:\d+}.json', array(
+    'action' => 'delDrawPeriod'
+));
+
+//时段奖品管理页面
+$activity->addGet('/activity/period/{period_id:\d+}/award', array(
+    'action' => 'drawPeriodAward'
+));
+
+//获取指定时段奖品列表
+$activity->add('/activity/period/{period_id:\d+}/awardList.json', array(
+    'action' => 'getDrawPeriodAwardList'
+));
+
+//为指定时段添加奖品
+$activity->addPost('/activity/period/{period_id:\d+}/award.json', array(
+    'action' => 'addDrawPeriodAward'
+));
+
+//删除抽奖时段的奖品
+$activity->addDelete('/activity/periodAward/{id:\d+}.json', array(
+    'action' => 'delDrawPeriodAward'
+));
+
+//奖品管理页面
+$activity->addGet('/awardManage/{aid:\d+}', array(
+    'action' => 'awardManage'
+));
+
 //获取活动签到信息列表
 $activity->add('/activityCheckList.json', array(
     'action' => 'getCheckList'
@@ -690,6 +740,11 @@ $award->addDelete('/award/{id:\d+}.json', array(
 //更新奖品
 $award->addPut('/award.json', array(
     'action' => 'updateAward'
+));
+
+//获取指定ID奖品图像
+$award->addGet('/award/{award_id:\d+}/pic.png', array(
+    'action' => 'getAwardPic'
 ));
 
 //中奖管理页面

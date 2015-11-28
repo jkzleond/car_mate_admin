@@ -29,6 +29,12 @@ CarMate.unbind = function(event, handler){
     }
 };
 
+CarMate.one = function(event, handler){
+    jQuery(CarMate.dispatcher).one(event, handler);
+}
+
+
+
 
 /**
  * 页面对象,加载面页并持有页面状态

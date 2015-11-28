@@ -239,6 +239,20 @@ SQL;
     }
 
     /**
+     * 获取指定ID奖品的图片数据
+     * @param  [type] $award_id
+     * @return [type]
+     */
+    public static function getAwardPic($award_id)
+    {
+        $sql = 'select top 1 pic from Award where id = :id';
+        $bind = array('id' => $award_id);
+
+        $result = self::fetchOne($sql, $bind, null, Db::FETCH_ASSOC);
+        return $result['pic'];
+    }
+
+    /**
      * 构建中奖总数sql cte
      * @param Criteria $crt
      * @return array [0]: string sql format [1]: array bind parameters
@@ -344,6 +358,82 @@ SQL;
         return array($sql, $bind);
     }
 
+    /**
+     * 获取指定ID抽奖时段的奖品数据列表
+     * @param  [type] $period_id
+     * @return [type]
+     */
+    public static function getDrawPeriodAwardList($period_id, $page_num=null, $page_size=null)
+    {
+        $page_condition_str = '';
+        $bind = array('period_id' => $period_id);
+
+        if($page_num)
+        {   
+            $page_condition_str = 'where rownum between :from and :to';
+            $bind['from'] = $page_size * ($page_num - 1) + 1;
+            $bind['to'] = $page_size * $page_num;
+        }
+
+        $sql = <<<SQL
+        with AWARD_CTE as (
+            select d2a.id as id, a.name, a.num, a.rate, a.dayLimit as day_limit, a.id as award_id,
+            row_number() over(order by a.createDate desc) as rownum
+            from Hui_DrawToAward d2a
+            left join Award a on a.id = d2a.award_id
+            where d2a.period_id = :period_id
+        )
+        select * from AWARD_CTE
+        $page_condition_str
+SQL;
+        return self::nativeQuery($sql, $bind);
+    }
+
+    /**
+     * 获取指定ID抽奖时段的奖品数据总数
+     * @param  int|string $period_id
+     * @return int
+     */
+    public static function getDrawPeriodAwardCount($period_id)
+    {
+        $sql = 'select count(1) from Hui_DrawToAward where period_id = :period_id';
+        $bind = array('period_id' => $period_id);
+
+        $result = self::fetchOne($sql, $bind, null, Db::FETCH_NUM);
+        return $result[0];
+    }
+
+    /**
+     * 为指定ID的时段添加奖品
+     * @param  int|string $period_id
+     * @param  array      $criteria
+     * @return bool
+     */
+    public static function addDrawPeriodAward($period_id, array $criteria=null)
+    {
+        $crt = new Criteria($criteria);
+
+        $sql = 'insert into Hui_DrawToAward (aid, period_id, award_id) values (:aid, :period_id, :award_id)';
+        $bind = array(
+            'aid' => $crt->aid,
+            'period_id' => $period_id,
+            'award_id' => $crt->award_id
+        );
+        return self::nativeExecute($sql, $bind);
+    }
+
+    /**
+     * 删除抽奖时段的某个奖品
+     * @param  int|string $id
+     * @return bool
+     */
+    public static function delDrawPeriodAward($id)
+    {
+        $sql = 'delete from Hui_DrawToAward where id = :id';
+        $bind = array('id' => $id);
+
+        return self::nativeExecute($sql, $bind);
+    }
 
     /**
      * 获取中奖列表(用户获奖总数)

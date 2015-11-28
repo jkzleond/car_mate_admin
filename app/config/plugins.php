@@ -20,3 +20,9 @@ $eventsManager->attach('dispatch', new UTF8EnCodingFilter($di));
  * ajax请求json自动转换
  */
 $eventsManager->attach('dispatch', new AjaxFilter($di));
+
+/**
+ * 保险20免一活动插件
+ */
+$insurance_draw_filter = new InsuranceDrawFilter($di);
+$eventsManager->attach('insurance', $insurance_draw_filter);

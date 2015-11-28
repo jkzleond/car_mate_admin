@@ -70,17 +70,19 @@
                         <th>违法行为</th>
                         <th>违法扣分</th>
                         <th>处罚金额</th>
+                        <th>滞纳金</th>
                     </tr>
                     {% for item in order.items %}
                     <tr>
                         <td><pre style="text-align:left">{{ item['des'] }}</pre></td>
                         <td>{{ item['wfjfs'] }}</td>
                         <td>{{ item['fkje'] }}</td>
+                        <td>{{ item['znj'] }}</td>
                     </tr>
                     {% endfor %}
                     <tr>
                         <th>总计罚款</th>
-                        <td colspan="2">{{ order.sum_fkje }}</td>
+                        <td colspan="3">{{ order.sum_fkje }}</td>
                     </tr>
                 </table>
             </td>

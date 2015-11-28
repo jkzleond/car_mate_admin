@@ -128,6 +128,19 @@ $di->setShared('trans', function() use($di) {
 });
 
 /**
+ * set flash component
+ */
+$di->setShared('flashSession', function() use($di) {
+    $di->getShared('session');
+    $flashSession = new \Phalcon\Flash\Session(array(
+        'error' => 'alert alert-error',
+        'success' => 'alert alert-success',
+        'notice' => 'alert alert-info'
+    ));
+    return $flashSession;
+});
+
+/**
  * 设置脚本引擎(用于全险种)
  */
 $di->setShared('script_engine', function() use ($config){ 

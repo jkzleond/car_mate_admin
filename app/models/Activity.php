@@ -92,7 +92,7 @@ SQL;
 
 		select rownum,a.id,a.name,a.picData,a.contents,place,ISNULL(url,0) url,a.createDate,startDate,endDate,
 		signStartDate, signEndDate, tripLine, autoStart, a.state, isnull(u.num,0) num, isnull(u.gainNum,0) gainNum,
-		[option],needCheckIn,t.name as typeName, t.id as typeId, a.awardStart, a.awardEnd, a.awardState,
+		[option],needCheckIn,t.name as typeName, t.id as typeId, a.awardStart, a.awardEnd, a.awardState, a.is_period,
 		a.infos, a.[option], a.needPay, a.needNotice, a.deposit, a.payTypes, a.groupColumn,
 		g.id as pay_item_id, g.name as pay_item_name, g.price as pay_item_price,
 		s.name as sname, s.optionList, s.shortNames, s.depositList
@@ -127,7 +127,7 @@ SQL;
 
         if($page_num)
         {
-            $page_condition = 'and rownum between :offset and :limit';
+            $page_condition = 'and a.rownum between :offset and :limit';
             //rownum 从 1 开始计数, $offset 要 加 1
             $offset = $page_size * ( $page_num - 1) + 1;
             $bind['offset'] = $offset;
@@ -149,7 +149,7 @@ SQL;
           group by aid
         )
 
-		select a_cte.rownum,a.id,a.name,place,ISNULL(url,0) url,a.createDate,startDate,endDate,
+		select a.rownum,a.id,a.name,place,ISNULL(url,0) url,a.createDate,startDate,endDate,
 		autoStart,a.state,isnull(u.num,0) num,isnull(u.gainNum,0) gainNum,
 		[option],needCheckIn,t.name as typeName, t.id as typeId, a.awardStart, a.awardEnd, a.awardState,
 		a.infos, a.[option], a.needPay, a.needNotice, a.deposit, a.payTypes, a.groupColumn,
@@ -170,6 +170,101 @@ SQL;
         return self::nativeQuery($sql, $bind);
     }
 
+    /**
+     * 获取抽奖时段数据列表
+     */
+    public static function getDrawPeriodList($aid)
+    {
+        $sql = <<<SQL
+        select id, aid, convert(varchar(20), start_time, 20) as start_time, convert(varchar(20), end_time, 20) as end_time 
+        from Hui_DrawPeriod
+        where aid = :aid
+        order by start_time asc
+SQL;
+        $bind = array('aid' => $aid);
+
+        return self::nativeQuery($sql, $bind);
+    }
+
+    /**
+     * 获取指定ID抽奖时段数据
+     * @param  int|string $period_id
+     * @return int|string
+     */
+    public static function getDrawPeriodById($period_id)
+    {
+        $sql = <<<SQL
+        select id, aid, convert(varchar(20), start_time, 20) as start_time, convert(varchar(20), end_time, 20) as end_time
+        from Hui_DrawPeriod 
+        where id = :id
+SQL;
+        $bind = array('id' => $period_id);
+
+        return self::fetchOne($sql, $bind);
+    }
+
+    /**
+     * 为指定ID活动添加时段
+     * @param int $aid
+     * @param array $criteria
+     * @return bool
+     */
+    public static function addDrawPeriod($aid, array $criteria)
+    {
+        $crt = new Criteria($criteria);
+        $sql = 'insert into Hui_DrawPeriod (aid, start_time, end_time) values (:aid, :start_time, :end_time)';
+        $bind = array(
+            'aid' => $aid,
+            'start_time' => $crt->start_time,
+            'end_time' => $crt->end_time
+        );
+
+        return self::nativeExecute($sql, $bind);
+    }
+
+    /**
+     * 更新指定ID的时段
+     * @param  int|string $id
+     * @param  array      $criteria
+     * @return bool
+     */
+    public static function updateDrawPeriod($id, array $criteria=null)
+    {
+        $crt = new Criteria($criteria);
+        $field_str = '';
+        $bind = array('id' =>$id);
+
+        if($crt->start_time)
+        {
+            $field_str .= 'start_time = :start_time, ';
+            $bind['start_time'] = $crt->start_time;
+        }
+
+        if($crt->end_time)
+        {
+            $field_str .= 'end_time = :end_time, ';
+            $bind['end_time'] = $crt->end_time;
+        }
+
+        $field_str = rtrim($field_str, ', ');
+
+        $sql = "update Hui_DrawPeriod set $field_str where id = :id";
+
+        return self::nativeExecute($sql, $bind);
+    }
+
+    /**
+     * 删除指定ID抽奖时段
+     * @param  int|string $id
+     * @return bool
+     */
+    public static function delDrawPeriod($id)
+    {
+        $sql = 'delete from Hui_DrawPeriod where id = :id';
+        $bind = array('id' => $id);
+
+        return self::nativeExecute($sql, $bind);
+    }
 
     /**
      * 获取活动总数
@@ -397,73 +492,52 @@ SQL;
 
     /**
      * 添加活动
-     * @param $name
-     * @param $place
-     * @param $url
-     * @param $start_date
-     * @param $end_date
-     * @param $sign_start_date
-     * @param $sign_end_date
-     * @param $trip_line
-     * @param $auto_start
-     * @param $info
-     * @param $option
-     * @param $type_id
-     * @param $need_check_in
-     * @param $need_notice
-     * @param null $award_start
-     * @param null $award_end
-     * @param $need_pay
-     * @param $deposit
-     * @param $pay_types
-     * @param $group_column
-     * @param $pic_data
-     * @param $contents
+     * @param  array $criteria
      * @return bool|int
      */
-    public static function addActivity($name, $place, $url, $start_date, $end_date, $sign_start_date, $sign_end_date, $trip_line, $auto_start, $info, $option, $type_id, $need_check_in, $need_notice, $award_start=null, $award_end=null, $need_pay, $deposit, $pay_types, $group_column, $pic_data, $contents)
+    public static function addActivity(array $criteria)
     {
 
-        $award_start = $award_start ? $award_start : date('Y-m-d H:i:s');
-        $award_end = $award_end ? $award_end : date('Y-m-d H:i:s');
+        $crt = new Criteria($criteria);
 
-        $award_state = 0;
+        $crt->award_state = 0;
 
-        if($type_id == '2')
+        if($crt->type_id == '2')
         {
-            $award_state = 1;
+            $crt->award_state = 1;
         }
 
         $sql = <<<SQL
         insert into Activity([name], place, url, createDate, startDate, endDate, signStartDate, signEndDate, tripLine,
 		state, autoStart, infos, [option], [type], needCheckIn, needNotice, awardStart, awardEnd, awardState,
-		needPay, deposit, payTypes,groupColumn,picData,contents)
-		values ( :name, :place, :url, getdate(), :start_date,:end_date, :sign_start_date, :sign_end_date, :trip_line, 0, :auto_start, :info, :option, :type_id, :need_check_in, :need_notice,:award_start, :award_end, :award_state, :need_pay, :deposit , :pay_types,:group_column, :pic_data, :contents)
+		needPay, deposit, payTypes,groupColumn,picData,contents, is_period)
+		values ( :name, :place, :url, getdate(), :start_date,:end_date, :sign_start_date, :sign_end_date, :trip_line, 0, :auto_start, :info, :option, :type_id, :need_check_in, :need_notice,:award_start, :award_end, :award_state, :need_pay, :deposit , :pay_types,:group_column, :pic_data, :contents, :is_period)
 SQL;
         $bind = array(
-            'name' => $name,
-            'place' => $place,
-            'url' => $url,
-            'start_date' => $start_date,
-            'end_date' => $end_date,
-            'sign_start_date' => $sign_start_date,
-            'sign_end_date' => $sign_end_date,
-            'trip_line' => $trip_line,
-            'auto_start' => $auto_start,
-            'info' => $info,
-            'option' => $option,
-            'type_id' => $type_id,
-            'need_check_in' => $need_check_in,
-            'need_notice' => $need_notice,
-            'award_start' => $award_start,
-            'award_end' => $award_end,
-            'award_state' => $award_state,
-            'need_pay' => $need_pay,
-            'deposit' => $deposit,
-            'pay_types' => $pay_types,
-            'group_column' => $group_column,
-            'pic_data' => $pic_data,
-            'contents' => $contents
+            'name' => $crt->name,
+            'place' => $crt->place,
+            'url' => $crt->url,
+            'start_date' => $crt->start_date,
+            'end_date' => $crt->end_date,
+            'sign_start_date' => $crt->sign_start_date,
+            'sign_end_date' => $crt->sign_end_date,
+            'trip_line' => $crt->trip_line,
+            'auto_start' => $crt->auto_start,
+            'info' => $crt->info,
+            'option' => $crt->option,
+            'type_id' => $crt->type_id,
+            'need_check_in' => $crt->need_check_in,
+            'need_notice' => $crt->need_notice,
+            'award_start' => $crt->award_start ? $crt->award_start : date('Y-m-d H:i:s'),
+            'award_end' => $crt->award_end ? $crt->award_end : date('Y-m-d H:i:s'),
+            'award_state' => $crt->award_state,
+            'need_pay' => $crt->need_pay,
+            'deposit' => $crt->deposit,
+            'pay_types' => $crt->pay_types,
+            'group_column' => $crt->group_column,
+            'pic_data' => $crt->pic_data,
+            'contents' => $crt->contents,
+            'is_period' => $crt->is_period
         );
         
         $success = self::nativeExecute($sql, $bind);
@@ -485,191 +559,173 @@ SQL;
 
     /**
      * 更新活动
-     * @param $id
-     * @param null $name
-     * @param null $pic_data
-     * @param null $contents
-     * @param null $place
-     * @param null $url
-     * @param null $auto_start
-     * @param null $start_date
-     * @param null $end_date
-     * @param null $sign_start_date
-     * @param null $sign_end_date
-     * @param null $trip_line
-     * @param null $state
-     * @param null $info
-     * @param null $option
-     * @param null $type_id
-     * @param null $need_check_in
-     * @param null $award_start
-     * @param null $award_end
-     * @param null $award_state
-     * @param null $need_pay
-     * @param null $deposit
-     * @param null $need_notice
-     * @param null $pay_types
-     * @param null $group_column
+     * @param int|string $id
+     * @param array      $criteria
      * @return bool
      */
-    public static function updateActivity($id, $name=null, $pic_data=null, $contents=null, $place=null, $url=null, $auto_start=null, $start_date=null, $end_date=null, $sign_start_date=null, $sign_end_date=null, $trip_line=null, $state=null, $info=null, $option=null, $type_id=null, $need_check_in=null, $award_start=null, $award_end=null, $award_state=null, $need_pay=null, $deposit=null, $need_notice=null, $pay_types=null, $group_column=null)
+    public static function updateActivity($id, array $criteria=null)
     {
+
+        $crt = new Criteria($criteria);
 
         $sql = 'update Activity set %s where id = :id';
 
         $field_str = '';
         $bind = array('id' => $id);
 
-        if($name)
+
+        if($crt->name)
         {
             $field_str .= '[name] = :name, ';
-            $bind['name'] = $name;
+            $bind['name'] = $crt->name;
         }
 
-        if($pic_data)
+        if($crt->pic_data)
         {
             $field_str .= 'picData = :pic_data, ';
-            $bind['pic_data'] = $pic_data;
+            $bind['pic_data'] = $crt->pic_data;
         }
 
-        if($contents)
+        if($crt->contents)
         {
             $field_str .= 'contents = :contents, ';
-            $bind['contents'] = $contents;
+            $bind['contents'] = $crt->contents;
         }
 
-        if($place)
+        if($crt->place)
         {
             $field_str .= 'place = :place, ';
-            $bind['place'] = $place;
+            $bind['place'] = $crt->place;
         }
 
-        if($url)
+        if($crt->url)
         {
             $field_str .= 'url = :url, ';
-            $bind['url'] = $url;
+            $bind['url'] = $crt->url;
         }
 
-        if($auto_start || $auto_start === 0 || $auto_start === '0')
+        if($crt->auto_start || $crt->auto_start === 0 || $crt->auto_start === '0')
         {
             $field_str .= 'autoStart = :auto_start, ';
-            $bind['auto_start'] = $auto_start;
+            $bind['auto_start'] = $crt->auto_start;
         }
 
-        if($start_date)
+        if($crt->start_date)
         {
             $field_str .= 'startDate = :start_date, ';
-            $bind['start_date'] = $start_date;
+            $bind['start_date'] = $crt->start_date;
         }
 
-        if($end_date)
+        if($crt->end_date)
         {
             $field_str .= 'endDate = :end_date, ';
-            $bind['end_date'] = $end_date;
+            $bind['end_date'] = $crt->end_date;
         }
 
-        if($sign_start_date)
+        if($crt->sign_start_date)
         {
             $field_str .= 'signStartDate = :sign_start_date, ';
-            $bind['sign_start_date'] = $sign_start_date;
+            $bind['sign_start_date'] = $crt->sign_start_date;
         }
 
-        if($sign_end_date)
+        if($crt->sign_end_date)
         {
             $field_str .= 'signEndDate = :sign_end_date, ';
-            $bind['sign_end_date'] = $sign_end_date;
+            $bind['sign_end_date'] = $crt->sign_end_date;
         }
 
-        if($trip_line)
+        if($crt->trip_line)
         {
             $field_str .= 'tripLine = :trip_line, ';
-            $bind['trip_line'] = $trip_line;
+            $bind['trip_line'] = $crt->trip_line;
         }
 
-        if($state || $state === 0 || $state === '0')
+        if($crt->state || $crt->state === 0 || $crt->state === '0')
         {
             $field_str .= 'state = :state, ';
-            $bind['state'] = $state;
+            $bind['state'] = $crt->state;
         }
 
-        if($info)
+        if($crt->info)
         {
             $field_str .= 'infos = :info, ';
-            $bind['info'] = $info;
+            $bind['info'] = $crt->info;
         }
 
-        if($option)
+        if($crt->option)
         {
             $field_str .= '[option] = :option, ';
-            $bind['option'] = $option;
+            $bind['option'] = $crt->option;
         }
 
-        if($type_id)
+        if($crt->type_id)
         {
             $field_str .= '[type] = :type_id, ';
-            $bind['type_id'] = $type_id;
+            $bind['type_id'] = $crt->type_id;
         }
 
-        if($need_check_in || $need_check_in === 0 || $need_check_in === '0')
+        if($crt->need_check_in || $crt->need_check_in === 0 || $crt->need_check_in === '0')
         {
             $field_str .= 'needCheckIn = :need_check_in, ';
-            $bind['need_check_in'] = $need_check_in;
+            $bind['need_check_in'] = $crt->need_check_in;
         }
 
-        if($award_start)
+        if($crt->award_start)
         {
             $field_str .= 'awardStart = :award_start, ';
-            $bind['award_start'] = $award_start;
+            $bind['award_start'] = $crt->award_start;
         }
 
-        if($award_end)
+        if($crt->award_end)
         {
             $field_str .= 'awardEnd = :award_end, ';
-            $bind['award_end'] = $award_end;
+            $bind['award_end'] = $crt->award_end;
         }
 
-        if($award_state)
+        if($crt->is_period or $crt->is_period === '0' or $crt->is_period === 0)
+        {
+            $field_str .= 'is_period = :is_period, ';
+            $bind['is_period'] = $crt->is_period;
+        }
+
+        if($crt->award_state)
         {
             $field_str .= 'awardState = :award_state, ';
-            $bind['award_state'] = $award_state;
+            $bind['award_state'] = $crt->award_state;
         }
 
-        if($need_pay or $need_pay === 0 or $need_pay === '0')
+        if($crt->need_pay or $crt->need_pay === 0 or $crt->need_pay === '0')
         {
             $field_str .= 'needPay = :need_pay, ';
-            $bind['need_pay'] = $need_pay;
+            $bind['need_pay'] = $crt->need_pay;
         }
 
-        if($deposit)
+        if($crt->deposit)
         {
             $field_str .= 'deposit = :deposit, ';
-            $bind['deposit'] = $deposit;
+            $bind['deposit'] = $crt->deposit;
         }
 
-        if($need_notice || $need_notice === 0 || $need_notice === '0')
+        if($crt->need_notice || $crt->need_notice === 0 || $crt->need_notice === '0')
         {
             $field_str .= 'needNotice = :need_notice, ';
-            $bind['need_notice'] = $need_notice;
+            $bind['need_notice'] = $crt->need_notice;
         }
 
-        if($pay_types)
+        if($crt->pay_types)
         {
             $field_str .= 'payTypes = :pay_types, ';
-            $bind['pay_types'] = $pay_types;
+            $bind['pay_types'] = $crt->pay_types;
         }
 
-        if($group_column)
+        if($crt->group_column)
         {
             $field_str .= 'groupColumn = :group_column, ';
-            $bind['group_column'] = $group_column;
+            $bind['group_column'] = $crt->group_column;
         }
 
         $field_str = rtrim($field_str, ', ');
-
         $sql = sprintf($sql, $field_str);
-
-        //echo $sql.PHP_EOL;
-        //print_r($bind);
 
         return self::nativeExecute($sql, $bind);
     }

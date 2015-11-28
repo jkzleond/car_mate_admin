@@ -55,7 +55,7 @@
                             <textarea id="activity_contents_editor" name="contents" style="width:60%; height:200px"></textarea>
                         </div>
                     </div>
-                    <div class="row-fluid" style="margin-top: 10px">
+                    <div class="row-fluid" style="margin-top: 10px" id="activity_sing_date_section">
                         <div class="span5">
                             <label class="label">报名开始时间</label>
                             <input name="sign_start" id="activity_sign_start" class="datetimebox" type="text" />
@@ -89,61 +89,70 @@
                             </select>
                         </div>
                     </div>
-                    <div class="row-fluid">
-                        <div class="span6">
-                            <label class="label">需要付款</label>
-                            <select id="activity_need_pay" name="need_pay" class="input-mini">
-                                <option value="0" checked>否</option>
-                                <option value="1">是</option>
-                            </select>
+                    <div class="row-fluid" id="activity_draw_period_section" style="display:none">
+                        <span class="label">抽奖时段</span>
+                        <select name="is_period" class="input-small">
+                            <option value="0">全天</option>
+                            <option value="1">分时段</option>
+                        </select>
+                    </div>
+                    <div class="row-fluid" id="activity_need_pay_section">
+                        <div class="row-fluid">
+                            <div class="span12">
+                                <label class="label">需要付款</label>
+                                <select id="activity_need_pay" name="need_pay" class="input-mini">
+                                    <option value="0" checked>否</option>
+                                    <option value="1">是</option>
+                                </select>
+                            </div>
                         </div>
-                    </div>
-                    <div class="row-fluid hidden-none pay" >
-                        <fieldset class="well well-small">
-                            <legend>付款金额</legend>
-                            <div class="row-fluid">
-                                <label class="label">付款金额(老本活动用)：</label>
-                                <input type="text" name="deposit" value="0" tag="付款金额">
-                            </div>
-                            <div class="row-fluid">
-                                <div class="span4">
-                                    <label class="label">付款项目：</label>
-                                    <button id="activity_add_pay_item"><i class="iconfa-plus"></i>添加</button>
+                        <div class="row-fluid hidden-none pay" >
+                            <fieldset class="well well-small">
+                                <legend>付款金额</legend>
+                                <div class="row-fluid">
+                                    <label class="label">付款金额(老本活动用)：</label>
+                                    <input type="text" name="deposit" value="0" tag="付款金额">
                                 </div>
-                                <div id="activity_pay_item_container" class="span8">
+                                <div class="row-fluid">
+                                    <div class="span4">
+                                        <label class="label">付款项目：</label>
+                                        <button id="activity_add_pay_item"><i class="iconfa-plus"></i>添加</button>
+                                    </div>
+                                    <div id="activity_pay_item_container" class="span8">
 
+                                    </div>
                                 </div>
-                            </div>
-                        </fieldset>
-                    </div>
-                    <div class="row-fluid hidden-none pay" style="display: none">
-                        <fieldset class="well well-small">
-                            <legend>付款方式</legend>
-                            <div class="controls controls-row">
-                                <div class="span6">
-                                    <label for="CASH" class="checkbox">
-                                        <input type="checkbox" name="pay_type" value="CASH" id="CASH"/>线下现金支付
-                                    </label>
+                            </fieldset>
+                        </div>
+                        <div class="row-fluid hidden-none pay" style="display: none">
+                            <fieldset class="well well-small">
+                                <legend>付款方式</legend>
+                                <div class="controls controls-row">
+                                    <div class="span6">
+                                        <label for="CASH" class="checkbox">
+                                            <input type="checkbox" name="pay_type" value="CASH" id="CASH"/>线下现金支付
+                                        </label>
+                                    </div>
+                                    <div class="span6">
+                                        <label for="POS" class="checkbox">
+                                            <input type="checkbox" name="pay_type" value="POS" id="POS"/>线下POS机刷卡
+                                        </label>
+                                    </div>
                                 </div>
-                                <div class="span6">
-                                    <label for="POS" class="checkbox">
-                                        <input type="checkbox" name="pay_type" value="POS" id="POS"/>线下POS机刷卡
-                                    </label>
+                                <div class="controls controls-row">
+                                    <div class="span6">
+                                        <label for="ONLINE" class="checkbox">
+                                            <input type="checkbox" name="pay_type" value="ONLINE" id="ONLINE"/>支付宝在线支付
+                                        </label>
+                                    </div>
+                                    <div class="span6">
+                                        <label for="TRANSFER" class="checkbox">
+                                            <input type="checkbox" name="pay_type" value="TRANSFER" id="TRANSFER"/>支付宝转账
+                                        </label>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="controls controls-row">
-                                <div class="span6">
-                                    <label for="ONLINE" class="checkbox">
-                                        <input type="checkbox" name="pay_type" value="ONLINE" id="ONLINE"/>支付宝在线支付
-                                    </label>
-                                </div>
-                                <div class="span6">
-                                    <label for="TRANSFER" class="checkbox">
-                                        <input type="checkbox" name="pay_type" value="TRANSFER" id="TRANSFER"/>支付宝转账
-                                    </label>
-                                </div>
-                            </div>
-                        </fieldset>
+                            </fieldset>
+                        </div>
                     </div>
 
                     <div class="row-fluid">
@@ -298,6 +307,8 @@
             <div id="activity_preview_window">
                 <iframe src="" frameborder="0" style="width: 300px; height: 480px"></iframe>
             </div>
+            <!-- 时段编辑窗口 -->
+            <div id="activity_period_edit_window"></div>
         </div>
     </div>
 </div>
@@ -325,7 +336,7 @@
             title: '活动添加',
             iconCls: 'icon-plus',
             width: 1100,
-            height: 600,
+            height: 700,
             closed: true,
             shadow: false,
             modal: true,
@@ -364,6 +375,7 @@
                         var type_id = $('#activity_cu_window [name="type_id"]').val();
                         var award_start = $('#activity_cu_window [name="award_start"]').val();
                         var award_end = $('#activity_cu_window [name="award_end"]').val();
+                        var is_period = $('#activity_cu_window [name="is_period"]').val();
                         var need_pay = $('#activity_cu_window [name="need_pay"]').val();
 
                         var pay_items = [];
@@ -437,6 +449,7 @@
                         activity.set('type_id', type_id);
                         activity.set('award_start', award_start);
                         activity.set('award_end', award_end);
+                        activity.set('is_period', is_period);
                         activity.set('need_pay', need_pay);
                         activity.set('pay_items', pay_items); //付款项目
                         activity.set('pay_types', pay_types);
@@ -544,6 +557,24 @@
             openAnimation: 'fade'
         });
 
+        //时段编辑窗口
+        var period_edit_window = $('#activity_period_edit_window').window({
+            title: '时段编辑编辑窗口',
+            iconCls: 'icon-wrench',
+            width: '640',
+            height: '640',
+            closed: true,
+            shadow: false,
+            modal: true,
+            openAnimation: 'fade',
+            onLoad: function(){
+                $(document).trigger('pageLoad:drawPeriod');
+            },
+            onBeforeClose: function(){
+                $(document).trigger('pageLeave:drawPeriod');
+            }
+        });
+
         /******表格********/
 
         //活动表格
@@ -646,17 +677,24 @@
                 $('#activity_grid').datagrid('fixDetailRowHeight',index);
             },
             frozenColumns: [[
-                {field:'id',title:'操作',width:'12%',align:'center', formatter: function(value, row, index){
+                {field:'id',title:'操作',width:'20%',align:'center', formatter: function(value, row, index){
                     if(!value) return;
-                    if(row.state != 2)
+                    var btn_group_html = '<button title="预览" class="btn btn-mini btn-info activity-preview-btn" data-id="' + value + '"><i class="icon-eye-open"></i></button><button class="btn btn-mini btn-warning activity-update-btn" data-id="' + value + '"><i class="icon-edit"></i></button>';
+
+                    if(row.typeId == 2)
                     {
-                        return '<div class="btn-group"><button title="预览" class="btn btn-mini btn-info activity-preview-btn" data-id="' + value + '"><i class="icon-eye-open"></i></button><button class="btn btn-mini btn-warning activity-update-btn" data-id="' + value + '"><i class="icon-edit"></i></button><button class="btn btn-mini btn-danger activity-del-btn" data-id="' + value + '"><i class="icon-trash"></i></button></div>';
-                    }
-                    else
-                    {
-                        return '<div class="btn-group"><button title="预览" class="btn btn-mini btn-info activity-preview-btn" data-id="' + value + '"><i class="icon-eye-open"></i></button><button class="btn btn-mini btn-warning activity-update-btn" data-id="' + value + '"><i class="icon-edit"></i></button></div>';
+                        if(row.is_period == 1)
+                        {
+                            btn_group_html += '<button title="编辑时段" class="btn btn-mini btn-warning activity-edit-period" data-id="' + row.id + '"><i class="iconfa-time"></i></button>';
+                        }
                     }
 
+                    if(row.state != 2)
+                    {
+                        btn_group_html += '<button class="btn btn-mini btn-danger activity-del-btn" data-id="' + value + '"><i class="icon-trash"></i></button>';
+                    }
+
+                    return '<div class="btn-group">' + btn_group_html + '</div>';
                 }}
             ]],
             columns:[[
@@ -811,10 +849,16 @@
         //活动类型select change 事件
         $('#activity_type').change(function(event){
             $('#activity_award').hide(500);
+            $('#activity_draw_period_section').hide(500);
             $('#activity_trip_line').hide(500);
+            $('#activity_sing_date_section').show(500);
+            $('#activity_need_pay_section').show(500);
             if($(this).val() == '2')
             {
                 $('#activity_award').show(500);
+                $('#activity_draw_period_section').show(500);
+                $('#activity_sing_date_section').hide(500);
+                $('#activity_need_pay_section').hide(500);
             }
             else if($(this).val() == '3')
             {
@@ -930,6 +974,7 @@
             var aetime = CarMate.utils.date.mssqlToJs(row.awardEnd);
             award_start.datetimebox('setValue', CarMate.utils.date('Y-m-d H:i:s', astime));
             award_end.datetimebox('setValue', CarMate.utils.date('Y-m-d H:i:s', aetime));
+            $('#activity_cu_form [name="is_period"]').val(row.is_period);
             $('#activity_cu_form [name="award_state"]').val(row.awardState);
 
             $('#activity_cu_form [name="need_pay"]').val(row.needPay);
@@ -1062,6 +1107,21 @@
 
         });
 
+        //编辑时段按钮点击事件
+        $(document).on('click', '.activity-edit-period', function(event){
+            var aid = $(this).attr('data-id');
+            var url = '/activity/drawPeriod/' + aid;
+            var opt = period_edit_window.window('options');
+            opt.href = url;
+            period_edit_window.window(opt).window('open');
+        });
+        
+        //编辑奖品按钮点击事件
+        $(document).on('click', '.activity-edit-award-btn', function(event){
+            var aid = $(this).attr('data-id');
+            CarMate.viewManager.open('/activity/awardManage/' + aid);
+        });
+
         //删除活动按钮点击事件
         $(document).on('click', '.activity-del-btn', function(event){
             var id = $(this).attr('data-id');
@@ -1089,7 +1149,20 @@
         //活动预览按钮点击事件
         $(document).on('click', '.activity-preview-btn', function(event){
             var activity = $('#activity_grid').datagrid('getSelected');
-            var url = activity.url.replace('{loginname}', 'SYSTEM_ACCOUNT');
+            var type_id = activity.typeId;
+
+            var url = null;
+
+            if(type_id == 3)
+            {
+                url = 'http://116.55.248.76:8092/?{url_param}#tour/detail/' + activity.id;
+            }
+            else
+            {
+                url = 'http://116.55.248.76:8092/?{url_param}#activity/detail/' + activity.id;
+            }
+
+            url = url.replace('{url_param}', 'userId=SYSTEM_ACCOUNT');
             $('#activity_preview_window iframe').attr('src', url);
             $('#activity_preview_window').window('open').window('center');
         });
@@ -1185,21 +1258,25 @@
             $.messager.show({title: '系统消息', msg: '活动更新成功'});
             $('#activity_grid').datagrid('reload');
         });
+        
+        CarMate.page.on_leave = function(){
+            //销毁窗口
+            $('#activity_cu_window').dialog('destroy');
+            $('#activity_pay_window').window('destroy');
+            $('#activity_check_in_window').window('destroy');
+            $('#activity_preview_window').window('destroy');
+            period_edit_window.window('destroy');
+
+            //清除动态绑定事件
+            $(document).off('click', '.activity-update-btn');
+            $(document).off('click', '.activity-edit-period');
+            $(document).off('click', '.activity-edit-award-btn');
+            $(document).off('click', '.activity-del-btn');
+            $(document).off('click', '.activity-detail-btn');
+            $(document).off('click', '.check-user-view');
+            $(document).off('click', '.pay-user-view');
+            $(document).off('click', '.activity-remove-pay-item');
+        };
     };
 
-    CarMate.page.on_leave = function(){
-        //销毁窗口
-        $('#activity_cu_window').dialog('destroy');
-        $('#activity_pay_window').window('destroy');
-        $('#activity_check_in_window').window('destroy');
-        $('#activity_preview_window').window('destroy');
-
-        //清除动态绑定事件
-        $(document).off('click', '.activity-update-btn');
-        $(document).off('click', '.activity-del-btn');
-        $(document).off('click', '.activity-detail-btn');
-        $(document).off('click', '.check-user-view');
-        $(document).off('click', '.pay-user-view');
-        $(document).off('click', '.activity-remove-pay-item');
-    };
 </script>

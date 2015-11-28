@@ -59,7 +59,7 @@ class WelcomepageController extends ControllerBase
             $pic_data = WelcomePage::getAdvPicDataById($id);
             file_put_contents($img_cache_path.'/'.$id.'.png', base64_decode($pic_data));
         }
-        $this->response->redirect($this->url->get('/images/cache/'.$controller_name.'/advpics/'.$id.'.png'));
+        return $this->response->redirect($this->url->get('/images/cache/'.$controller_name.'/advpics/'.$id.'.png'));
     }
 
     /**

@@ -183,7 +183,14 @@ class InsuranceController extends ControllerBase
         {
             $push_title = '您的车险保单已出单，请登录本地惠保险巨惠进行查看！';
             PushNotifications::addPushMessage(2, $user_id, null, null, $push_title, 0);
+
         }
+        //触发保险出单后事件
+        $this->eventsManager->fire('insurance:afterIssuing', $this, array(
+            'success' => $success, //是否成功
+            'affected_rows' => $this->db->affectedRows(),
+            'user_id' => $data
+        ));
 
         $this->view->setVar('data', array(
             'success' => $success

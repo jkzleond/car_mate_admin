@@ -273,10 +273,9 @@
                 //{
                     resize_height = Math.round(client_height * 0.8);
                 //}
-                console.log(resize_width + ':' + resize_height);
                 $(this).window('resize', {
-                    width: 200,
-                    height: 300
+                    width: resize_width,
+                    height: resize_height
                 });
 
                 $(this).window('center');

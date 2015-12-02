@@ -193,7 +193,7 @@ SQL;
         }
         elseif($crt->pay_state == 3)
         {
-            $cte_condition_arr[] = "(o.pay_state = 'TRADE_CLOSED')";
+            $condition_arr[] = "(o.pay_state = 'TRADE_CLOSED')";
         }
 
         if($crt->client_type)

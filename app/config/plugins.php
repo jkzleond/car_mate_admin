@@ -24,5 +24,5 @@ $eventsManager->attach('dispatch', new AjaxFilter($di));
 /**
  * 保险20免一活动插件
  */
-//$insurance_draw_filter = new InsuranceDrawFilter($di);
-//$eventsManager->attach('insurance', $insurance_draw_filter);
+$insurance_draw_filter = new InsuranceDrawFilter($di);
+$eventsManager->attach('insurance', $insurance_draw_filter);

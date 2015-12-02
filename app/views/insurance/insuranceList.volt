@@ -235,10 +235,6 @@
             modal: true,
             openAnimation: 'fade',
             onOpen: function(){
-                $(this).window('resize', {
-                    width: 'auto',
-                    height: 'auto'
-                });
                 $(this).window('center');
             },
             onBeforeLoad: function(){

@@ -189,7 +189,8 @@ class InsuranceController extends ControllerBase
         $this->eventsManager->fire('insurance:afterIssuing', $this, array(
             'success' => $success, //是否成功
             'affected_rows' => $this->db->affectedRows(),
-            'user_id' => $data
+            'insurance_info_id' => $id,
+            'user_id' => $data,
         ));
 
         $this->view->setVar('data', array(

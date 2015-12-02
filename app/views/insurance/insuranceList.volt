@@ -335,40 +335,45 @@
             var btn_state = $(this).attr('data-state');
             var state_id = $(this).attr('data-state-id');
             $('#insurance_window').data('state_id', state_id);
+            var opt = $('#insurance_window').window('options');
             if(btn_state == 'exact')
             {
                 var exact_url = $(this).attr('data-url');
+                opt.title = '保险精算';
+                opt.href = excat_url;
                 $('#insurance_window')
-                    .window('setTitle', '保险精算')
-                    .window('open', true)
-                    .window('refresh', exact_url)
+                    .window(opt)
+                    .window('open')
                     .window('center');
             }
             else if(btn_state == 'buy')
             {
                 var buy_url = $(this).attr('data-url');
+                opt.title = '保险购买处理';
+                opt.href = buy_url;
                 $('#insurance_window')
-                    .window('setTitle', '保险购买处理')
-                    .window('open', true)
-                    .window('refresh', buy_url)
+                    .window(opt)
+                    .window('open')
                     .window('center');
             }
             else if(btn_state == 'detail')
             {
                 var detail_url = $(this).attr('data-url');
+                opt.title = '保险详情';
+                opt.href = detail_url;
                 $('#insurance_window')
-                    .window('setTitle', '保险详情')
-                    .window('open', true)
-                    .window('refresh', detail_url)
+                    .window(opt)
+                    .window('open')
                     .window('center');
             }
             else if(btn_state == 'order_info')
             {
                 var detail_url = $(this).attr('data-url');
+                opt.title = '保险订单信息';
+                opt.href = detail_url
                 $('#insurance_window')
-                    .window('setTitle', '保险订单信息')
-                    .window('open', true)
-                    .window('refresh', detail_url)
+                    .window(opt)
+                    .window('open')
                     .window('center');
             }
 

@@ -73,6 +73,7 @@
                                     <option value="">全部</option>
                                     <option value="1">未支付</option>
                                     <option value="2">已支付</option>
+                                    <option value="3">已关闭</option>
                                 </select>
                             </div>
                             <div class="span3">

@@ -61,9 +61,13 @@ class Order extends ModelEx
         {
             $cte_condition_arr[] = "(o.pay_state != 'TRADE_SUCCESS' and o.pay_state != 'TRADE_FINISHED' or o.pay_state is null)";
         }
-        else if($crt->pay_state == 2)
+        elseif($crt->pay_state == 2)
         {
             $cte_condition_arr[] = "(o.pay_state = 'TRADE_SUCCESS' or o.pay_state = 'TRADE_FINISHED')";
+        }
+        elseif($crt->pay_state == 3)
+        {
+            $cte_condition_arr[] = "(o.pay_state = 'TRADE_CLOSED')";
         }
 
         if($crt->client_type)

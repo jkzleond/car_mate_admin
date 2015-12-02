@@ -263,20 +263,20 @@
                 var resize_height = 'auto';
 
                 var $panel = $(this).window('panel');
-                var panel_width = $panel.outerWidth();
-                var panel_height = $panel.outerHeight();
-                var client_width = window.innerWidth;
-                var client_height = window.innerHeight;
+                //var panel_width = $panel.outerWidth();
+                //var panel_height = $panel.outerHeight();
+                var client_width = $(window).width();
+                var client_height = $(window).height();
 
-                if(client_width < panel_width)
-                {
+                //if(client_width < panel_width)
+                //{
                     resize_width = Math.round(client_width * 0.8);
-                }
+                //}
 
-                if(client_height < panel_height)
-                {
+                //if(client_height < panel_height)
+                //{
                     resize_height = Math.round(client_height * 0.8);
-                }
+                //}
 
                 $(this).window('resize', {
                     width: resize_width,

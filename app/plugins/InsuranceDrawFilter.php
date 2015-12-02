@@ -128,6 +128,7 @@ SQL;
 				'num' => 1,
 				'rate' => 1,
 				'aid' => 228,
+				'pic' => null,
 				'day_limit' => 1
 			);
 			$add_award_sql = '';

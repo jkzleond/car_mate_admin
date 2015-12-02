@@ -1,11 +1,14 @@
 <?php
 use \Phalcon\Mvc\User\Plugin;
 use \Phalcon\Db;
+use \Phalcon\Logger\Adapter\File as FileLogger;
 
 class InsuranceDrawFilter extends Plugin
 {
 	public function afterIssuing($insurance_controller, $results)
 	{
+		$logger = new FileLogger('../insurance_isuse.log');
+		
 		if($results['success'])
 		{
 			$user_id = $results['user_id'];

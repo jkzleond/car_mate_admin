@@ -8,4 +8,5 @@ public/images/**
 *.sublime-project
 *.sublime-workspace
 .idea/**
+.vscode/**
 .tag*

@@ -159,7 +159,6 @@ SQL;
 				$add_award_sql = 'insert into Award (name, num, rate, aid, pic, dayLimit, value) values '.$add_award_param_str;
 				$db->execute($add_award_sql, $add_award_bind);
 			}
-			
 		}
 	}
 }

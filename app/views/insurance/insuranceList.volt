@@ -279,8 +279,8 @@
                 //}
                 console.log(resize_width + ':' + resize_height);
                 $(this).window('resize', {
-                    width: resize_width,
-                    height: resize_height
+                    width: 200,
+                    height: 300
                 });
 
                 $(this).window('center');

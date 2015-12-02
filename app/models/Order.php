@@ -191,6 +191,10 @@ SQL;
         {
             $condition_arr[] = "(o.pay_state = 'TRADE_SUCCESS' or o.pay_state = 'TRADE_FINISHED')";
         }
+        elseif($crt->pay_state == 3)
+        {
+            $cte_condition_arr[] = "(o.pay_state = 'TRADE_CLOSED')";
+        }
 
         if($crt->client_type)
         {

@@ -340,7 +340,7 @@
             {
                 var exact_url = $(this).attr('data-url');
                 opt.title = '保险精算';
-                opt.href = excat_url;
+                opt.href = exact_url;
                 $('#insurance_window')
                     .window(opt)
                     .window('open')

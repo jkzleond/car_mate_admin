@@ -5,10 +5,11 @@ use \Phalcon\Logger\Adapter\File as FileLogger;
 
 class InsuranceDrawFilter extends Plugin
 {
-	public function afterIssuing($insurance_controller, $results)
+	public function afterIssuing($event, $insurance_controller, $results)
 	{
-		$logger = new FileLogger('../insurance_isuse.log');
-		
+		ini_set('display_errors', 1);
+		$logger = new FileLogger('./insurance_isuse.log', 'w');
+
 		if($results['success'])
 		{
 			$user_id = $results['user_id'];
@@ -16,7 +17,7 @@ class InsuranceDrawFilter extends Plugin
 
 			//获取保险20免一活动参与用户的上家
 			$get_involve_sql = <<<SQL
-			select top 1 p_user_id from ActivityUser where user_id = :user_id and aid = :aid
+			select top 1 p_user_id from ActivityUser where userid = :user_id and aid = :aid
 SQL;
 			$get_involve_bind = array(
 				'user_id' => $user_id,
@@ -34,6 +35,7 @@ SQL;
 			}
 
 			$p_user_id = $involve_info['p_user_id'];
+
 			//增加用户上家的抽奖次数
 			$update_chance_sql = <<<SQL
 			update AwardChance set chance = chance + 1 where userid = :user_id and aid = :aid
@@ -43,19 +45,19 @@ SQL;
 				'aid' => 228
 			);
 
-			$update_success = $db->execute($update_chance_sql, $update_chance_sql);
-
+			$update_success = $db->execute($update_chance_sql, $update_chance_bind);
+			
 			$get_insurance_info_mark_sql = <<<SQL
-			select top 1 from InsuranceInfoToMarkTmp where insurance_info_id = :insurance_info_id and mark = 1
+			select top 1 id from InsuranceInfoToMarkTmp where insurance_info_id = :insurance_info_id and mark = 1
 SQL;
 			$get_insurance_info_mark_bind = array(
-				'insurance_info_id' => $results['id']
+				'insurance_info_id' => $results['insurance_info_id']
 			);
 
 			$insurance_info_mark_result = $db->query($get_insurance_info_mark_sql, $get_insurance_info_mark_bind);
 			$insurance_info_mark_result->setFetchMode(Db::FETCH_ASSOC);
 			$insurance_info_mark = $insurance_info_mark_result->fetch();
-
+			
 			//计算过的保险信息则直接返回
 			if(!empty($insurance_info_mark))
 			{
@@ -67,7 +69,7 @@ SQL;
 			insert into InsuranceInfoToMarkTmp (insurance_info_id) values (:insurance_info_id)
 SQL;
 			$insert_insurance_info_mark_bind = array(
-				'insurance_info_id' => $result['id']
+				'insurance_info_id' => $results['insurance_info_id']
 			);
 
 			$insert_insurance_info_mark_success = $db->execute($insert_insurance_info_mark_sql, $insert_insurance_info_mark_bind);
@@ -77,7 +79,8 @@ SQL;
 				取出没参与过计算的20条保险信息的实际出单价
 			*/
 			$get_top20_insurance_info_sql = <<<SQL
-			select i.id as id, i.actulAmount as actul_amount, r.afterDiscountCompusoryInsurance as compusory, r.afterDiscountThird as third, r.afterDiscountDriver as driver, r.afterDiscountPassenger as passenger from Insurance_Info i
+			select i.id as id, i.actulAmount as actul_amount, r.afterDiscountCompulsoryInsurance as compulsory, r.afterDiscountThird as third, r.afterDiscountDriver as driver, r.afterDiscountPassenger as passenger
+			from Insurance_Info i
 			left join Insurance_FinalResult r on r.id = i.finalResult_id
 			where i.id in (
 				select top 20 insurance_info_id from InsuranceInfoToMarkTmp where mark = 0
@@ -86,42 +89,44 @@ SQL;
 			$get_top20_insurance_info_result = $db->query($get_top20_insurance_info_sql);
 			$get_top20_insurance_info_result->setFetchMode(Db::FETCH_ASSOC);
 			$top20_insurance_info_list = $get_top20_insurance_info_result->fetchAll();
-
+			
 			//没有20条则直接返回
-			if(count($top20_insurance_info_list) != 20)
+			if(count($top20_insurance_info_list) < 20)
 			{
 				return;
 			}
 
 			$avg_amount = 0;
-			$avg_compusory = 0;
+			$avg_compulsory = 0;
 			$avg_third = 0;
 			$avg_seet = 0; //座位险平均值(包含司机和乘客)
 			$total_amount = 0;
-			$total_compusory = 0;
+			$total_compulsory = 0;
 			$total_third = 0;
 			$total_seet = 0;
 			$total = 0;
 			$info_ids = '';
+
 			foreach($top20_insurance_info_list as $top20_insurance_info)
 			{
 				$total++;
 				$total_amount += $top20_insurance_info['actul_amount'];
-				$total_compusory += $top20_insurance_info['compusory'];
+				$total_compulsory += $top20_insurance_info['compulsory'];
 				$total_third += $top20_insurance_info['third'];
-				$total_seet += $top20_insurance_info['driver'] + $top_insurance_info['passenger'];
-				$info_ids += $top20_insurance_info['id'] + ',';
+				$total_seet += $top20_insurance_info['driver'] + $top20_insurance_info['passenger'];
+				$info_ids .= $top20_insurance_info['id'].',';
 			}
 			$info_ids = rtrim($info_ids, ',');
-			$avg_amount = number_format($total_amount/$total,2);
-			$avg_compusory = number_format($total_compusory/$total,2);
-			$avg_third = number_format($total_third/$total, 2);
-			$avg_seet = number_format($total_seet/$total, 2);
+			$avg_amount = round($total_amount/$total,2);
+			$avg_compulsory = round($total_compulsory/$total,2);
+			$avg_third = round($total_third/$total, 2);
+			$avg_seet = round($total_seet/$total, 2);
 			
 			//更新标记为已计算
 			$update_mark_sql = <<<SQL
-			update InsuranceInfoToMarkTmp set mark = 1 where id in ($info_ids)
+			update InsuranceInfoToMarkTmp set mark = 1 where insurance_info_id in ($info_ids)
 SQL;
+			
 			$db->execute($update_mark_sql);
 
 			//添加奖品
@@ -136,32 +141,33 @@ SQL;
 			);
 			$add_award_sql = '';
 			
-			if(!(float)$avg_compusory != 0)
+			if((float)$avg_compulsory != 0)
 			{
-				$add_award_params[] = '(:compusory_name, :num, :rate, :aid, :day_limit, :compusory_value)';
-				$add_award_bind['compusory_name'] = '交强险免' + $avg_compusory + '元';
-				$add_award_bind['compusory_value'] = $avg_compusory;
+				$add_award_params[] = '(:compulsory_name, :num, :rate, :aid, :pic, :day_limit, :compulsory_value)';
+				$add_award_bind['compulsory_name'] = '交强险免'.$avg_compulsory.'元';
+				$add_award_bind['compulsory_value'] = $avg_compulsory;
 			}
 			
-			if(!(float)$avg_third != 0)
+			if((float)$avg_third != 0)
 			{
-				$add_award_params[] = '(:third_name, :num, :rate, :aid, :day_limit, :third_value)';
-				$add_award_bind['third_name'] = '三者险免' + $avg_third + '元';
-				$add_award_bind['thrid_value'] = $avg_third;
+				$add_award_params[] = '(:third_name, :num, :rate, :aid, :pic, :day_limit, :third_value)';
+				$add_award_bind['third_name'] = '三者险免'.$avg_third.'元';
+				$add_award_bind['third_value'] = $avg_third;
 			}
 			
-			if(!(float)$avg_seet != 0)
+			if((float)$avg_seet != 0)
 			{
-				$add_award_params[] = '(:seet_name, :num, :rate, :aid, :day_limit, :seet_value)';
-				$add_award_bind['seet_name'] = '座位险免' + $avg_seet + '元';
+				$add_award_params[] = '(:seet_name, :num, :rate, :aid, :pic, :day_limit, :seet_value)';
+				$add_award_bind['seet_name'] = '座位险免'.$avg_seet.'元';
 				$add_award_bind['seet_value'] = $avg_seet;
 			}
 			
 			if(!empty($add_award_params))
 			{
 				$add_award_params_str = implode(', ', $add_award_params);
-				$add_award_sql = 'insert into Award (name, num, rate, aid, pic, dayLimit, value) values '.$add_award_param_str;
-				$db->execute($add_award_sql, $add_award_bind);
+				$add_award_sql = 'insert into Award ([name], num, rate, aid, pic, dayLimit, [value]) values '.$add_award_params_str;
+				
+				$success = $db->execute($add_award_sql, $add_award_bind);
 			}
 		}
 	}

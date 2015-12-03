@@ -190,7 +190,7 @@ class InsuranceController extends ControllerBase
             'success' => $success, //是否成功
             'affected_rows' => $this->db->affectedRows(),
             'insurance_info_id' => $id,
-            'user_id' => $data,
+            'user_id' => $data['user_id'],
         ));
 
         $this->view->setVar('data', array(

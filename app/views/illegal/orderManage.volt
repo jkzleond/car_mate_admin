@@ -189,11 +189,11 @@
                     }
                     else if(value == 'TRADE_CLOSED')
                     {
-                        return '<span class="label label-important">已关闭</span>'
+                        return '<span class="label label-important">已关闭</span>';
                     }
                     else
                     {
-                        return '已支付'
+                        return '未支付';
                     }
                 }},
                 {field:'mark', title:'处理结果', width:'10%', align:'center', formatter: function(value, row, index){

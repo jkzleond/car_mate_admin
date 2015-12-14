@@ -122,7 +122,7 @@ $di->set('crypt', function () {
  */
 $di->setShared('trans', function() use($di) {
     $language = $di->getShared('request')->getBestLanguage();
-    $language = strtolower($language);
+    $language = 'zh-cn';//strtolower($language);
     $messages = include __DIR__.'/../messages/'.$language.'.php';
     return new Translation(array('content' => $messages));
 });

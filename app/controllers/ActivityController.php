@@ -148,7 +148,8 @@ class ActivityController extends ControllerBase
             $id = isset($data['id']) ? $data['id'] : null;
             $pay_items = isset($data['pay_items']) ? $data['pay_items'] : null;
             $info_arr = isset($data['info']) ? $data['info'] : null;
-            $data['info'] = isset($data['info']) ? implode(',', $data['info']) : null;
+            $data['info'] = isset($data['info']) ? implode(', ', $data['info']) : null;
+            $data['pay_types'] = isset($data['pay_types']) ? implode(', ', $data['pay_types']) : null;
             $data['pay_items'] = isset($data['pay_items']) ? $data['pay_items'] : null;
 
             $rst = Activity::updateActivity($id, $data);

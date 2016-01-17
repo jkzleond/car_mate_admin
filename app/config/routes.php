@@ -1169,6 +1169,60 @@ $router->addPut('/noticeUnextend/{id:\d+}.json', array(
     'action' => 'noticeUnextend'
 ));
 
+//车友互动管理页面
+$router->addGet('/talk/manage', array(
+    'controller' => 'talkinfo',
+    'action' => 'manage'
+));
+
+//获取车友互动列表
+$router->addPost('/talk/list.json', array(
+    'controller' => 'talkinfo',
+    'action' => 'talkList'
+));
+
+//获取车友互动图片
+$router->addGet('/talk/{id:\d+}.png', array(
+    'controller' => 'talkinfo',
+    'action' => 'getTalkPic'
+));
+
+//添加车友互动回复
+$router->addPost('/talk/{id:\d+}/reply.json', array(
+    'controller' => 'talkinfo',
+    'action' => 'talkReply'
+));
+
+//获取车友互动回复列表
+$router->addGet('/talk/{id:\d+}/reply_list.json', array(
+    'controller' => 'talkinfo',
+    'action' => 'talkReplyList'
+));
+
+//改变车友互动发布状态
+$router->addPut('/talk/{id:\d+}/state/{state:\d}.json', array(
+    'controller' => 'talkinfo',
+    'action' => 'talkStateChange'
+));
+
+//改变车友互动禁止回复状态
+$router->addPut('/talk/{id:\d+}/no_reply/{no_reply:\d}.json', array(
+    'controller' => 'talkinfo',
+    'action' => 'talkNoReplyChange'
+));
+
+//删除指定ID车友互动
+$router->addDelete('/talk/{id:\d+}.json', array(
+    'controller' => 'talkinfo',
+    'action' => 'deleteTalk'
+));
+
+//删除指定ID回复
+$router->addDelete('/talk/reply/{id:\d+}.json', array(
+    'controller' => 'talkinfo',
+    'action' => 'deleteTalkReply'
+));
+
 //消息推送页面
 $router->addGet('/push_message', array(
     'controller' => 'pushmessage',

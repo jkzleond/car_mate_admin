@@ -261,7 +261,7 @@
                         <li class="dropdown"><a href="">油价管理</a></li>
                         {% endif %}
                         {% if 'talkInfo' in auth %}
-                        <li class="dropdown"><a href="">车友互动</a></li>
+                        <li class="dropdown"><a href="/talk/manage">车友互动</a></li>
                         {% endif %}
                         {% if 'interaction' in auth %}
                         <li class="dropdown"><a href="">路况管理</a></li>

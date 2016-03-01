@@ -1040,7 +1040,7 @@
             $('#activity_cu_form [name="need_check_in"]').val(row.needCheckIn);
             $('#activity_cu_form [name="need_notice"]').val(row.needNotice);
 
-            var info = row.infos ? row.infos.split(', ') : [];
+            var info = row.infos ? row.infos.split(/,\s*/) : [];
 
             $('#activity_cu_window [name="info"]').each(function(i, n){
                 if( info.indexOf( $(this).val() ) == -1 )

@@ -136,7 +136,7 @@
             pageNumber:1,///（当前页码）
             onChange: function(new_value, old_value){
                 var activity = activity_select.combogrid('grid').datagrid('getSelected');
-                var info_arr = activity.infos.split(', ');
+                var info_arr = activity.infos.split(/,\s*/);
 
                 //根据活动需要填写的用户信息显示信息滤器
                 $('#activity_user_grid_tb [data-rel-info]').each(function(i, n){

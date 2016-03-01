@@ -139,6 +139,7 @@ class Order extends ModelEx
                  money as order_fee, state as pay_state,
                  refundState as refund_state, isnull(refundFee, 0.00) as refund_fee, isnull(poundage, 0.00) as poundage, des,
                  mark, failReason as fail_reason,
+                 convert(varchar(20), markTime, 20) as mark_time,
                  convert(varchar(20), createTime, 20) as create_date,
                  convert(varchar(20), payTime, 20) as pay_time
                 from PayList
@@ -474,8 +475,9 @@ SQL;
 
         if($crt->mark)
         {
-            $field_str .= 'mark = :mark, ';
+            $field_str .= 'mark = :mark, markTime = :mark_time, ';
             $bind['mark'] = $crt->mark;
+            $bind['mark_time'] = date('Y-m-d H:i:s');
         }
 
         if($crt->refund_state == 'REFUND_PART' or $crt->refund_state == 'REFUND_FULL')

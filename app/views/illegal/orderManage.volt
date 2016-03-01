@@ -229,7 +229,8 @@
                     {
                         return value;
                     }
-                }}
+                }},
+                {field:'mark_time', title:'处理时间', width:'12%', align:'center'}
             ]]
         });
 

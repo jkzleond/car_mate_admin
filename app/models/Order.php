@@ -130,7 +130,7 @@ class Order extends ModelEx
 
         $sql = <<<SQL
         with ORDER_CTE as (
-            select o.id, o.order_no, o.trade_no, o.user_id, o.client_type, o2i.hphm, o2i.[count] as illegal_num, o2i.sum_fkje, o.pay_type, o.order_fee, o.pay_state, o.pay_time, o.mark, o.create_date, o.fail_reason, u.phone, u.uname as user_name,
+            select o.id, o.order_no, o.trade_no, o.user_id, o.client_type, o2i.hphm, o2i.[count] as illegal_num, o2i.sum_fkje, o.pay_type, o.order_fee, o.pay_state, o.pay_time, o.mark, o.create_date, o.mark_time, o.fail_reason, u.phone, u.uname as user_name,
             refund_state, refund_fee, poundage, ( o2i.[count]*10 - poundage) as real_income, des,
             ROW_NUMBER() over(order by o.create_date desc) as rownum
             from (

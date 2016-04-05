@@ -743,6 +743,7 @@
                     }
                 }},
                 {field:'typeName',title:'类型',width:'6%',align:'center'},
+                {field:'viewNum', title:'浏览量', width:'6%',align:'center'},
                 {field:'num',title:'参与人数',width:'6%',align:'center'},
                 {field:'gainNum',title:'领取人数',width:'6%',align:'center'}
             ]]

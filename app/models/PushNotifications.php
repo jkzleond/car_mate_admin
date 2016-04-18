@@ -116,8 +116,8 @@ SQL;
 SQL;
 		$bind['type_id'] = $msg_crt->type_id ? $msg_crt->type_id : 0;
 		$bind['is_read'] = $msg_crt->is_read;
-		$bind['title'] = !empty($msg_crt->content) ? $msg_crt->title.'...' : $msg_crt->title;
-		$bind['content'] = $msg_crt->content;
+        $bind['content'] = $msg_crt->content;
+		$bind['title'] = !empty($bind['content']) ? $msg_crt->title.'...' : $msg_crt->title;
 		$bind['count'] = 0;
 
 		return self::nativeExecute($sql, $bind);

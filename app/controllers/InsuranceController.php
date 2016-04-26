@@ -73,6 +73,7 @@ class InsuranceController extends ControllerBase
 
         $this->view->setVars(array(
             'info' => $info,
+            'attach' => !empty($info->attach_id) ? Insurance::getInsuranceAttach($info->attach_id) : null,
             'insurance' => $insurance,
             'result' => $result,
             'discount_list' => $discount_list,

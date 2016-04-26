@@ -29,9 +29,6 @@
                         <input type="text" name="insurance_no" style="width: 250px;"/>
                     </td>
                 </tr>
-                <tr height="25px">
-                    <td colspan="6">&nbsp;</td>
-                </tr>
                 <tr>
                     <th>车牌号</th>
                     <td bgcolor="#EEE">{{ info.c_hphm }}</td>
@@ -92,9 +89,23 @@
                     <td bgcolor="#EEE">{{ info.failureReason }}</td>
                     {% endif %}
                 </tr>
-                <tr height="25px">
-                    <td  colspan="6">&nbsp;</td>
+                {% if attach is empty is false %}
+                <tr>
+                    <th>驾驶证号</th>
+                    <td bgcolor="#EEE">
+                        <img class="insurance-result-attach-img" style="width:50px; height:50px" src="data:image/png;base64,{{ attach.driving_license_a }}" alt="驾驶证正面">
+                        <img class="insurance-result-attach-img" style="width:50px; height:50px" src="data:image/png;base64,{{ attach.driving_license_b }}" alt="驾驶证背面">
+                    </td>
+                    <th>身份证号</th>
+                    <td bgcolor="#EEE">
+                        <img class="insurance-result-attach-img" style="width:50px; height:50px" src="data:image/png;base64,{{ attach.idcard }}" alt="身份证">
+                    </td>
+                    <th>保险卡</th>
+                    <td bgcolor="#EEE">
+                        <img class="insurance-result-attach-img" style="width:50px; height:50px" src="data:image/png;base64,{{ attach.insurance_card }}" alt="驾驶证正面">
+                    </td>
                 </tr>
+                {% endif %}
                 <tr>
                     <th>保险公司及折扣</th>
                     <td bgcolor="#CCDDEE" colspan="5">
@@ -108,9 +119,6 @@
                             {% endfor %}
                         </select>
                     </td>
-                </tr>
-                <tr height="25px">
-                    <td  colspan="6">&nbsp;</td>
                 </tr>
                 <tr height="30px">
                     <th width="10%">险别</th>
@@ -456,6 +464,15 @@
 
         need_destroy_dialogs.push(insurance_reason_dialog);
 
+        //附件图片tooltip
+        $('.insurance-result-attach-img').tooltip({
+            position: 'right',
+            content: '<img />',
+            onShow: function(){
+                $(this).tooltip('tip').find('img').attr('src', $(this).attr('src'));
+            }
+        });
+
         //事件
         $('#insurance_unupdate_btn').click(function(event){
             event.preventDefault();
@@ -554,7 +571,7 @@
 
         {% endif %}
 
-        {% if info.state_id == 2 or info.state_id == 3 or info.state_id == 7 %}
+        {% if info.state_id == 2 or info.state_id == 3 or info.state_id == 7 %}                        
             //提交尽算结果按钮点击事件
             $('#insurance_result_update_btn').click(function(event){
                 event.preventDefault();

@@ -389,6 +389,7 @@ SQL;
 	      	,i.emailAddr
 	      	,i.sfzh
 	      	,i.failureReason
+          ,i.attachId as attach_id
 		    ,car.hpzl c_hpzl
 		    ,car.hphm c_hphm
 		    ,car.fdjh c_fdjh
@@ -2923,5 +2924,16 @@ SQL;
         $sql = "update Insurance_Reservation set $field_str where id =:id";
 
         return self::nativeExecute($sql, $bind);
+    }
+
+    /**
+     * 
+     * @param  int|string $attach_id
+     * @return array
+     */
+    public static function getInsuranceAttach($attach_id){
+        $sql = 'select driving_license_a, driving_license_b, idcard, insurance_card from Insurance_Attach where id = :id';
+        $bind = array('id' => $attach_id);
+        return self::fetchOne($sql, $bind);
     }
 }

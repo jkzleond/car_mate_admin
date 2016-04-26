@@ -102,7 +102,9 @@
                     </td>
                     <th>保险卡</th>
                     <td bgcolor="#EEE">
-                        <img class="insurance-result-attach-img" style="width:50px; height:50px" src="data:image/png;base64,{{ attach.insurance_card }}" alt="驾驶证正面">
+                        {% if attach.insurance_card is empty is false %}
+                        <img class="insurance-result-attach-img" style="width:50px; height:50px" src="data:image/png;base64,{{ attach.insurance_card }}" alt="保险卡">
+                        {% endif %}
                     </td>
                 </tr>
                 {% endif %}

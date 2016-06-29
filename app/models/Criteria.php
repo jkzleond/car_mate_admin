@@ -32,6 +32,11 @@ class Criteria implements ArrayAccess
         $this->_collection[$prop] = $value;
     }
 
+    public function __isset($name)
+    {
+        return isset($this->_collection[$name]);
+    }
+
     /**
      * (PHP 5 &gt;= 5.0.0)<br/>
      * Whether a offset exists

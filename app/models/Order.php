@@ -551,4 +551,321 @@ SQL;
         $bind = array('order_id' => $order_id);
         return self::nativeQuery($sql, $bind);
     }
+
+    /**
+     * 获取挪车订单列表
+     * @param array $criteria
+     * @param $page_num
+     * @param $page_size
+     * @return array
+     */
+    public static function getMoveCarOrderList(array $criteria=null, $page_num=null, $page_size=null)
+    {
+        $crt = new Criteria($criteria);
+        $cte_condition_arr = array();
+        $cte_condition_str = '';
+        $page_condition_str = '';
+
+        $bind = array();
+
+        if($crt->order_no)
+        {
+            $cte_condition_arr[] = 'o.order_no like :order_no';
+            $bind['order_no'] = '%'.$crt->order_no.'%';
+        }
+
+        if($crt->trade_no)
+        {
+            $cte_condition_arr[] = 'o.trade_no like :trade_no';
+            $bind['trade_no'] = '%'.$crt->trade_no.'%';
+        }
+
+        if($crt->refund_state == '1')
+        {
+            $cte_condition_arr[] = 'o.refund_state is null';
+        }
+        elseif($crt->refund_state == '2')
+        {
+            $cte_condition_arr[] = "o.refund_state = 'REFUND_PART'";
+        }
+        elseif($crt->refund_state == '3')
+        {
+            $cte_condition_arr[] = "o.refund_state = 'REFUND_FULL'";
+        }
+
+        if($crt->user_id)
+        {
+            $cte_condition_arr[] = 'o.user_id = :user_id';
+            $bind['user_id'] = $crt->user_id;
+        }
+
+        if($crt->pay_type)
+        {
+            $cte_condition_arr[] = 'o.pay_type = :pay_type';
+            $bind['pay_type'] = $crt->pay_type;
+        }
+
+        if($crt->pay_state == 1)
+        {
+            $cte_condition_arr[] = "(o.pay_state != 'TRADE_SUCCESS' and o.pay_state != 'TRADE_FINISHED' or o.pay_state is null)";
+        }
+        elseif($crt->pay_state == 2)
+        {
+            $cte_condition_arr[] = "(o.pay_state = 'TRADE_SUCCESS' or o.pay_state = 'TRADE_FINISHED')";
+        }
+        elseif($crt->pay_state == 3)
+        {
+            $cte_condition_arr[] = "(o.pay_state = 'TRADE_CLOSED')";
+        }
+        elseif($crt->pay_state == 4)
+        {
+            $cte_condition_arr[] = "o.pay_state = 'ORDER_FREE'";
+        }
+
+        if($crt->client_type)
+        {
+            $cte_condition_arr[] = 'o.client_type = :client_type';
+            $bind['client_type'] = $crt->client_type;
+        }
+
+        if($crt->mark == 1)
+        {
+            $cte_condition_arr[] = 'o.mark is null and ma.create_date is not null';
+        }
+        elseif($crt->mark == 2)
+        {
+            $cte_condition_arr[] = "o.mark = 'PROCESS_SUCCESS' and ma.create_date is not null";
+        }
+        elseif($crt->mark == 3)
+        {
+            $cte_condition_arr[] = "o.mark = 'PROCESS_FAILED' and ma.create_date is not null";
+        }
+
+        if($crt->start_date)
+        {
+            $cte_condition_arr[] = 'convert(varchar(10), o.create_date, 23) >= :start_date';
+            $bind['start_date'] = $crt->start_date;
+        }
+
+        if($crt->end_date)
+        {
+            $cte_condition_arr[] = 'convert(varchar(10), o.create_date, 23) <= :end_date';
+            $bind['end_date'] = $crt->end_date;
+        }
+
+        if($crt->phone)
+        {
+            $cte_condition_arr[] = 'u.phone = :phone';
+            $bind['phone'] = $crt->phone;
+        }
+
+        if($crt->hphm)
+        {
+            $cte_condition_arr[] = 'o2mc.hphm like :hphm';
+            $bind['hphm'] = '%'.$crt->hphm.'%';
+        }
+
+
+        if(!empty($cte_condition_arr))
+        {
+            $cte_condition_str = 'where '.implode(' and ', $cte_condition_arr);
+        }
+
+        if($page_num)
+        {
+            $page_condition_str = 'where rownum between :from and :to';
+            //rownum 从 1 开始计数, $from 要 加 1
+            $from = $page_size * ( $page_num - 1) + 1;
+            $bind['from'] = $from;
+            $bind['to'] = $from + $page_size - 1 ;
+        }
+
+        $sql = <<<SQL
+        with ORDER_CTE as (
+            select o.id, o.order_no, o.trade_no, o.user_id, o.client_type, o2mc.hphm, o2mc.price as origin_price, o2mc.phone_bill, o.pay_type, o.order_fee, o.pay_state, o.pay_time, o.mark, o.create_date, o.mark_time, o.fail_reason, isnull(mu.phone, u.phone) as phone, u.uname as user_name,
+            refund_state, refund_fee, poundage, des,
+            convert(varchar(20), ma.create_date, 20) as appeal_date,
+            mcc.call_count, mcc.bill,
+            ROW_NUMBER() over(order by o.create_date desc) as rownum
+            from (
+                 select id, orderNo as order_no, tradeNo as trade_no, userId as user_id, clientType as client_type,
+                 payType as pay_type,
+                 money as order_fee, state as pay_state,
+                 refundState as refund_state, isnull(refundFee, 0.00) as refund_fee, isnull(poundage, 0.00) as poundage, des,
+                 mark, failReason as fail_reason,
+                 convert(varchar(20), markTime, 20) as mark_time,
+                 convert(varchar(20), createTime, 20) as create_date,
+                 convert(varchar(20), payTime, 20) as pay_time
+                from PayList
+                where orderType = 'move_car'
+            ) o
+            left join OrderToMoveCar o2mc on o2mc.order_id = o.id
+            left join IAM_USER u on u.userId = o.user_id
+            left join MC_User mu on mu.user_id = o.user_id
+            left join MC_Appeal ma on ma.order_id = o.id
+            left join (
+              select order_id as order_id, count(id) as call_count, (ceiling((sum(caller_duration) + sum(called_duration)) / 60.00) * 0.12) as bill from MC_CallRecord
+              group by order_id
+            ) mcc on mcc.order_id = o.id
+            $cte_condition_str
+        )
+        select * from ORDER_CTE
+        $page_condition_str
+SQL;
+        return self::nativeQuery($sql, $bind);
+    }
+
+    /**
+     * 获取挪车订单总数
+     * @param array $criteria
+     * @return mixed
+     */
+    public static function getMoveCarOrderTotal(array $criteria=null)
+    {
+        $crt = new Criteria($criteria);
+        $condition_arr = array();
+        $condition_str = '';
+
+        $bind = array();
+
+        if($crt->user_id)
+        {
+            $condition_arr[] = 'o.user_id = :user_id';
+            $bind['user_id'] = $crt->user_id;
+        }
+
+        if($crt->pay_type)
+        {
+            $condition_arr[] = 'o.pay_type = :pay_type';
+            $bind['pay_type'] = $crt->pay_type;
+        }
+
+        if($crt->pay_state == 1)
+        {
+            $condition_arr[] = "(o.pay_state != 'TRADE_SUCCESS' and o.pay_state != 'TRADE_FINISHED' or o.pay_state is null)";
+        }
+        elseif($crt->pay_state == 2)
+        {
+            $condition_arr[] = "(o.pay_state = 'TRADE_SUCCESS' or o.pay_state = 'TRADE_FINISHED')";
+        }
+        elseif($crt->pay_state == 3)
+        {
+            $condition_arr[] = "(o.pay_state = 'TRADE_CLOSED')";
+        }
+        elseif($crt->pay_state == 4)
+        {
+            $condition_arr[] = "o.pay_state = 'ORDER_FREE'";
+        }
+
+        if($crt->client_type)
+        {
+            $condition_arr[] = 'o.client_type = :client_type';
+            $bind['client_type'] = $crt->client_type;
+        }
+
+        if($crt->mark == 1)
+        {
+            $condition_arr[] = 'o.mark is null';
+        }
+        elseif($crt->mark == 2)
+        {
+            $condition_arr[] = "o.mark = 'PROCESS_SUCCESS'";
+        }
+        elseif($crt->mark == 3)
+        {
+            $condition_arr[] = "o.mark = 'PROCESS_FAILED'";
+        }
+
+        if($crt->start_date)
+        {
+            $condition_arr[] = 'convert(varchar(10), o.create_date, 23) >= :start_date';
+            $bind['start_date'] = $crt->start_date;
+        }
+
+        if($crt->end_date)
+        {
+            $condition_arr[] = 'convert(varchar(10), o.create_date, 23) <= :end_date';
+            $bind['end_date'] = $crt->end_date;
+        }
+
+        if($crt->phone)
+        {
+            $condition_arr[] = 'u.phone = :phone';
+            $bind['phone'] = $crt->phone;
+        }
+
+        if($crt->hphm)
+        {
+            $condition_arr[] = 'o2mc.hphm like :hphm';
+            $bind['hphm'] = '%'.$crt->hphm.'%';
+        }
+
+        if(!empty($condition_arr))
+        {
+            $condition_str = 'where '.implode(' and ', $condition_arr);
+        }
+
+        $sql = <<<SQL
+        select count(o.id)
+            from (
+                 select id, orderNo as order_no, tradeNo as trade_no, userId as user_id, payType as pay_type,
+                 money as order_fee, state as pay_state, mark, clientType as client_type,
+                 createTime as create_date,
+                 payTime as pay_time
+                from PayList
+                where orderType = 'move_car'
+            ) o
+            left join OrderToMoveCar o2mc on  o2mc.order_id = o.id
+            left join IAM_USER u on u.userId = o.user_id
+            $condition_str
+SQL;
+        $result = self::fetchOne($sql, $bind, null, Db::FETCH_NUM);
+
+        return $result[0];
+    }
+
+    /**
+     * 获取指定ID挪车订单信息
+     * @param $order_id
+     * @return array
+     */
+    public static function getMoveCarOrderById($order_id)
+    {
+        $sql = <<<SQL
+    select o.id, o.userId as user_id, o.orderNo as order_no, o.orderType as order_type, o.money as total_fee, o.relId as rel_id, o.ticket_id, convert(varchar(20), o.createTime, 20) as create_date,
+        o.state as pay_state,
+        o.payType as pay_type,
+        o.tradeNo as trade_no,
+        convert(varchar(20), o.payTime, 20) pay_time,
+        convert(varchar(20), dateadd(hh, 2, o.createTime), 20) as expire_date,
+        case
+          when getdate() >= dateadd(hh, 2, o.createTime) then
+           1
+          else
+           0
+        end as is_expired,
+        u.uname,
+        isnull(mu.phone, u.phone) as phone
+     from PayList as o
+     left join IAM_USER u on u.userid = o.userId
+     left join MC_User mu on mu.user_id = o.userId
+     where o.id = :order_id
+SQL;
+        $bind = array('order_id' => $order_id);
+        $order = self::fetchOne($sql, $bind, null, Db::FETCH_ASSOC);
+
+        $get_record_sql = "select hphm, price, phone_bill, uphone, convert(varchar(20),last_call_time, 20) as last_call_time from OrderToMoveCar where order_id = :order_id";
+        $get_record_bind = array('order_id' => $order['id']);
+        $record = self::fetchOne($get_record_sql, $get_record_bind, null, Db::FETCH_ASSOC);
+        $order['record'] = $record;
+
+        if($order['ticket_id'])
+        {
+            //获取订单所使用的票券信息
+            $ticket = Ticket::getTicketById($order['ticket_id']);
+            $order['ticket'] = $ticket;
+        }
+
+        return $order;
+    }
 }

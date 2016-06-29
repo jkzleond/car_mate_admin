@@ -58,6 +58,25 @@ class Statistics extends ModelEx
         return self::_call_statistics_process('getUserTotalCount', $start_date, $end_date, null, $province_id);
     }
 
+    /**
+     * @param $start_date
+     * @param $end_date
+     * @param $grain
+     * @param $client
+     * @param $version
+     * @return array
+     */
+    public static function getUserRetention($start_date, $end_date, $grain, $client, $version)
+    {
+        return self::_apply_statistics_process('getUserRetention', array(
+            $start_date,
+            $end_date,
+            $grain,
+            $client,
+            $version
+        ));
+    }
+
 
     /**
      * @param $start_date
@@ -580,6 +599,15 @@ SQL;
         $arr_data = json_decode($json_data, true);
         $data = self::_normalize_data($arr_data);
         return $data;
+    }
+
+    protected static function _apply_statistics_process($proc_name, $params)
+    {
+        $url = 'http://116.55.248.76/statistics/apply_proc.php?proc_name='.$proc_name;
+        $http_connection = new \Palm\Utils\HttpConnect();
+        $post_data = 'params='.json_encode($params);
+        $http_response = $http_connection->post($url, $post_data);
+        return !empty($http_response) ? $http_response->getResponseBody() : null;
     }
 
 

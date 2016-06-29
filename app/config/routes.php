@@ -97,6 +97,15 @@ $statistics->addGet('/userTotalStatistics/{start_date:(\d{4}-\d{2}-\d{2}|origin)
     'action' => 'getUserTotalStatistics'
 ));
 
+//用户留存统计
+$statistics->addGet('/userRetentionStatistics', array(
+    'action' => 'userRetentionStatistics'
+));
+
+$statistics->addGet('/userRetentionStatistics/{start_date:(\d{4}-\d{2}-\d{2}|origin)}/{end_date:(\d{4}-\d{2}-\d{2}|now)}/{grain:(day|week|month|year)}/{client:.*}/{version:.*}.json', array(
+    'action' => 'getUserRetentionStatistics'
+));
+
 /*
  * 操作统计
  */
@@ -987,6 +996,33 @@ $illegal->add('/orderUserList.json', array(
 ));
 
 $router->mount($illegal);
+
+/**
+ * 挪车业务
+ */
+
+$move_car = new \Phalcon\Mvc\Router\Group(array(
+    'controller' => 'movecar'
+));
+
+$move_car->setPrefix('/move_car');
+
+//订单管理页面
+$move_car->addGet('/orderMng',array(
+    'action' => 'orderManage'
+));
+
+//获取挪车订单列表
+$move_car->add('/orderList.json', array(
+    'action' => 'getOrderList'
+));
+
+//挪车详细页面
+$move_car->add('/orderDetail/{order_id:\d+}', array(
+    'action' => 'orderDetail'
+));
+
+$router->mount($move_car);
 
 /**
  * 公告

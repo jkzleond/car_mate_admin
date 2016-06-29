@@ -34,6 +34,9 @@ class StatisticsController extends ControllerBase
         $this->view->setVar('data', $query_total_statistics);
     }
 
+    /**
+     * 用户统计页面
+     */
     public function userStatisticsAction()
     {
         $this->view->setVars(array(
@@ -42,6 +45,12 @@ class StatisticsController extends ControllerBase
         ));
     }
 
+    /**
+     * 获取用户统计数据
+     * @param $start_date
+     * @param $end_date
+     * @param $group_type
+     */
     public function getUserStatisticsAction($start_date, $end_date, $group_type)
     {
         $user = $this->session->get('user');
@@ -50,6 +59,11 @@ class StatisticsController extends ControllerBase
         $this->view->setVar('data', $user_statistics);
     }
 
+    /**
+     * 获取用户总数统计数据
+     * @param $start_date
+     * @param $end_date
+     */
     public function getUserTotalStatisticsAction($start_date, $end_date)
     {
         $user = $this->session->get('user');
@@ -59,6 +73,23 @@ class StatisticsController extends ControllerBase
         $user_total_statistics = Statistics::getUserTotalCount($start_date, $end_date, $province_id);
         $this->view->setVar('data', $user_total_statistics);
     }
+
+    /**
+     *
+     * @param $start_date
+     * @param $end_date
+     * @param $grain
+     * @param $client
+     * @param $version
+     */
+    public function userRetentionStatisticsAction($start_date, $end_date, $grain, $client, $version)
+    {
+        $start_date = $start_date == 'origin' ? null : $start_date;
+        $end_date = $end_date == 'now' ? null : $end_date;
+        $user_retention_statistics = Statistics::getUserRetention($start_date, $end_date, $grain, $client, $version);
+        $this->view->setVar('data', $user_retention_statistics);
+    }
+
 
     public function actStatisticsAction()
     {

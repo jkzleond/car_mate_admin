@@ -33,6 +33,17 @@
             <td>{{ order.phone }}</td>
             <td colspan="2"></td>
         </tr>
+        <tr>
+            <th colspan="2">来源</th>
+            <td colspan="2">
+                {% if order.record['source'] is 'wx' %}
+                    微信
+                {% elseif order.record['source'] is 'cm' %}
+                {% endif %}
+            </td>
+            <th colspan="2">设备</th>
+            <td colspan="2">{{order.client_type}}</td>
+        </tr>
         <tr id="move_car_order_detail_info_row">
             <th style="position: relative">挡路车牌号</th>
             <td class="move_car-editable">
@@ -42,7 +53,7 @@
         </tr>
         <tr>
             <th>
-                相关车主
+                相关电话:
             </th>
             <td colspan="7">
                 <table class="table" style="margin-bottom:0px;">
@@ -50,6 +61,7 @@
                         <th>来源</th>
                         <th>用户名</th>
                         <th>电话</th>
+                        <th>拨打情况</th>
                     </tr>
                     {% for car_owner in car_owners %}
                     <tr>
@@ -66,6 +78,11 @@
                             {% endif %}
                         </td>
                         <td>{{ car_owner['phone'] }}</td>
+                        <td>
+                            反馈不是车主次数:{{car_owner['not_owner_count']}}
+                            拨通次数: {{ car_owner['call_count'] - car_owner['not_link_count'] }}
+                            拨打次数: {{ car_owner['call_count'] }}
+                        </td>
                     </tr>
                     {% endfor %}
                 </table>
@@ -78,18 +95,22 @@
             <td colspan="7">
                 <table class="table" style="margin-bottom:0px;">
                     <tr>
+                        <th>时间</th>
                         <th>主叫</th>
                         <th>被叫</th>
                         <th>时长(秒)</th>
                         <th>话费</th>
                         <th>状态</th>
                     </tr>
+                    {% set call_count = 0 %}
                     {% set sum_duration = 0 %}
                     {% set sum_bill = 0 %}
                     {% for call_record in call_records %}
+                        {% set call_count += 1 %}
                         {% set sum_duration += call_record['duration'] %}
                         {% set sum_bill += call_record['bill'] %}
                     <tr>
+                        <td>{{ call_record['start_time'] }}</td>
                         <td>{{ call_record['caller'] }}</td>
                         <td>{{ call_record['called'] }}</td>
                         <td>{{ call_record['duration'] }}</td>
@@ -104,10 +125,12 @@
                     </tr>
                     {% endfor %}
                     <tr>
+                        <th>通话总次数</th>
+                        <td>{{ call_count }}</td>
                         <th>总计时长(秒)</th>
-                        <td colspan="1">{{ sum_duration }}</td>
+                        <td>{{ sum_duration }}</td>
                         <th>总计话费</th>
-                        <td colspan="2">{{ sum_bill }}</td>
+                        <td>{{ sum_bill }}</td>
                     </tr>
                 </table>
             </td>
@@ -119,6 +142,14 @@
                 支付宝
                 {% elseif order.pay_type == 'wxpay' %}
                 微信支付
+                {% endif %}
+            </td>
+            <th>票券使用</th>
+            <td>
+                {% if not (order.ticket is empty) %}
+                {{ order.ticket['title'] }}:{{ order.ticket['value'] }}
+                {% else %}
+                未使用
                 {% endif %}
             </td>
             <th>支付金额</th>
@@ -133,14 +164,6 @@
                 未支付
                 {% endif %}
             </td>
-            {% if not (order.ticket is empty) %}
-            <th>票券</th>
-            <td>
-                {{ order.ticket['title'] }}:{{ order.ticket['value'] }}
-            </td>
-            {% else %}
-            <td colspan="2"></td>
-            {% endif %}
         </tr>
         {% if not (feed_back is empty) %}
         <tr>
@@ -189,15 +212,12 @@
         {% if not (appeal is empty) %}
         <tr>
             <th>
-                申诉内容
+                申诉情况
             </th>
             <td colspan="7">
                 <table class="table" style="margin-bottom:0px;">
                     <tr>
-                        <th>问题</th>
-                        <th>建议</th>
-                    </tr>
-                    <tr>
+                        <th>申诉理由</th>
                         <td>
                             {% if appeal['problem'] == 1 %}
                             语音拨通了,但对方不是车主
@@ -207,23 +227,26 @@
                             {{ appeal['addition'] }}
                             {% endif %}
                         </td>
-                        <td>{{ appeal['advise'] }}</td>
+                    </tr>
+                    <tr>
+                        <th>意见建议</th>
+                        <td>
+                            {{ appeal['advise'] }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>处理结果</th>
+                        <td>
+                            {% if order.mark == 'PROCESS_SUCCESS' %}
+                            处理完成
+                            {% elseif order.mark == 'PROCESS_FAILED' %}
+                            因[{{ order.fail_reason }}]而<span style="color:orangered">无法处理</span>
+                            {% else %}
+                            未处理
+                            {% endif %}
+                        </td>
                     </tr>
                 </table>
-            </td>
-        </tr>
-        {% endif %}
-        {% if not (appeal is empty) %}
-        <tr>
-            <th>申诉处理结果</th>
-            <td colspan="7">
-                {% if order.mark == 'PROCESS_SUCCESS' %}
-                处理完成
-                {% elseif order.mark == 'PROCESS_FAILED' %}
-                因[{{ order.fail_reason }}]而<span style="color:orangered">无法处理</span>
-                {% else %}
-                未处理
-                {% endif %}
             </td>
         </tr>
         {% endif %}

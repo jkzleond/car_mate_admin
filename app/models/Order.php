@@ -628,17 +628,28 @@ SQL;
             $bind['client_type'] = $crt->client_type;
         }
 
-        if($crt->mark == 1)
+        if($crt->appeal_state or $crt->appeal_state === 0 or $crt->appeal_state === '0')
         {
-            $cte_condition_arr[] = 'o.mark is null and ma.create_date is not null';
+            $cte_condition_arr[] = "ma.state = :appeal_state";
+            $bind['appeal_state'] = $crt->appeal_state;
         }
-        elseif($crt->mark == 2)
+
+        if($crt->is_link === 0 or $crt->is_link === '0' )
         {
-            $cte_condition_arr[] = "o.mark = 'PROCESS_SUCCESS' and ma.create_date is not null";
+            $cte_condition_arr[] = '( mcc.called_duration_total <= 0 or mcc.called_duration_total is null )';
         }
-        elseif($crt->mark == 3)
+        elseif($crt->is_link == 1)
         {
-            $cte_condition_arr[] = "o.mark = 'PROCESS_FAILED' and ma.create_date is not null";
+            $cte_condition_arr[] = 'mcc.called_duration_total > 0';
+        }
+
+        if($crt->is_feedbacked === '0' or $crt->is_feedbacked === 0)
+        {
+            $cte_condition_arr[] = 'o2mc.feedback_date is null';
+        }
+        elseif($crt->is_feedbacked == 1)
+        {
+            $cte_condition_arr[] = 'o2mc.feedback_date is not null';
         }
 
         if($crt->start_date)
@@ -682,10 +693,22 @@ SQL;
 
         $sql = <<<SQL
         with ORDER_CTE as (
-            select o.id, o.order_no, o.trade_no, o.user_id, o.client_type, o2mc.hphm, o2mc.price as origin_price, o2mc.phone_bill, o.pay_type, o.order_fee, o.pay_state, o.pay_time, o.mark, o.create_date, o.mark_time, o.fail_reason, isnull(mu.phone, u.phone) as phone, u.uname as user_name,
+            select o.id, o.order_no, o.trade_no, o.user_id, o.client_type,
+            o2mc.source, o2mc.hphm, o2mc.price as origin_price, o2mc.phone_bill,
+            convert(varchar(20), o2mc.feedback_date, 20) as feedback_date,
+            convert(varchar(20), o2mc.last_call_time, 20) as last_call_time,
+            o.pay_type, o.order_fee, o.pay_state, o.pay_time, o.mark, o.create_date, o.mark_time, o.fail_reason, isnull(mu.phone, u.phone) as phone, u.uname as user_name,
             refund_state, refund_fee, poundage, des,
             convert(varchar(20), ma.create_date, 20) as appeal_date,
+            ma.state as appeal_state,
+            ma.process_des as appeal_process_des,
             mcc.call_count, mcc.bill,
+            case
+              when mcc.called_duration_total > 0 then
+                1
+              else
+                0
+            end is_link,
             ROW_NUMBER() over(order by o.create_date desc) as rownum
             from (
                  select id, orderNo as order_no, tradeNo as trade_no, userId as user_id, clientType as client_type,
@@ -704,7 +727,7 @@ SQL;
             left join MC_User mu on mu.user_id = o.user_id
             left join MC_Appeal ma on ma.order_id = o.id
             left join (
-              select order_id as order_id, count(id) as call_count, (ceiling((sum(caller_duration) + sum(called_duration)) / 60.00) * 0.12) as bill from MC_CallRecord
+              select order_id as order_id, count(id) as call_count, (ceiling((sum(caller_duration) + sum(called_duration)) / 60.00) * 0.12) as bill, sum(called_duration) as called_duration_total from MC_CallRecord
               group by order_id
             ) mcc on mcc.order_id = o.id
             $cte_condition_str
@@ -763,17 +786,28 @@ SQL;
             $bind['client_type'] = $crt->client_type;
         }
 
-        if($crt->mark == 1)
+        if($crt->appeal_state and $crt->appeal_state === 0 or $crt->appeal_state === '0')
         {
-            $condition_arr[] = 'o.mark is null';
+            $condition_arr[] = "ma.state = :appeal_state";
+            $bind['appeal_state'] = $crt->appeal_state;
         }
-        elseif($crt->mark == 2)
+
+        if($crt->is_link === 0 or $crt->is_link === '0' )
         {
-            $condition_arr[] = "o.mark = 'PROCESS_SUCCESS'";
+            $condition_arr[] = '( mcc.called_duration_total <= 0 or mcc.called_duration_total is null )';
         }
-        elseif($crt->mark == 3)
+        elseif($crt->is_link == 1)
         {
-            $condition_arr[] = "o.mark = 'PROCESS_FAILED'";
+            $condition_arr[] = 'mcc.called_duration_total > 0';
+        }
+
+        if($crt->is_feedbacked === '0' or $crt->is_feedbacked === 0)
+        {
+            $condition_arr[] = 'o2mc.feedback_date is null';
+        }
+        elseif($crt->is_feedbacked == 1)
+        {
+            $condition_arr[] = 'o2mc.feedback_date is not null';
         }
 
         if($crt->start_date)
@@ -817,6 +851,11 @@ SQL;
             ) o
             left join OrderToMoveCar o2mc on  o2mc.order_id = o.id
             left join IAM_USER u on u.userId = o.user_id
+            left join MC_Appeal ma on ma.order_id = o.id
+            left join (
+              select order_id as order_id, count(id) as call_count, (ceiling((sum(caller_duration) + sum(called_duration)) / 60.00) * 0.12) as bill, sum(called_duration) as called_duration_total from MC_CallRecord
+              group by order_id
+            ) mcc on mcc.order_id = o.id
             $condition_str
 SQL;
         $result = self::fetchOne($sql, $bind, null, Db::FETCH_NUM);
@@ -854,7 +893,7 @@ SQL;
         $bind = array('order_id' => $order_id);
         $order = self::fetchOne($sql, $bind, null, Db::FETCH_ASSOC);
 
-        $get_record_sql = "select hphm, price, phone_bill, uphone, convert(varchar(20),last_call_time, 20) as last_call_time from OrderToMoveCar where order_id = :order_id";
+        $get_record_sql = "select hphm, price, phone_bill, uphone, source, convert(varchar(20),last_call_time, 20) as last_call_time from OrderToMoveCar where order_id = :order_id";
         $get_record_bind = array('order_id' => $order['id']);
         $record = self::fetchOne($get_record_sql, $get_record_bind, null, Db::FETCH_ASSOC);
         $order['record'] = $record;

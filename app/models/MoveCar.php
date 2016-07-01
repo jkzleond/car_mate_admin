@@ -36,42 +36,134 @@ class MoveCar extends ModelEx
 
     /**
      * 获取车主列表
-     * @param $hphm
+     * @param array|null $criteria
+     * @param int|null $page_num,
+     * @param int|null $page_size
      * @return array | null
      */
-    public static function getCarOwnerList($hphm)
+    public static function getCarOwnerList(array $criteria=null, $page_num=null, $page_size=null)
     {
-        $get_mc_car_sql = "
-          select
-            c.id,
-            case
-              when c.success_count > 0 or c.fail_count > 0 then
-                c.success_count / (c.success_count + c.fail_count) * 10
-              else
-                5
-            end as success_rate,
-            isnull(mu.phone, u.phone) as phone,
-            c.user_id,
-            'cm' as source
-          from MC_Car c
-          left join IAM_USER u on u.userid = c.user_id
-          left join MC_User mu on mu.user_id = c.user_id
-          where c.hphm = :hphm and c.state = 1
-          order by success_rate desc
-";
-        $get_mc_car_bind = array('hphm' => $hphm);
+        $crt = new Criteria($criteria);
+        $bind = array();
+        $cte_condition_arr = array();
+        $cte_condition_str = '';
+        $page_condition_str = '';
 
-        $mc_car_list = self::nativeQuery($get_mc_car_sql, $get_mc_car_bind);
-
-        if(!empty($mc_car_list))
+        if($crt->hphm)
         {
-            return $mc_car_list;
+            $cte_condition_arr[] = 'hphm = :hphm';
+            $bind['hphm'] = $crt->hphm;
         }
 
-        $get_jg_car_sql = "select id, phone, 'jg' as source from JGCarOwner where hphm = :hphm";
-        $get_jg_car_bind = array('hphm' => $hphm);
-        $jg_car_list = self::nativeQuery($get_jg_car_sql, $get_jg_car_bind);
-        return $jg_car_list;
+        if($crt->user_id)
+        {
+            $cte_condition_arr[] = 'user_id = :user_id';
+            $bind['user_id'] = $crt->user_id;
+        }
+
+        if($crt->phone)
+        {
+            $cte_condition_arr[] = 'phone = :phone';
+            $bind['phone'] = $crt->phone;
+        }
+
+        if(!empty($cte_condition_arr))
+        {
+            $cte_condition_str = 'where '.implode(' and ', $cte_condition_arr);
+        }
+
+        if($page_num)
+        {
+            $row_start = ($page_num - 1) * $page_size + 1;
+            $row_end = $page_num * $page_size;
+            $page_condition_str = "where row_num between $row_start and $row_end ";
+        }
+
+        $sql = <<<SQL
+        with CO_CTE as (
+          select *, ROW_NUMBER() over (order by source asc) as row_num from
+          (
+              select
+                c.id,
+                c.hphm,
+                isnull(mu.phone, u.phone) as phone,
+                c.user_id,
+                c.not_owner_count,
+                c.not_link_count,
+                c.call_count,
+                c.state,
+                'cm' as source
+              from MC_Car c
+              left join IAM_USER u on u.userid = c.user_id
+              left join MC_User mu on mu.user_id = c.user_id
+          union all
+              select id, hphm, phone, null as user_id, not_owner_count, not_link_count, call_count, state, 'jg' as source from JGCarOwner
+          ) co
+          $cte_condition_str
+        )
+        select * from CO_CTE
+        $page_condition_str
+SQL;
+        return self::nativeQuery($sql, $bind);
+    }
+
+    /**
+     * 获取车主总数
+     * @param array|null $criteria
+     * @return int
+     */
+    public static function getCarOwnerTotal(array $criteria=null)
+    {
+        $crt = new Criteria($criteria);
+        $bind = array();
+        $condition_arr = array();
+        $condition_str = '';
+
+        if($crt->hphm)
+        {
+            $condition_arr[] = 'hphm = :hphm';
+            $bind['hphm'] = $crt->hphm;
+        }
+
+        if($crt->user_id)
+        {
+            $condition_arr[] = 'user_id = :user_id';
+            $bind['user_id'] = $crt->user_id;
+        }
+
+        if($crt->phone)
+        {
+            $condition_arr[] = 'phone = :phone';
+            $bind['phone'] = $crt->phone;
+        }
+
+        if(!empty($condition_arr))
+        {
+            $condition_str = 'where '.implode(' and ', $condition_arr);
+        }
+
+        $sql = <<<SQL
+        select count(id) from
+          (
+              select
+                c.id,
+                c.hphm,
+                isnull(mu.phone, u.phone) as phone,
+                c.user_id,
+                c.not_owner_count,
+                c.not_link_count,
+                c.call_count,
+                'cm' as source
+              from MC_Car c
+              left join IAM_USER u on u.userid = c.user_id
+              left join MC_User mu on mu.user_id = c.user_id
+          union all
+              select id, hphm, phone, null as user_id, not_owner_count, not_link_count, call_count, 'jg' as source from JGCarOwner
+          ) co
+          $condition_str
+SQL;
+        $result = self::fetchOne($sql, $bind, null, Db::FETCH_NUM);
+        return !empty($result) ? (int)$result[0] : 0;
     }
 
     /**
@@ -106,6 +198,44 @@ SQL;
     }
 
     /**
+     * 获取指定ID车主的相关话单
+     * @param $car_owner_source
+     * @param $car_owner_id
+     * @return array
+     */
+    public static function getCarOwnerCallRecord($car_owner_source, $car_owner_id)
+    {
+        $car_owner = MoveCar::getCarOwnerById($car_owner_id, $car_owner_source);
+        $sql = <<<SQL
+        select
+          caller, called,
+          convert(varchar(20), caller_start_time, 20) as start_time,
+          convert(varchar(20), caller_end_time , 20) as end_time,
+          caller_duration as duration,
+          (ceiling((caller_duration + called_duration) / 60.00) * 0.12) as bill,
+          case
+            when called_duration > 0 then
+              1
+            else
+              0
+          end is_link
+        from MC_CallRecord mc
+        left join (
+          select id from PayList where orderType = 'move_car'
+        ) o on o.id = mc.order_id
+        left join OrderToMoveCar o2mc on o2mc.order_id = o.id
+        where mc.caller_start_time is not null and o2mc.hphm = :hphm and mc.called = :phone
+SQL;
+        $bind = array(
+            'hphm' => $car_owner['hphm'],
+            'phone' => $car_owner['phone']
+        );
+
+
+        return self::nativeQuery($sql, $bind);
+    }
+
+    /**
      * 标记车主(成功率)
      * @param int $id
      * @param bool $is_success
@@ -134,6 +264,45 @@ SQL;
 
         $sql = <<<SQL
             update $table_name set $field_str where id = :id
+SQL;
+        return self::nativeExecute($sql, $bind);
+    }
+
+    /**
+     * 更新指定ID车主信息
+     * @param $id
+     * @param $source
+     * @param array|null $criteria
+     * @return bool
+     */
+    public static function updateCarOwner($id, $source='cm', array $criteria=null)
+    {
+        $crt = new Criteria($criteria);
+        $bind = array('id' => $id);
+        $field_str = '';
+
+        if(!is_null($crt->state))
+        {
+            $field_str .= 'state = :state, ';
+            $bind['state'] = $crt->state;
+        }
+
+        if(!empty($field_str))
+        {
+            $field_str = rtrim($field_str, ', ');
+        }
+        else
+        {
+            return false;
+        }
+
+        $table_name = 'MC_Car';
+        if($source == 'jg')
+        {
+            $table_name = 'JGCarOwner';
+        }
+        $sql = <<<SQL
+        update $table_name set $field_str where id = :id;
 SQL;
         return self::nativeExecute($sql, $bind);
     }
@@ -185,6 +354,24 @@ SQL;
         );
 
         return self::fetchOne($sql, $bind, null, Db::FETCH_ASSOC);
+    }
+
+    /**
+     * 处理指定ID订单的申诉
+     * @param $order_id
+     * @param $process_des
+     * @return bool
+     */
+    public static function processAppeal($order_id, $process_des)
+    {
+        $sql = <<<SQL
+        update MC_Appeal set state = 1, process_des = :process_des where order_id = :order_id
+SQL;
+        $bind = array(
+            'order_id' => $order_id,
+            'process_des' => $process_des
+        );
+        return self::nativeExecute($sql, $bind);
     }
 
     /**

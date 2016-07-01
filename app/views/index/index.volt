@@ -252,6 +252,7 @@
                 <li class="dropdown"><a href=""><span class="iconfa-hand-right"></span>挪车业务</a>
                     <ul>
                         <li><a href="/move_car/orderMng">订单管理</a></li>
+                        <li><a href="/move_car/carOwnerMng">车主管理</a></li>
                     </ul>
                 </li>
                 {% endif %}

@@ -1022,6 +1022,31 @@ $move_car->add('/orderDetail/{order_id:\d+}', array(
     'action' => 'orderDetail'
 ));
 
+//挪车订单申诉处理
+$move_car->addPut('/appeal_process/{order_id:\d+}.json', array(
+    'action' => 'appealProcess'
+));
+
+//车主管理页面
+$move_car->addGet('/carOwnerMng', array(
+    'action' => 'carOwnerManage'
+));
+
+//获取车主列表
+$move_car->add('/car_owners.json', array(
+    'action' => 'getCarOwnerList'
+));
+
+//更新车主
+$move_car->addPut('/car_owner/{car_owner_source:.*}/{car_owner_id:\d+}.json', array(
+    'action' => 'updateCarOwner'
+));
+
+//车主话单详情页面
+$move_car->addGet('/car_owner/{car_owner_source:.*}/{car_owner_id:\d+}/call_record', array(
+    'action' => 'carOwnerCallRecord'
+));
+
 $router->mount($move_car);
 
 /**

@@ -59,17 +59,17 @@
                                     {% endfor %}
                                 </select>
                             </div>
-                            <div class="span2">
+                            <div class="span3">
                                 <span class="label">支付方式</span>
-                                <select name="pay_type" class="input-mini">
+                                <select name="pay_type" class="input-small">
                                     <option value="">全部</option>
                                     <option value="alipay">支付宝</option>
                                     <option value="wxpay">微信支付</option>
                                 </select>
                             </div>
-                            <div class="span2">
+                            <div class="span3">
                                 <span class="label">支付状态</span>
-                                <select name="pay_state" class="input-mini">
+                                <select name="pay_state" class="input-small">
                                     <option value="">全部</option>
                                     <option value="1">未支付</option>
                                     <option value="2">已支付</option>
@@ -78,15 +78,32 @@
                                 </select>
                             </div>
                             <div class="span3">
-                                <span class="label">处理结果</span>
-                                <select name="mark" class="input-small">
+                                <span class="label">申诉状态</span>
+                                <select name="appeal_state" class="input-small">
                                     <option value="">全部</option>
-                                    <option value="1">未处理</option>
-                                    <option value="2">已处理</option>
-                                    <option value="3">无法处理</option>
+                                    <option value="0">未处理</option>
+                                    <option value="1">已处理</option>
                                 </select>
                             </div>
-                            <div class="span2">
+                        </div>
+                        <div class="row-fluid">
+                            <div class="span3">
+                                <span class="label">接通状态</span>
+                                <select name="is_link" class="input-medium">
+                                    <option value="">全部</option>
+                                    <option value="1">已接通</option>
+                                    <option value="0">未接通</option>
+                                </select>
+                            </div>
+                            <div class="span3">
+                                <span class="label">反馈状态</span>
+                                <select name="is_feedbacked" class="input-medium">
+                                    <option value="">全部</option>
+                                    <option value="1">已反馈</option>
+                                    <option value="0">未反馈</option>
+                                </select>
+                            </div>
+                            <div class="span3">
                                 <button class="btn btn-primary" id="move_car_search_btn"><i class="iconfa-search"></i>查找</button>
                             </div>
                         </div>
@@ -108,21 +125,13 @@
             <div id="move_car_detail_window"></div>
             <div id="move_car_process_window">
                 <div id="move_car_process_form">
-                    <div class="row-fluid">
+                    <div class="row-fluid" id="move_car_fail_reason_container">
                         <div class="span12">
-                            <span class="label">处理结果</span>
+                            <span class="label">备注</span>
                             <input type="hidden" name="order_id">
-                            <input type="radio" name="mark" value="PROCESS_SUCCESS" checked><span style="color:limegreen">成功处理</span>
-                            <input type="radio" name="mark" value="PROCESS_FAILED"><span style="color:orangered">无法处理</span>
+                            <textarea name="process_des" id="" cols="30" rows="10"></textarea>
                         </div>
                     </div>
-                    <div class="row-fluid" id="move_car_fail_reason_container" style="display:none">
-                        <div class="span12">
-                            <span class="label">无法处理原因</span>
-                            <textarea name="fail_reason" id="" cols="30" rows="10"></textarea>
-                        </div>
-                    </div>
-
                 </div>
             </div>
         </div>
@@ -201,18 +210,14 @@
                         return '未支付';
                     }
                 }},
-                {field:'mark', title:'申诉处理', width:'10%', align:'center', formatter: function(value, row, index){
-                    if(value == 'PROCESS_SUCCESS')
-                    {
-                        return '处理完成';
-                    }
-                    else if(value == 'PROCESS_FAILED')
-                    {
-                        return '因[' + row.fail_reason + ']而无法处理';
-                    }
-                    else if(row.appeal_date)
+                {field:'appeal_state', title:'申诉状态', width:'10%', align:'center', formatter: function(value, row, index){
+                    if(value == 0)
                     {
                         return '<span class="label label-important">未处理</span>';
+                    }
+                    else if(value == 1)
+                    {
+                        return '已处理' + '[' + row.appeal_process_des + ']';
                     }
                     else
                     {
@@ -221,16 +226,18 @@
                 }}
             ]],
             columns:[[
+                {field:'source', title:'来源', width: '6%', align:'center', formatter: function(value, row, index){
+            if(value == 'cm')
+            {
+                return 'app';
+            }
+            else
+            {
+                return '微信';
+            }
+        }},
                 {field:'order_no', title:'订单号', width:'15%', align:'center'},
                 {field:'create_date', title:'订单时间', width:'12%', align:'center'},
-                {field:'user_id', title:'用户名', width:'15%', align:'center'},
-                {field:'user_name', title:'姓名', width:'6%', align:'center'},
-                {field:'phone', title:'手机号', width:'9%', align:'center'},
-                {field:'hphm', title:'车牌号', width:'7%', align:'center'},
-                {field:'origin_price', title:'原价', width:'6%', align:'center'},
-                {field:'order_fee', title:'订单金额', width:'6%', align:'center'},
-                {field:'call_count', title:'通话次数', width:'6%', align:'center'},
-                {field:'bill', title:'使用话费', width:'6%', align:'center'},
                 {field:'client_type', title:'客户端', width:'6%', align:'center', formatter: function(value, row, index){
                     if( value == 'unknown' )
                     {
@@ -241,6 +248,27 @@
                         return value;
                     }
                 }},
+                {field:'user_id', title:'用户名', width:'15%', align:'center'},
+                {field:'user_name', title:'姓名', width:'6%', align:'center'},
+                {field:'phone', title:'手机号', width:'9%', align:'center'},
+                {field:'hphm', title:'车牌号', width:'7%', align:'center'},
+                {field:'origin_price', title:'原价', width:'6%', align:'center'},
+                {field:'order_fee', title:'订单金额', width:'6%', align:'center'},
+                {field:'is_link', title:'接通状态', width:'6%', align:'center', formatter: function(value, row, index){
+                    if(value == 1)
+                    {
+                        return '<span class="label label-success">已接通</span>';
+                    }
+                    else
+                    {
+                        return '<span class="label label-important">未接通</span>';
+                    }
+                }},
+                {field:'call_count', title:'通话次数', width:'6%', align:'center'},
+                {field:'bill', title:'使用话费', width:'6%', align:'center'},
+                {field:'last_call_time', title:'最近通知时间', width:'12%', align:'center'},
+                {field:'feedback_date', title:'反馈时间', width:'12%', align:'center'},
+
                 {field:'mark_time', title:'处理时间', width:'12%', align:'center'}
             ]]
         });
@@ -298,7 +326,7 @@
         });
 
         var move_car_process_window = $('#move_car_process_window').dialog({
-            title: '挪车业务处理',
+            title: '挪车业务申诉处理',
             iconCls: 'icon-wrench',
             width: 240,
             height: 'auto',
@@ -311,12 +339,11 @@
                     text: '处理',
                     handler: function(){
                         var order_id = $('#move_car_process_window [name="order_id"]').val();
-                        var mark = $('#move_car_process_window [name="mark"]:checked').val();
-                        var fail_reason = $('#move_car_process_window [name="fail_reason"]').val();
+                        var process_des = $('#move_car_process_window [name="process_des"]').val();
                         $.ajax({
-                            url: '/move_car/orderProcess/' + order_id + '.json',
+                            url: '/move_car/appeal_process/' + order_id + '.json',
                             method: 'PUT',
-                            data: {criteria: {mark: mark, fail_reason: fail_reason}},
+                            data: {criteria: {process_des: process_des}},
                             dataType: 'json',
                             global: true
                         }).done(function(data){
@@ -324,14 +351,14 @@
                             {
                                 $.messager.show({
                                     title: '系统消息',
-                                    msg: '违章处理结果提交失败'
+                                    msg: '申诉处理失败'
                                 });
                             }
                             else
                             {
                                 $.messager.show({
                                     title: '系统消息',
-                                    msg: '违章处理结果提交成功'
+                                    msg: '申诉处理成功'
                                 });
                                 move_car_grid.datagrid('reload');
                             }
@@ -347,8 +374,7 @@
                 }
             ],
             onClose: function(){
-                $(this).find('[name="mark"][value="PROCESS_SUCCESS"]').click();
-                $(this).find('[name="fail_reason"]').val('');
+                $(this).find('[name="process_des"]').val('');
             }
         });
 
@@ -364,7 +390,9 @@
             criteria.pay_type = $('#move_car_search_bar [name="pay_type"]').val();
             criteria.pay_state = $('#move_car_search_bar [name="pay_state"]').val();
             criteria.client_type = $('#move_car_search_bar [name="client_type"]').val();
-            criteria.mark = $('#move_car_search_bar [name="mark"]').val();
+            criteria.appeal_state = $('#move_car_search_bar [name="appeal_state"]').val();
+            criteria.is_link = $('#move_car_search_bar [name="is_link"]').val();
+            criteria.is_feedbacked = $('#move_car_search_bar [name="is_feedbacked"]').val();
             criteria.start_date = start_datebox.datebox('getValue');
             criteria.end_date = end_datebox.datebox('getValue');
             move_car_grid.datagrid('load',{criteria: criteria});
@@ -386,20 +414,6 @@
             var order_id = $(this).attr('data-id');
             move_car_process_window.find('[name=order_id]').val(order_id);
             move_car_process_window.window('open');
-        });
-
-        //当选择违章无法处理时的事件
-        $('#move_car_process_form [name="mark"]').change(function(event){
-            var is_fail = $(this).val() == 'PROCESS_FAILED';
-
-            if(is_fail)
-            {
-                $('#move_car_fail_reason_container').show();
-            }
-            else
-            {
-                $('#move_car_fail_reason_container').hide();
-            }
         });
 
 

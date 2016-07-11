@@ -123,4 +123,20 @@ class MoveCarController extends ControllerBase
             'success' => $success
         ));
     }
+
+    /**
+     * 获取反馈意见数据列表
+     */
+    public function getFeedbackAdviseAction()
+    {
+        $page_num = $this->request->getPost('page');
+        $page_size = $this->request->getPost('rows');
+        $advise_list  = MoveCar::getFeedbackAdviseList($page_num, $page_size);
+        $advise_total = MoveCar::getFeedbackAdviseTotal();
+        $this->view->setVar('data', array(
+            'rows' => $advise_list,
+            'count' => count($advise_list),
+            'total' => $advise_total
+        ));
+    }
 }

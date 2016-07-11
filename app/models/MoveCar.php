@@ -391,4 +391,56 @@ SQL;
 
         return self::fetchOne($sql, $bind, null, Db::FETCH_ASSOC);
     }
+
+    /**
+     * 获取所有反馈意见列表数据
+     * @param int $page_num
+     * @param int $page_size
+     * @return array
+     */
+    public static function getFeedbackAdviseList($page_num=null, $page_size=null)
+    {
+        $bind = array();
+        $page_condition_str = '';
+        if($page_num)
+        {
+            $page_condition_str = 'where row_num between :row_start and :row_end';
+            $bind['row_start'] = ($page_num - 1) * $page_size + 1;
+            $bind['row_end'] = $page_num * $page_size;
+        }
+        $sql = <<<SQL
+        with ADV_CTE as (
+            select order_id, convert(varchar(20), create_date, 20) as create_date, advise, q1_7 as other, row_number() over( order by create_date desc ) as row_num
+            from MC_Feedback
+            where advise is not null or q1_7 is not null
+    )
+        select
+          adv.create_date, adv.other, adv.advise, o.userId as user_id, isnull(mu.phone, u.phone) as phone,
+          stuff(
+              (
+                select ',' + hphm from MC_Car where user_id = o.userId for xml path('')
+          ), 1, 1, ''
+          ) as hphm
+        from ADV_CTE adv
+        left join PayList o on o.id = adv.order_id
+        left join MC_User mu on mu.user_id = o.userId
+        left join IAM_USER u on u.userid = o.userId
+        $page_condition_str
+SQL;
+
+        return self::nativeQuery($sql, $bind);
+    }
+
+    /**
+     * 获取反馈意见总数
+     * @return int
+     */
+    public static function getFeedbackAdviseTotal()
+    {
+        $sql = <<<SQL
+        select count(id) from MC_Feedback where advise is not null or q1_7 is not null
+SQL;
+        $result = self::fetchOne($sql, null, null, Db::FETCH_NUM);
+        return (int)$result[0];
+    }
 }

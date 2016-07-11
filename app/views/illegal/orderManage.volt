@@ -85,6 +85,17 @@
                                     <option value="3">无法处理</option>
                                 </select>
                             </div>
+                        </div>
+                        <div class="row-fluid">
+                            <div class="span3">
+                                <span class="label">订单号</span>
+                                <input type="text" name="order_no">
+                            </div>
+                            <div class="span3">
+                                <span class="label">交易流水</span>
+                                <input type="text" name="trade_no">
+                            </div>
+                            <div class="span4"></div>
                             <div class="span2">
                                 <button class="btn btn-primary" id="illegal_search_btn"><i class="iconfa-search"></i>查找</button>
                             </div>
@@ -350,6 +361,8 @@
             criteria.user_id = $('#illegal_search_bar [name="user_id"]').val();
             criteria.phone = $('#illegal_search_bar [name="phone"]').val();
             criteria.hphm = $('#illegal_search_bar [name="hphm"]').val();
+            criteria.order_no = $('#illegal_search_bar [name="order_no"]').val();
+            criteria.trade_no = $('#illegal_search_bar [name="trade_no"]').val();
             criteria.pay_type = $('#illegal_search_bar [name="pay_type"]').val();
             criteria.pay_state = $('#illegal_search_bar [name="pay_state"]').val();
             criteria.client_type = $('#illegal_search_bar [name="client_type"]').val();

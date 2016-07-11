@@ -27,9 +27,9 @@
                     {% set sum_duration = 0 %}
                     {% set sum_bill = 0 %}
                     {% for call_record in call_records %}
-                    {% set call_count += 1 %}
-                    {% set sum_duration += call_record['duration'] %}
-                    {% set sum_bill += call_record['bill'] %}
+                        {% set call_count += 1 %}
+                        {% set sum_duration += call_record['duration'] %}
+                        {% set sum_bill += call_record['bill'] %}
                     <tr>
                         <td>{{ call_record['start_time'] }}</td>
                         <td>{{ call_record['caller'] }}</td>

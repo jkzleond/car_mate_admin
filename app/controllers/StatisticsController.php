@@ -423,5 +423,37 @@ class StatisticsController extends ControllerBase
         $this->view->setVar('data', $order_illegal_track_total_statistics);
     }
 
+    /**
+     * 挪车业务统计页面
+     */
+    public function moveCarStatisticsAction()
+    {
+        $this->view->setVars(array(
+            'start_date' => date('Y-m-d H:i:s', strtotime('-7 day')),
+            'end_date' => date('Y-m-d H:i:s')
+        ));
+    }
+
+    /**
+     * 调用统计存储过程
+     * @param $proc_name
+     */
+    public function callMoveCarStatisticsProcAction($proc_name)
+    {
+        $data = $this->request->getJsonRawBody(true);
+        $result = Statistics::callProc($proc_name, $data);
+        $return_data = array('success' => true);
+        if(isset($result[0]) and is_array($result[0]))
+        {
+            $return_data['list'] = $result;
+            $return_data['count'] = count($result);
+        }
+        else
+        {
+            $return_data['data'] = $result;
+        }
+        $this->view->setVar('data', $return_data);
+    }
+
 }
 

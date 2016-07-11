@@ -240,6 +240,19 @@ $statistics->add('/orderIllegalTrackTotalStatistics/{user_id:.*}/{start_date:\d{
     'action' => 'getOrderIllegalTrackTotalStatistics'
 ));
 
+/**
+ * 挪车业务统计
+ */
+//挪车业务统计页面
+$statistics->addGet('/moveCarStatistics', array(
+    'action' => 'moveCarStatistics'
+));
+
+//调用挪车业务统计存储过程
+$statistics->add('/move_car/{proc_name:.*}.json', array(
+    'action' => 'callMoveCarStatisticsProc'
+));
+
 $router->mount($statistics);
 
 /**
@@ -1025,6 +1038,11 @@ $move_car->add('/orderDetail/{order_id:\d+}', array(
 //挪车订单申诉处理
 $move_car->addPut('/appeal_process/{order_id:\d+}.json', array(
     'action' => 'appealProcess'
+));
+
+//获取挪车反馈意见数据列表
+$move_car->addPost('/advise.json', array(
+    'action' => 'getFeedbackAdvise'
 ));
 
 //车主管理页面

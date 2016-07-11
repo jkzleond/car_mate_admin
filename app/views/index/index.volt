@@ -178,6 +178,9 @@
                         <li><a href="/statistics/orderIllegalUserStatistics">违章代缴业务用户统计</a></li>
                         <li><a href="/statistics/orderIllegalTrackStatistics">违章代缴业务追踪统计</a></li>
                         {% endif %}
+                        {% if 'totalStatistics' in auth%}
+                        <li><a href="/statistics/moveCarStatistics">挪车业务统计</a></li>
+                        {% endif %}
                     </ul>
                 </li>
                 <li class="dropdown"><a href=""><span class="iconfa-briefcase"></span> 保险系统</a>

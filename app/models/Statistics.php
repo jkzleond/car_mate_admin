@@ -534,12 +534,22 @@ SQL;
      * @param  string $user_id
      * @param  string $start_date
      * @param  string $end_date
-     * @param  string $group_type
      * @return array
      */
     public static function getOrderIllegalTrackTotalStatistics($user_id, $start_date=null, $end_date=null)
     {
         return self::_call_statistics_process('getOrderIllegalTrackTotalCount', $start_date, $end_date, null, null, $user_id);
+    }
+
+    /**
+     * 调用存储过程
+     * @param $proc_name
+     * @param $params
+     * @return array | null
+     */
+    public static function callProc($proc_name, $params)
+    {
+        return self::_apply_statistics_process($proc_name, $params);
     }
 
     /**
@@ -607,7 +617,8 @@ SQL;
         $http_connection = new \Palm\Utils\HttpConnect();
         $post_data = 'params='.json_encode($params);
         $http_response = $http_connection->post($url, $post_data);
-        return !empty($http_response) ? $http_response->getResponseBody() : null;
+        $resp = !empty($http_response) ? $http_response->getResponseBody() : null;
+        return json_decode($resp, true);
     }
 
 

@@ -628,6 +628,18 @@ SQL;
             $bind['client_type'] = $crt->client_type;
         }
 
+        if($crt->order_no)
+        {
+            $cte_condition_arr[] = 'o.orderNo = :order_no';
+            $bind['order_no'] = $crt->order_no;
+        }
+
+        if($crt->trade_no)
+        {
+            $cte_condition_arr[] = 'o.tradeNo = :trade_no';
+            $bind['trade_no'] = $crt->trade_no;
+        }
+
         if($crt->appeal_state or $crt->appeal_state === 0 or $crt->appeal_state === '0')
         {
             $cte_condition_arr[] = "ma.state = :appeal_state";
@@ -784,6 +796,18 @@ SQL;
         {
             $condition_arr[] = 'o.client_type = :client_type';
             $bind['client_type'] = $crt->client_type;
+        }
+
+        if($crt->order_no)
+        {
+            $condition_arr[] = 'o.orderNo = :order_no';
+            $bind['order_no'] = $crt->order_no;
+        }
+
+        if($crt->trade_no)
+        {
+            $condition_arr[] = 'o.tradeNo = :trade_no';
+            $bind['trade_no'] = $crt->trade_no;
         }
 
         if($crt->appeal_state and $crt->appeal_state === 0 or $crt->appeal_state === '0')

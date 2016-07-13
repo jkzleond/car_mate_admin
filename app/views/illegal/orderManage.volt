@@ -178,7 +178,7 @@
                 var business_fee_total = Number($('#illegal_business_fee_total').text());
                 var agency_fee_total = Number($('#illegal_agency_fee_total').text());
                 business_fee_total += Number(row.order_fee) - 10.00;
-                agency_fee_total += 10.00;
+                agency_fee_total += Number(row.illegal_num) * 10.00;
                 $('#illegal_business_fee_total').text(business_fee_total);
                 $('#illegal_agency_fee_total').text(agency_fee_total);
             },
@@ -187,7 +187,7 @@
                 var agency_fee_total = Number($('#illegal_agency_fee_total').text());
                 if(business_fee_total <= 0) return;
                 business_fee_total -= Number(row.order_fee) - 10.00;
-                agency_fee_total -= 10.00;
+                agency_fee_total -= Number(row.illegal_num) * 10.00;
 
                 $('#illegal_business_fee_total').text(business_fee_total);
                 $('#illegal_agency_fee_total').text(agency_fee_total);
@@ -197,7 +197,7 @@
                 var agency_fee_total = 0.00;
                 $.each(rows, function(index, row){
                     business_fee_total += Number(row.order_fee) - 10.00;
-                    agency_fee_total += 10.00;
+                    agency_fee_total += Number(row.illegal_num) * 10.00;
                 });
                 $('#illegal_business_fee_total').text(business_fee_total);
                 $('#illegal_agency_fee_total').text(agency_fee_total);

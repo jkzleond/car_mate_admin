@@ -91,13 +91,13 @@ class Order extends ModelEx
 
         if($crt->start_date)
         {
-            $cte_condition_arr[] = 'convert(varchar(10), o.create_date, 23) >= :start_date';
+            $cte_condition_arr[] = 'o.create_date >= :start_date';
             $bind['start_date'] = $crt->start_date;
         }
 
         if($crt->end_date)
         {
-            $cte_condition_arr[] = 'convert(varchar(10), o.create_date, 23) <= :end_date';
+            $cte_condition_arr[] = 'o.create_date <= :end_date';
             $bind['end_date'] = $crt->end_date;
         }
 
@@ -218,13 +218,13 @@ SQL;
 
         if($crt->start_date)
         {
-            $condition_arr[] = 'convert(varchar(10), o.create_date, 23) >= :start_date';
+            $condition_arr[] = 'o.create_date >= :start_date';
             $bind['start_date'] = $crt->start_date;
         }
 
         if($crt->end_date)
         {
-            $condition_arr[] = 'convert(varchar(10), o.create_date, 23) <= :end_date';
+            $condition_arr[] = 'o.create_date <= :end_date';
             $bind['end_date'] = $crt->end_date;
         }
 

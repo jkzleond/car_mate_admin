@@ -41,8 +41,8 @@
                             </div>
                             <div class="span4">
                                 <span class="label">时间段</span>
-                                <input type="text" name="start_date" class="input-small">-
-                                <input type="text" name="end_date" class="input-small">
+                                <input type="text" name="start_date" class="input-medium">-
+                                <input type="text" name="end_date" class="input-medium">
                             </div>
                         </div>
                         <div class="row-fluid">
@@ -100,6 +100,12 @@
                                 <button class="btn btn-primary" id="illegal_search_btn"><i class="iconfa-search"></i>查找</button>
                             </div>
                         </div>
+                        <div class="row-fluid">
+                            <div class="span3">
+                                <span class="label">业务金额</span><span id="illegal_business_fee_total">0</span>
+                                <span class="label">代办费</span><span id="illegal_agency_fee_total">0</span>
+                            </div>
+                        </div>
                     </div>
                     <!--<div class="row-fluid">
                         <div class="span12">
@@ -146,8 +152,8 @@
          * 控件相关
          */
         //时间控件
-        var start_datebox = $('#illegal_grid_tb [name="start_date"]').datebox({editable: false});
-        var end_datebox = $('#illegal_grid_tb [name="end_date"]').datebox({editable: false});
+        var start_datebox = $('#illegal_grid_tb [name="start_date"]').datetimebox({editable: false});
+        var end_datebox = $('#illegal_grid_tb [name="end_date"]').datetimebox({editable: false});
 
         //数据表格
         var illegal_grid = $('#illegal_grid').datagrid({
@@ -157,16 +163,51 @@
             width: '100%',
             height: 'auto',
             fitColumns: true,
-            singleSelect: true,
+            singleSelect: false,
+            checkOnSelect: false,
+            selectOnCheck: false,
             nowrap: false,///设置为true，当数据长度超出列宽时将会自动截取
             striped: true,///显示条纹
             pagination:true,///分页
             pageSize:10,///（每页记录数）
             pageNumber:1,///（当前页码）
-            //pageList:[50,100,150,200],
+            pageList:[10,50,100,150,200],
             toolbar: '#illegal_grid_tb',
             idField: 'id',
+            onCheck: function(index, row){
+                var business_fee_total = Number($('#illegal_business_fee_total').text());
+                var agency_fee_total = Number($('#illegal_agency_fee_total').text());
+                business_fee_total += Number(row.order_fee) - 10.00;
+                agency_fee_total += 10.00;
+                $('#illegal_business_fee_total').text(business_fee_total);
+                $('#illegal_agency_fee_total').text(agency_fee_total);
+            },
+            onUncheck: function(index, row){
+                var business_fee_total = Number($('#illegal_business_fee_total').text());
+                var agency_fee_total = Number($('#illegal_agency_fee_total').text());
+                if(business_fee_total <= 0) return;
+                business_fee_total -= Number(row.order_fee) - 10.00;
+                agency_fee_total -= 10.00;
+
+                $('#illegal_business_fee_total').text(business_fee_total);
+                $('#illegal_agency_fee_total').text(agency_fee_total);
+            },
+            onCheckAll: function(rows){
+                var business_fee_total = 0.00;
+                var agency_fee_total = 0.00;
+                $.each(rows, function(index, row){
+                    business_fee_total += Number(row.order_fee) - 10.00;
+                    agency_fee_total += 10.00;
+                });
+                $('#illegal_business_fee_total').text(business_fee_total);
+                $('#illegal_agency_fee_total').text(agency_fee_total);
+            },
+            onUncheckAll: function(rows){
+                $('#illegal_business_fee_total').text(0.00);
+                $('#illegal_agency_fee_total').text(0.00);
+            },
             frozenColumns: [[
+                {field: 'rownum', checkbox: true},
                 {field: 'id', title: '操作', width: '10%', align: 'center', formatter: function(value, row, index){
                     var info_btn_html = '<button class="btn btn-info illegal-order-detail-btn" data-id="'+ value +'">明细</button>';
                     var process_btn_html = '<button class="btn btn-primary illegal-process-btn" data-id="' + value + '">处理</button>';

@@ -104,7 +104,8 @@
             pagination:true,///分页
             pageSize:10,///（每页记录数）
             pageNumber:1,///（当前页码）
-            //pageList:[50,100,150,200],
+            pageList:[10,50,100,150,200],
+            showFooter: true,
             toolbar: '#driver_info_grid_tb',
             idField: 'id',
             columns:[[

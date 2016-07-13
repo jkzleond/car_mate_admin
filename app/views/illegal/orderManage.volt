@@ -174,6 +174,9 @@
             pageList:[10,50,100,150,200],
             toolbar: '#illegal_grid_tb',
             idField: 'id',
+            onLoadSuccess: function(data){
+                illegal_grid.uncheckAll();
+            },
             onCheck: function(index, row){
                 var business_fee_total = Number($('#illegal_business_fee_total').text());
                 var agency_fee_total = Number($('#illegal_agency_fee_total').text());

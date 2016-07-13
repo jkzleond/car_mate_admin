@@ -100,6 +100,38 @@
                 </tr>
             </table>
             <table class="table">
+                <tr>
+                    <th class="left">挪车服务操作统计</th>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="row-fluid">
+                            <div class="span2"></div>
+                            <div class="span4">
+                                <span class="label">时间粒度</span>
+                                <input type="radio" name="op_count_grain" value="hour">小时
+                                <input type="radio" name="op_count_grain" value="day" checked>天
+                                <input type="radio" name="op_count_grain" value="week">周
+                                <input type="radio" name="op_count_grain" value="month">月
+                                <input type="radio" name="op_count_grain" value="year">年
+                            </div>
+                            <div class="span4">
+                                <span class="label">日期</span>
+                                <input name="op_count_start_date" type="text" class="input input-small easyui-datebox" value="{{ start_date }}" />
+                                -
+                                <input name="op_count_end_date" type="text" class="input input-small easyui-datebox" value="{{ end_date }}" />
+                            </div>
+                            <div class="span2">
+                                <button class="btn btn-primary pull-right move-car-op-count-statistics-btn" title="统计"><i class="iconfa-bar-chart"></i></button>
+                            </div>
+                        </div>
+                        <div class="row-fluid">
+                            <div id="move_car_op_count_chart_container"></div>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+            <table class="table">
                 <tr><th colspan="2">挪车提醒反馈统计</th></tr>
                 <tr>
                     <th style="width: 50%">车主来挪车了吗</th>
@@ -218,6 +250,14 @@
         });
 
         var charge_trend_end_date_box = $('[name=charge_trend_end_date]').datebox({
+            required: true
+        });
+
+        var op_count_start_date_box = $('[name=op_count_start_date]').datebox({
+            required: true
+        });
+
+        var op_count_end_date_box = $('[name=op_count_end_date]').datebox({
             required: true
         });
 
@@ -362,6 +402,114 @@
         var pie_chart3 = $('#charts_container3').highcharts();
 
 
+        var op_count_chart_options = {
+            chart: {
+                type: $('#chart_type').val(),
+                height: 300,
+                backgroundColor: 'none',
+                zoomType: 'xy'
+            },
+            title: {
+                text: '挪车业务操作统计'
+            },
+            xAxis: {
+                categories: []
+            },
+            yAxis: {
+                title: {
+                    text: '操作数'
+                }
+            },
+            tooltip: {
+                crosshairs: true,
+                shared: true
+            },
+            plotOptions: {
+                spline: {
+                    marker: {
+                        radius: 4,
+                        lineColor: '#666666',
+                        lineWidth: 1
+                    }
+                }
+            },
+            series: [
+                {
+                    id: 'submit_order',
+                    name: '提交订单',
+                    data: []
+                },
+                {
+                    id: 'order_pay',
+                    name: '订单支付',
+                    data: []
+                },
+                {
+                    id: 'select_ticket',
+                    name: '选择票券',
+                    data: []
+                },
+                {
+                    id: 'notify',
+                    name: '通知车主',
+                    data: []
+                },
+                {
+                    id: 'notify_again',
+                    name: '再次通知车主',
+                    data: []
+                },
+                {
+                    id: 'feedback',
+                    name: '反馈页面',
+                    data: []
+                },
+                {
+                    id: 'submit_ticket',
+                    name: '提交反馈',
+                    data: []
+                },
+                {
+                    id: 'car_list',
+                    name: '查看车辆',
+                    data: []
+                },
+                {
+                    id: 'modify_car',
+                    name: '编辑车辆',
+                    data: []
+                },
+                {
+                    id: 'delete_car',
+                    name: '删除车辆',
+                    data: []
+                },
+                {
+                    id: 'check_available_tickets',
+                    name: '查看可用票券',
+                    data : []
+                },
+                {
+                    id: 'check_expired_tickets',
+                    name: '查看过期票券',
+                    data : []
+                },
+                {
+                    id: 'modify_phone',
+                    name: '修改手机号',
+                    data: []
+                },
+                {
+                    id: 'wx_share',
+                    name: '微信分享',
+                    data: []
+                }
+            ]
+        };
+
+        $('#move_car_op_count_chart_container').highcharts(op_count_chart_options);
+        var op_count_chart = $('#move_car_op_count_chart_container').highcharts();
+
         //意见表格
         var move_car_advise_grid = $('#move_car_advise_grid').datagrid({
             url: '/move_car/advise.json',
@@ -446,6 +594,39 @@
             });
         });
 
+        //挪车业务操作统计按钮点击时间
+        $('.move-car-op-count-statistics-btn').click(function(event){
+            var start_date = op_count_start_date_box.datebox('getValue');
+            var end_date = op_count_end_date_box.datebox('getValue');
+            var grain = $('[name="op_count_grain"]:checked').val();
+
+            op_count_chart.showLoading();
+            MoveCarStatistics.getOpCountStatistics(start_date, end_date, grain).done(function(resp){
+                if(resp.success)
+                {
+                    var categories = [];
+                    var series_data = {};
+                    $.each(resp.list, function(index, item){
+                        categories.push(item.date);
+                        $.each(item, function(key, value){
+                            if(key == 'date') return;
+                            series_data[key] = series_data[key] || [];
+                            series_data[key].push(Number(value));
+                        });
+                    });
+                    $.each(series_data, function(series_id, series_data){
+                        if(op_count_chart.get(series_id))
+                        {
+                            op_count_chart.get(series_id).setData(series_data, false);
+                        }
+                    });
+                    op_count_chart.xAxis[0].setCategories(categories, false);
+                    op_count_chart.redraw();
+                    op_count_chart.hideLoading();
+                }
+            });
+        });
+
         /**
          * 数据相关
          */
@@ -501,6 +682,16 @@
                     method: 'post',
                     data: JSON.stringify({start_date: start_date, end_date: end_date}),
                     url: '/statistics/move_car/getMoveCarChargeTrendUseCountList.json',
+                    dataType: 'json',
+                    contentType: 'application/json',
+                    global: true
+                });
+            },
+            getOpCountStatistics: function(start_date, end_date, grain){
+                return $.ajax({
+                    method: 'post',
+                    data: JSON.stringify({start_date: start_date, end_date: end_date, grain: grain}),
+                    url: '/statistics/move_car/getMoveCarUserOpCount.json',
                     dataType: 'json',
                     contentType: 'application/json',
                     global: true
@@ -569,6 +760,30 @@
             if(resp.success)
             {
                 $('#move_car_charge_trend_use_count_list_container').empty().append(move_car_charge_trend_use_count_list_tpl(resp.list));
+            }
+        });
+
+        MoveCarStatistics.getOpCountStatistics(op_count_start_date_box.get('getValue'), op_count_end_date_box.get('getValue'), 'day').done(function(resp){
+            if(resp.success)
+            {
+                var categories = [];
+                var series_data = {};
+                $.each(resp.list, function(index, item){
+                    categories.push(item.date);
+                    $.each(item, function(key, value){
+                        if(key == 'date') return;
+                        series_data[key] = series_data[key] || [];
+                        series_data[key].push(Number(value));
+                    });
+                });
+                $.each(series_data, function(series_id, series_data){
+                    if(op_count_chart.get(series_id))
+                    {
+                        op_count_chart.get(series_id).setData(series_data, false);
+                    }
+                });
+                op_count_chart.xAxis[0].setCategories(categories, false);
+                op_count_chart.redraw();
             }
         });
 

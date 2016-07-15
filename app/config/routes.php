@@ -1320,6 +1320,12 @@ $router->add('/user/list.json', array(
     'action' => 'getUserList'
 ));
 
+//用户禁言
+$router->add('/user/{user_id:.*}/no_talk.json', array(
+    'controller' => 'user',
+    'action' => 'setNoTalk'
+));
+
 //异常信息页面
 $router->addGet('/appException', array(
     'controller' => 'feedback',

@@ -69,6 +69,17 @@
                     </div>
                 </div>
             </div>
+            <div id="no_talk_window">
+                <div class="row-fluid">
+                    <div class="span6">
+                        <span class="label">截至时间</span>
+                    </div>
+                    <div class="span6">
+                        <input type="hidden" name="user_id">
+                        <input type="text" class="input-small" name="no_talk_date">
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -82,6 +93,7 @@
         //时间控件
         var start_datebox = $('#talk_grid_tb [name="start_publish_time"]').datebox({editable: false});
         var end_datebox = $('#talk_grid_tb [name="end_publish_time"]').datebox({editable: false});
+        var no_talk_datebox = $('#no_talk_window [name="no_talk_date"]').datebox({editable: false});
 
         //数据表格
         var talk_grid = $('#talk_grid').datagrid({
@@ -104,8 +116,9 @@
                 {field: 'id', title: '操作', width: '15%', align: 'center', formatter: function(value, row, index){
                     var reply_list_btn_html = '<button class="btn btn-info talk-reply-list-btn" data-id="'+ value +'" title="回复列表"><i class="iconfa-list"></i></button>';
                     var reply_btn_html = '<button class="btn btn-primary talk-reply-btn" data-id="'+ value +'" title="回复"><i class="iconfa-comment"></i></button>';
+                    var no_talk_btn_html = '<button class="btn btn-primary no-talk-btn" data-user_id="'+ row.user_id +'" title="禁言"><i class="iconfa-remove-circle"></i></button>';
                     var delete_btn_html = '<button class="btn btn-danger talk-delete-btn" data-id="' + value + '" title="删除"><i class="iconfa-trash"></i></button>';
-                    return reply_list_btn_html + reply_btn_html + delete_btn_html;
+                    return reply_list_btn_html + reply_btn_html + no_talk_btn_html + delete_btn_html;
                 }},
                 {field:'province_name', title:'省份', width:'6%', align:'center'}
             ]],
@@ -185,7 +198,7 @@
         var talk_reply_window = $('#talk_reply_window').dialog({
             title: '车友互动回复',
             iconCls: 'iconfa-comment',
-            width: 560,
+            width: 500,
             height: 'auto',
             closed: true,
             shadow: false,
@@ -231,8 +244,61 @@
                 }
             ],
             onClose: function(){
-                $(this).find('[name="id"]').val('');
-                $(this).find('[name="comment"]').val('');
+                $(talk_reply_window).find('[name="id"]').val('');
+                $(talk_reply_window).find('[name="comment"]').val('');
+            }
+        });
+
+        var no_talk_window = $('#no_talk_window').dialog({
+            title: '用户禁言',
+            iconCls: 'iconfa-remove-circle',
+            width: 260,
+            height: 'auto',
+            closed: true,
+            shadow: false,
+            modal: true,
+            openAnimation: 'fade',
+            buttons: [
+                {
+                    text: '禁言',
+                    handler: function(){
+                        var user_id = $(no_talk_window).find('[name="user_id"]').val();
+                        var no_talk_date = no_talk_datebox.datebox('getValue');
+                        $.ajax({
+                            url: '/user/' + user_id + '/no_talk.json',
+                            method: 'PUT',
+                            data: {no_talk: no_talk_date},
+                            dataType: 'json',
+                            global: true
+                        }).done(function(data){
+                            if(!data.success)
+                            {
+                                $.messager.show({
+                                    title: '系统消息',
+                                    msg: '用户禁言失败'
+                                });
+                            }
+                            else
+                            {
+                                $.messager.show({
+                                    title: '系统消息',
+                                    msg: '用户禁言成功'
+                                });
+                            }
+                        });
+                        no_talk_window.dialog('close');
+                    }
+                },
+                {
+                    text: '取消',
+                    handler: function(){
+                        no_talk_window.dialog('close');
+                    }
+                }
+            ],
+            onClose: function(){
+                $(no_talk_window).find('[name="user_id"]').val('');
+                no_talk_datebox.datebox('setValue', '');
             }
         });
 
@@ -275,6 +341,13 @@
                     reply_grid.datagrid('reload');
                 });
             });
+        });
+
+        //禁言按钮点击事件
+        $(document).on('click', '.no-talk-btn', function(event){
+            var user_id = $(this).attr('data-user_id');
+            $(no_talk_window).find('[name=user_id]').val(user_id);
+            no_talk_window.dialog('open');
         });
 
         //车友互动删除按钮点击事件
@@ -472,6 +545,7 @@
             //销毁窗口
             talk_reply_list_window.window('destroy');
             talk_reply_window.dialog('destroy');
+            no_talk_window.dialog('dialog');
 
             //销毁时间控件
             start_datebox.datebox('destroy');
@@ -481,6 +555,7 @@
             $(document).off('click', '.talk-reply-list-btn');
             $(document).off('click', '.talk-reply-delete-btn');
             $(document).off('click', '.talk-reply-btn');
+            $(document).off('click', '.no-talk-btn');
             $(document).off('click', '.talk-delete-btn');
             $(document).off('click', '.talk-state-on-btn');
             $(document).off('click', '.talk-state-off-btn');

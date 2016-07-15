@@ -27,5 +27,18 @@ class UserController extends ControllerBase
     	));
     }
 
+	/**
+	 * 用户禁言
+	 * @param string $user_id
+	 */
+	public function setNoTalkAction($user_id)
+	{
+		$no_talk = $this->request->getPut('no_talk');
+		$success = User::setNoTalk($user_id, $no_talk);
+		$this->view->setVar('data', array(
+			'success' => $success
+		));
+	}
+
 }
 

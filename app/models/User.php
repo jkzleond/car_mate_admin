@@ -157,4 +157,20 @@ SQL;
 
 		return self::nativeQuery($sql);
 	}
+
+	/**
+	 * 用户禁言
+	 * @param string $user_id
+	 * @param string $end_date 禁言截至时间
+	 * @return bool
+	 */
+	public static function setNoTalk($user_id, $end_date)
+	{
+		$sql = 'update IAM_USER set notalk = :end_date where userid = :user_id';
+		$bind = array(
+			'end_date' => $end_date,
+			'user_id' => $user_id
+		);
+		return self::nativeExecute($sql, $bind);
+	}
 }

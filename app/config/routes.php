@@ -509,6 +509,11 @@ $local_favour->add('/localFavourAdvList.json', array(
     'action' => 'getLocalFavourAdvList'
 ));
 
+//获取指定ID首页推广信息
+$local_favour->addGet('/localFavourAdv/{id:\d+}.json', array(
+    'action' => 'getLocalFavourAdv'
+));
+
 //添加推广
 $local_favour->addPost('/localFavourAdv.json', array(
     'action' => 'addLocalFavourAdv'
@@ -1344,6 +1349,18 @@ $router->addDelete('/appException/{id:\d+}.json', array(
     'action' => 'delAppException'
 ));
 
+/*通用*/
+$common = new \Phalcon\Mvc\Router\Group(array(
+    'controller' => 'common'
+));
+
+//上传
+$common->addPost('/upload.json', array(
+    'action' => 'upload'
+));
+
+$router->mount($common);
+
 /*其他*/
 
 /**
@@ -1376,3 +1393,4 @@ $field->addDelete('/field/{id:\d+}.json', array(
 ));
 
 $router->mount($field);
+

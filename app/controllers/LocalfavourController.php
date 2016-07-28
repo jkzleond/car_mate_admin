@@ -238,9 +238,16 @@ class LocalfavourController extends ControllerBase
         $province_id = AdminUser::getCurrentProvinceId();
         $province_list = Province::getProvinceList();
 
+        $adv_criteria = array(
+            'province_id' => $province_id,
+            'is_state' => 1
+        );
+        $adv_use_list = LocalFavour::getLocalFavourAdvList($adv_criteria);
+
         $this->view->setVars(array(
             'province_list' => $province_list,
-            'current_province_id' => $province_id
+            'current_province_id' => $province_id,
+            'adv_use_list' => $adv_use_list
         ));
     }
 
@@ -254,13 +261,28 @@ class LocalfavourController extends ControllerBase
         $page_num = $this->request->getPost('page');
         $page_size = $this->request->getPost('rows');
 
-        $adv_list = LocalFavour::getLocalFavourAdvList($province_id, $page_num, $page_size);
-        $adv_total = LocalFavour::getLocalFavourAdvCount($province_id);
-
+        $adv_criteria = array(
+            'province_id' => $province_id
+        );
+        $adv_list = LocalFavour::getLocalFavourAdvList($adv_criteria, $page_num, $page_size);
+        $adv_total = LocalFavour::getLocalFavourAdvCount($adv_criteria);
         $this->view->setVar('data', array(
             'total' => $adv_total,
             'count' => count($adv_list),
             'rows' => $adv_list
+        ));
+    }
+
+    /**
+     * 获取指定ID首页推广信息
+     * @param $id
+     */
+    public function getLocalFavourAdvAction($id)
+    {
+        $adv_list = LocalFavour::getLocalFavourAdvList(array('id' => $id));
+        $this->view->setVar('data', array(
+            'success' => !empty($adv_list),
+            'data' => !empty($adv_list) ? $adv_list[0] : null
         ));
     }
 
@@ -273,39 +295,12 @@ class LocalfavourController extends ControllerBase
         $local_favour_adv = $creates[0];
 
         $rele_id = !empty($local_favour_adv['rele_id']) ? $local_favour_adv['rele_id'] : null;
-        $adv_src = isset($local_favour_adv['adv_src']) ? $local_favour_adv['adv_src'] : null;
-        $adv3_src = isset($local_favour_adv['adv3_src']) ? $local_favour_adv['adv3_src'] : null;
+        $adv = isset($local_favour_adv['adv_src']) ? $local_favour_adv['adv_src'] : null;
+        $adv3 = isset($local_favour_adv['adv_src']) ? $local_favour_adv['adv_src'] : null;
         $is_state = isset($local_favour_adv['is_state']) ? $local_favour_adv['is_state'] : 0;
         $type = $local_favour_adv['type'];
         $province_id = $local_favour_adv['province_id'];
-        $contents = !empty($local_favour_adv['contents']) ? $local_favour_adv['contents'] : null;  
-
-        $host = $this->request->getHttpHost();
-
-        $adv = null;
-        $adv3 = null;
-
-        if($adv_src)
-        {
-            preg_match('/data:image\/(?P<mime_type>.*);base64,(?P<base64_code>.*)/', $adv_src, $adv_matches);
-            $file_name = uniqid().date('YmdHis').$adv_matches['mime_type'];
-            $file_path = __DIR__.'/../../public/uploads/';
-            file_put_contents($file_path.$file_name, base64_decode($adv_matches['base64_code']));
-
-            $adv = 'http://'.$host.$this->url->get('/uploads/').$file_name;
-
-        }
-
-        if($adv3_src)
-        {
-            //preg_match('/data:image\/(?P<mime_type>.*);base64,(?P<base64_code>.*)/', $adv3_src, $adv3_matches);
-            //echo $adv3_src.PHP_EOL;
-            $file_name = uniqid().date('YmdHis').$adv3_src['mime_type'];
-            $file_path = __DIR__.'/../../public/uploads/';
-            file_put_contents($file_path.$file_name, base64_decode($adv3_src['base64_data']));
-
-            $adv3 = 'http://'.$host.$this->url->get('/uploads/').$file_name;
-        }
+        $contents = !empty($local_favour_adv['contents']) ? $local_favour_adv['contents'] : null;
 
 
         $success = LocalFavour::addLocalFavourAdv($rele_id, $adv, $adv3, $is_state, $type, $province_id, $contents);
@@ -325,15 +320,27 @@ class LocalfavourController extends ControllerBase
         $result = false;
         $updated = array();
 
-        foreach($updates as $data)
+        foreach($updates as $local_favour_adv)
         {
-            $id = $data['id'];
-            $adv = isset($data['adv']) ? $data['adv'] : null;
-            $is_state = isset($data['is_state']) ? $data['is_state'] : null;
-            $is_order = isset($data['is_order']) ? $data['is_order'] : null;
-            $rst = LocalFavour::updateLocalFavourAdv($id, $adv, $is_state, $is_order);
+            $id = $local_favour_adv['id'];
+            $rele_id = !empty($local_favour_adv['rele_id']) ? $local_favour_adv['rele_id'] : null;
+            $adv = isset($local_favour_adv['adv_src']) ? $local_favour_adv['adv_src'] : null;
+            $is_state = isset($local_favour_adv['is_state']) ? $local_favour_adv['is_state'] : null;
+            $is_order = isset($local_favour_adv['is_order']) ? $local_favour_adv['is_order'] : null;
+            $type = isset($local_favour_adv['type']) ? $local_favour_adv['type'] : null;
+            $province_id = isset($local_favour_adv['province_id']) ? $local_favour_adv['province_id'] : null;
+            $contents = !empty($local_favour_adv['contents']) ? $local_favour_adv['contents'] : null;
+            $rst = LocalFavour::updateLocalFavourAdv($id, array(
+                'rele_id' => $rele_id,
+                'adv' => $adv,
+                'is_state' => $is_state,
+                'is_order' => $is_order,
+                'type' => $type,
+                'province_id' => $province_id,
+                'contents' => $contents
+             ));
             $result = $result || $rst;
-            if($result) array_push($updated, $data);
+            if($result) array_push($updated, $local_favour_adv);
         }
 
         $this->view->setVar('data', array(
@@ -354,17 +361,15 @@ class LocalfavourController extends ControllerBase
         ));
     }
 
+
     /**
      * 本地惠稿件管理页面
      */
     public function localFavourSubListAction()
     {
         $province_id = AdminUser::getCurrentProvinceId();
-
         $local_favour_types = LocalFavour::getLocalFavourTypeList();
-
         $province_list = Province::getProvinceList();
-
         $city_list = Province::getCityListByPid($province_id);
 
         $this->view->setVars(array(

@@ -408,84 +408,127 @@ SQL;
     }
 
     /**
-     * @param null $province_id
+     * 获取本地惠推广
+     * @param array|null $criteria
      * @param null $page_num
      * @param null $page_size
      * @return array
      */
-    public static function getLocalFavourAdvList($province_id=null, $page_num=null, $page_size=null)
+    public static function getLocalFavourAdvList(array $criteria=null, $page_num=null, $page_size=null)
     {
+        $crt = new Criteria($criteria);
+        $cte_condition_arr = array();
+        $cte_condition_str = '';
+        $page_condition_str = '';
         $bind = array();
 
-        $province_condition = '';
-        $page_condition = '';
-
-        if($province_id)
+        if($crt->id)
         {
-            $province_condition = 'where l.provinceId in(:province_id,0)';
-            $bind['province_id'] = $province_id;
+            $cte_condition_arr[] = 'd.id = :id';
+            $bind['id'] = $crt->id;
+        }
+
+        if($crt->province_id)
+        {
+            $cte_condition_arr[] = 'l.provinceId in(:province_id,0)';
+            $bind['province_id'] = $crt->province_id;
+        }
+
+        if($crt->is_state)
+        {
+            $cte_condition_arr[] = 'd.isState = :is_state';
+            $bind['is_state'] = $crt->is_state;
+        }
+
+        if(!empty($cte_condition_arr))
+        {
+            $cte_condition_str = 'where '.implode(' and ', $cte_condition_arr);
         }
 
         if($page_num)
         {
-            $page_condition = 'where rownum between :offset and :limit';
+            $page_condition_str = 'where rownum between :offset and :limit';
             $offset = $page_size * ( $page_num - 1) + 1;
             $bind['offset'] = $offset;
             $bind['limit'] = $offset + $page_size - 1 ;
         }
         $sql = <<<SQL
         WITH LocalFavourAdv_CTE AS (
-			    SELECT *, ROW_NUMBER() OVER (ORDER BY [id] desc) AS rownum FROM
+		  SELECT d.id id,
+                d.releId releId,
+                d.isOrder isOrder,
+                d.isState isState,
+                d.adv adv,
+                d.provinceId,
+                p.name provinceName,
+                d.createTime createTime,
+                d.adv3 adv3,
+                d.contents,
+                d.type,
+                l.id l_id,
+                isnull(l.title, n.title) as title,
+                l.des l_des,
+                l.contents l_contents,
+                l.publishTime l_publishTime,
+                type.id l_typeId,
+                type.FavourType l_typeName,
+                ROW_NUMBER() OVER (ORDER BY d.isState desc, d.isOrder asc, d.createTime desc) AS rownum
+                FROM
 			    LocalFavourAdv d
-			    %s
-			)
-        select
-		d.id id,
-		d.releId releId,
-		d.isOrder isOrder,
-		d.isState isState,
-		d.adv adv,
-		d.provinceId,
-		p.name provinceName,
-		d.createTime createTime,
-		d.adv3 adv3,
-		l.id l_id,
-		l.title l_title,
-		l.des l_des,
-		l.contents l_contents,
-		l.publishTime l_publishTime,
-		type.id l_typeId,
-		type.FavourType l_typeName
+			    left join Province p on p.id = d.provinceId
+		        left join LocalFavour l on l.id = d.releId and d.type = 'LocalFavour'
+		        left join LocalFavourType type on type.id = l.typeId and d.type = 'LocalFavour'
+		        left join Notice n on n.id = d.releId and d.type = 'Notice'
+			    $cte_condition_str
+		)
+        select *
 		from LocalFavourAdv_CTE d
-		left join Province p on p.id = d.provinceId
-		left join LocalFavour l on l.id = d.releId
-		left join LocalFavourType type on type.id = l.typeId
-		%s
-		order by d.isState desc, d.isOrder asc, d.createTime desc
+		$page_condition_str
 SQL;
-        $sql = sprintf($sql, $province_condition, $page_condition);
         $result = self::nativeQuery($sql, $bind);
         return $result;
     }
 
     /**
      * 获取本地惠推广总数
-     * @param $province_id
+     * @param array|null $criteria
+     * @return int
      */
-    public static function getLocalFavourAdvCount($province_id)
+    public static function getLocalFavourAdvCount(array $criteria=null)
     {
+        $crt = new Criteria($criteria);
+        $condition_arr = array();
+        $condition_str = '';
         $bind = array();
-        $province_condition = '';
-        if($province_id)
+
+        if($crt->province_id)
         {
-            $province_condition = 'where provinceId in (:provinceId,0)';
-            $bind['province_id'] = $province_id;
+            $condition_arr[] = 'l.provinceId in(:province_id,0)';
+            $bind['province_id'] = $crt->province_id;
         }
 
-        $sql = 'select count(id) from LocalFavourAdv %s';
-        $sql = sprintf($sql, $province_condition);
-        $result = self::nativeQuery($sql, $bind, null, Db::FETCH_NUM);
-        return $result[0];
+        if($crt->is_state)
+        {
+            $condition_arr[] = 'd.isState = :is_state';
+            $bind['is_state'] = $crt->is_state;
+        }
+
+        if(!empty($condition_arr))
+        {
+            $condition_str = 'where '.implode(' and ', $condition_arr);
+        }
+
+        $sql = <<<SQL
+		SELECT count(d.id)
+        FROM
+        LocalFavourAdv d
+        left join Province p on p.id = d.provinceId
+        left join LocalFavour l on l.id = d.releId
+        left join LocalFavourType type on type.id = l.typeId
+        $condition_str
+SQL;
+        $result = self::fetchOne($sql, $bind, null, Db::FETCH_NUM);
+        return (int)$result[0];
     }
 
     /**
@@ -594,38 +637,71 @@ SQL;
     }
 
     /**
+     * 更新首页推广
      * @param $id
-     * @param $adv
-     * @param $is_state
-     * @param $is_order
+     * @param array $criteria
      * @return array
      */
-    public static function updateLocalFavourAdv($id, $adv=null, $is_state=null, $is_order=null)
+    public static function updateLocalFavourAdv($id, array $criteria=null)
     {
-        $sql = 'update LocalFavourAdv set %s where id = :id';
+        $crt = new Criteria($criteria);
+        $bind = array();
 
         $field_str = '';
         $bind = array('id' => $id);
 
-        if($adv)
+        if($crt->rele_id)
         {
-            $field_str .= 'adv = :adv, ';
-            $bind['adv'] = $adv;
+            $field_str .= 'releId = :rele_id, ';
+            $bind['rele_id'] = $crt->rele_id;
         }
-        if($is_state !== null)
+
+        if($crt->type)
+        {
+            $field_str .= 'type = :type, ';
+            $bind['type'] = $crt->type;
+        }
+
+        if($crt->province_id)
+        {
+            $field_str .= 'provinceId = :province_id, ';
+            $bind['province_id'] = $crt->province_id;
+        }
+
+        if($crt->contents)
+        {
+            $field_str .= 'contents = :contents, ';
+            $bind['contents'] = $crt->contents;
+        }
+
+        if($crt->adv)
+        {
+            $field_str .= 'adv3 = :adv, ';
+            $bind['adv'] = $crt->adv;
+        }
+
+        if($crt->is_state !== null)
         {
             $field_str .= 'isState = :is_state, ';
-            $bind['is_state'] = $is_state;
+            $bind['is_state'] = $crt->is_state;
         }
-        if($is_order !== null)
+
+        if($crt->is_order !== null)
         {
             $field_str .= 'isOrder = :is_order, ';
-            $bind['is_order'] = $is_order;
+            $bind['is_order'] = $crt->is_order;
         }
 
-        $field_str = rtrim($field_str, ', ');
+        if(!empty($field_str))
+        {
+            $field_str = rtrim($field_str, ', ');
+        }
+        else
+        {
+            return false;
+        }
 
-        $sql = sprintf($sql, $field_str);
+        $sql = "update LocalFavourAdv set $field_str where id = :id";
         return self::nativeExecute($sql, $bind);
     }
 

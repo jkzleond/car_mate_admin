@@ -108,7 +108,6 @@
                     </div>
                 </form>
             </div>
-
             <!--   滚动广告表格    -->
             <div class="row-fluid">
                 <div id="local_favour_scroll_ad_grid"></div>

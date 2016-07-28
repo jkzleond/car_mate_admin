@@ -4,6 +4,7 @@ jQuery(document).ready(function(){
 	
 	// dropdown in leftmenu
 	jQuery('.leftmenu .dropdown > a').click(function(){
+		jQuery('.leftmenu .dropdown > a').next(':visible').slideUp('fast');
 		if(!jQuery(this).next().is(':visible'))
 			jQuery(this).next().slideDown('fast');
 		else

@@ -262,37 +262,37 @@
                 <li class="dropdown"><a href=""><span  class="iconfa-signal"></span>系统</a>
                     <ul>
                         {% if 'welAdv' in auth %}
-                        <li class="dropdown"><a href="/welcomeAdvList">开屏广告管理</a></li>
-                        <li class="dropdown"><a href="/carService/manage">汽车服务内容</a></li>
+                        <li><a href="/welcomeAdvList">开屏广告管理</a></li>
+                        <li><a href="/carService/manage">汽车服务内容</a></li>
                         {% endif %}
                         {% if 'notice' in auth %}
-                        <li class="dropdown"><a href="/noticeManage">公告管理</a></li>
+                        <li><a href="/noticeManage">公告管理</a></li>
                         {% endif %}
                         {% if 'oilPrice' in auth %}
-                        <li class="dropdown"><a href="">油价管理</a></li>
+                        <li><a href="">油价管理</a></li>
                         {% endif %}
                         {% if 'talkInfo' in auth %}
-                        <li class="dropdown"><a href="/talk/manage">车友互动</a></li>
+                        <li><a href="/talk/manage">车友互动</a></li>
                         {% endif %}
                         {% if 'interaction' in auth %}
-                        <li class="dropdown"><a href="">路况管理</a></li>
+                        <li><a href="">路况管理</a></li>
                         {% endif %}
                         {% if 'iosPush' in auth %}
-                        <li class="dropdown"><a href="/push_message">消息推送</a></li>
+                        <li><a href="/push_message">消息推送</a></li>
                         {% endif %}
                         {% if 'feedBack' in auth %}
-                        <li class="dropdown"><a href="">意见反馈</a></li>
-                        <li class="dropdown"><a href="/appException">异常信息</a></li>
+                        <li><a href="/feedBackMng">意见反馈</a></li>
+                        <li><a href="/appException">异常信息</a></li>
                         {% endif %}
                         {% if 'logQuery' in auth %}
-                        <li class="dropdown"><a href="">查看日志</a></li>
+                        <li><a href="">查看日志</a></li>
                         {% endif %}
                         {% if 'userManager' in auth %}
-                        <li class="dropdown"><a href="">注册用户管理</a></li>
+                        <li><a href="">注册用户管理</a></li>
                         {% endif %}
                         {% if 'baiduMap' in auth %}
-                        <li class="dropdown"><a href="">查看地图</a></li>
-                        <li class="dropdown"><a href="">周边信息审核</a></li>
+                        <li><a href="">查看地图</a></li>
+                        <li><a href="">周边信息审核</a></li>
                         {% endif %}
                     </ul>
                 </li>

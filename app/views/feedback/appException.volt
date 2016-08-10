@@ -70,7 +70,7 @@
         //异常列表
         var exception_grid = $('#exception_grid').datagrid({
             url: '/appExceptionList.json',
-            title: '奖品列表',
+            title: '异常列表',
             iconCls: 'icon-list',
             width: '100%',
             height: 'auto',

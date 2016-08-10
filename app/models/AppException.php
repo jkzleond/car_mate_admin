@@ -70,7 +70,7 @@ class AppException extends ModelEx
             e.userId userId,
             u.UNAME uName,
             e.content,
-            e.occurTime,
+            convert(varchar(20), e.occurTime, 20) as occurTime,
             u.provinceId,
             p.name provinceName
             FROM dbo.AppException e

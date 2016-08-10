@@ -1349,6 +1349,30 @@ $router->addDelete('/appException/{id:\d+}.json', array(
     'action' => 'delAppException'
 ));
 
+//意见反馈管理页面
+$router->addGet('/feedBackMng', array(
+    'controller' => 'feedback',
+    'action' => 'feedBackManage'
+));
+
+//获取意见反馈列表
+$router->add('/feedBackList.json', array(
+    'controller' => 'feedback',
+    'action' => 'getFeedBackList'
+));
+
+//删除制定ID的意见反馈
+$router->addDelete('/feedBack/{id:\d+}.json', array(
+    'controller' => 'feedback',
+    'action' => 'delFeedBack'
+));
+
+//回复指定ID的意见反馈
+$router->addPost('/feedBack/{id:\d+}/reply.json', array(
+    'controller' => 'feedback',
+    'action' => 'replyFeedBack'
+));
+
 /*通用*/
 $common = new \Phalcon\Mvc\Router\Group(array(
     'controller' => 'common'

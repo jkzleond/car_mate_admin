@@ -72,11 +72,11 @@ class AdminuserController extends ControllerBase
                     {
                         if (strpos($user_id, 'stadium') !== false)
                         {
-                            $session_user->set('auth', ['gygd', 'stadium']);
+                            $session_user->set('auth', array('gygd', 'stadium'));
                         }
                         elseif (strpos($user_id, 'museum') !== false)
                         {
-                            $session_user->set('auth', ['gygd', 'museum']);
+                            $session_user->set('auth', array('gygd', 'museum'));
                         }
                         return $this->response->redirect('/gygd/');
                     }

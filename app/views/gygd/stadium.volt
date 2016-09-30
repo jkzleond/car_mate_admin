@@ -182,13 +182,20 @@
             var phone_rule = config_form.find('[name=phone_rule]').val();
             var id_no_rule = config_form.find('[name=id_no_rule]').val();
             var win_rate = win_rate_numbox.numberspinner('getValue');
+            var win_rule = {};
+            if (phone_rule)
+            {
+               win_rule.phone = phone_rule;
+            }
+
+            if (id_no_rule)
+            {
+                win_rule.id_no = id_no_rule;
+            }
             save_config({
                 win_limit: win_limit,
                 win_rate: win_rate,
-                win_rule: {
-                    phone: phone_rule,
-                    id_no: id_no_rule
-                }
+                win_rule: win_rule
             })
         });
 

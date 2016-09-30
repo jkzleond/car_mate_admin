@@ -50,6 +50,18 @@ class GygdController extends ControllerBase
     }
 
     /**
+     * @param $activity_id
+     * @param $user_id
+     */
+    public function delStadiumActivityUserAction($activity_id, $user_id)
+    {
+        $success = Gygd::deleteStadiumActivityUser($activity_id, $user_id);
+        $this->view->setVar('data', array(
+            'success' => $success
+        ));
+    }
+
+    /**
      * 更新体育馆活动
      */
     public function updateStadiumActivityAction()

@@ -1444,11 +1444,16 @@ $gygd->add('/stadium/activity_users.json', array(
     'action' => 'getStadiumActivityUserList'
 ));
 
+$gygd->addDelete('/stadium/activity/{activity_id:\d+}/users/{user_id:\d+}.json', array(
+    'action' => 'delStadiumActivityUser'
+));
+
 //更新体育馆活动
 $gygd->addPut('/stadium/activity.json', array(
     'action' => 'updateStadiumActivity',
 ));
 
+//体育馆活动领取
 $gygd->addPut('/stadium/activity/user/gain.json', array(
     'action' => 'gainStadiumActivity'
 ));

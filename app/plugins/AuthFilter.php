@@ -36,5 +36,20 @@ class AuthFilter extends Phalcon\Mvc\User\Plugin
             return false;
         }
 
+        if (in_array('gygd', $auth) && strpos($url, '/gygd') !== 0 && $url != '/login' && $url != '/validatecode')
+        {
+            if($this->request->isAjax())
+            {
+                $this->view->disable();
+                $this->response->setStatusCode(403, '无权访问');
+            }
+            else
+            {
+                $this->response->setStatusCode(403, '无权访问');
+                echo '无权访问';
+                exit;
+            }
+        }
+
     }
 }

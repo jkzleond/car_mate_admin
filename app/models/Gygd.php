@@ -198,6 +198,48 @@ SQL;
         return $result[0];
     }
 
+    /**
+     * 删除体育馆用户参与信息
+     * @param $activity_id
+     * @param $user_id
+     * @return bool
+     */
+    public static function deleteStadiumActivityUser($activity_id, $user_id)
+    {
+        $connection = self::_getConnection();
+        $connection->begin();
+        try
+        {
+            $del_activity_user_sql = "delete from GYGD_ActivityToUser where activity_id = :activity_id and user_id = :user_id";
+            $del_activity_user_bind = array(
+                'activity_id' => $activity_id,
+                'user_id' => $user_id
+            );
+            $del_activity_user_success = self::nativeExecute($del_activity_user_sql, $del_activity_user_bind);
+            if (!$del_activity_user_success)
+            {
+                throw new Exception();
+            }
+            $del_user_awards_sql = "delete from GYGD_AwardToUser where user_id = :user_id and award_id in (select id from GYGD_ActivityAward where activity_id = :activity_id)";
+            $del_user_awards_bind = array(
+                'activity_id' => $activity_id,
+                'user_id' => $user_id
+            );
+            $del_user_awards_success = self::nativeExecute($del_user_awards_sql, $del_user_awards_bind);
+            if (!$del_user_awards_success)
+            {
+                throw new Exception();
+            }
+            $success = $connection->commit();
+        }
+        catch(Exception $e)
+        {
+           $connection->rollback();
+        }
+
+        return $success;
+    }
+
     public static function updateActivity($activity_id, array $data)
     {
         $crt = new Criteria($data);

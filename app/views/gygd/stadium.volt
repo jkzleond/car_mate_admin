@@ -125,6 +125,7 @@
             toolbar: '#activity_user_grid_tb',
             frozenColumns: [[
                 {field:'id',title:'操作',width:'15%',align:'center', formatter: function(value, row, index){
+                    var delete_btn = '<button class="btn btn-danger activity-user-del-btn" title="删除" data-user_id="' + row.user_id + '" data-activity_id="' + row.activity_id + '"><i class="iconfa-trash"></i></button>';
                     var other_btn = null;
 
                     if( row.is_win == 1 && !row.exchange_date )
@@ -132,7 +133,7 @@
                         other_btn = '<button class="btn btn-primary activity-user-gain-btn " title="领取" data-user_id="' + row.user_id + '" data-activity_id="' + row.activity_id + '"><i class="iconfa-gift" style="color:#000"></i></button>';
                     }
 
-                    return '<div class="btn-group">' + other_btn + '</div>';
+                    return '<div class="btn-group">' + delete_btn + other_btn + '</div>';
                 }}
             ]],
             columns:[[
@@ -238,6 +239,15 @@
                 user_id: user_id,
                 activity_id: activity_id
             }, function(){
+                user_grid.datagrid('reload');
+            });
+        });
+
+        //删除参与用户信息
+        $(document).on('click', '.activity-user-del-btn', function(event){
+            var user_id = $(this).attr('data-user_id');
+            var activity_id = $(this).attr('data-activity_id');
+            del(activity_id, user_id, function(){
                 user_grid.datagrid('reload');
             });
         });
@@ -361,6 +371,46 @@
             });
         }
 
+        /**
+         * 删除参与用户信息
+         * @param activity_id
+         * @param user_id
+         * @param callback
+         */
+        function del(activity_id, user_id, callback)
+        {
+            $.messager.confirm('确认', '确定对删除该参与用户信息', function(is_ok){
+                if (is_ok)
+                {
+                    $.ajax({
+                        url: '/gygd/stadium/activity/' + activity_id +'/users/' + user_id + '.json',
+                        method: 'DELETE',
+                        global: true
+                    }).done(function(resp){
+                        if (resp.success)
+                        {
+                            $.messager.show({
+                                title: '系统消息',
+                                msg: '删除该参与用户信息成功'
+                            });
+
+                            if (typeof callback == 'function')
+                            {
+                                callback();
+                            }
+                        }
+                        else
+                        {
+                            $.messager.show({
+                                title: '系统消息',
+                                msg: '删除该参与用户信息失败'
+                            });
+                        }
+                    });
+                }
+            });
+        }
+
         //页面离开事件
         this.on_leave = function(){
             //销毁窗口
@@ -370,6 +420,7 @@
             $(document).off('click', '.activity-user-edit-btn');
             $(document).off('click', '.activity-user-notice-btn');
             $(document).off('click', '.activity-user-gain-btn');
+            $(document).off('click', '.activity-user-del-btn');
             $(document).off('click', '.activity-user-pay-btn');
             $(document).off('click', '.activity-user-order-detail-btn');
         };

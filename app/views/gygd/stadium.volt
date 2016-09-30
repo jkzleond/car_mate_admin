@@ -140,6 +140,7 @@
                 {field:'phone', title:'手机号', width:'15%', align:'center'},
                 {field:'id_no', title:'身份证号', width:'15%', align:'center'},
                 {field:'draw_date', title:'抽奖时间', width:'15%', align:'center'},
+                {field:'exchange_date', title:'领取时间', width:'15%', align:'center'},
                 {field:'is_win',title:'状态',width:'15%',align:'center', formatter: function(value, row, index){
                     if (row.is_win == 1)
                     {

@@ -1418,3 +1418,44 @@ $field->addDelete('/field/{id:\d+}.json', array(
 
 $router->mount($field);
 
+
+/*
+ * GYGD
+ */
+
+$gygd = new \Phalcon\Mvc\Router\Group(array(
+    'controller' => 'gygd'
+));
+
+$gygd->setPrefix('/gygd');
+
+$gygd->addGet('/', array(
+    'action' => 'index'
+));
+
+
+//体育馆活动页面
+$gygd->addGet('/stadium', array(
+    'action' => 'stadium'
+));
+
+//获取体育馆活动用户数据
+$gygd->add('/stadium/activity_users.json', array(
+    'action' => 'getStadiumActivityUserList'
+));
+
+//更新体育馆活动
+$gygd->addPut('/stadium/activity.json', array(
+    'action' => 'updateStadiumActivity',
+));
+
+$gygd->addPut('/stadium/activity/user/gain.json', array(
+    'action' => 'gainStadiumActivity'
+));
+
+//博物馆活动页面
+$gygd->addGet('/museum', array(
+    'action' => 'museum'
+));
+
+$router->mount($gygd);

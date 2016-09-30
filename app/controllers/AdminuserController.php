@@ -67,6 +67,20 @@ class AdminuserController extends ControllerBase
                     {
                         $this->cookies->get('remember')->delete();
                     }
+
+                    if ($user_id == 'stadium@gygd.com' or $user_id == 'museum@gygd.com')
+                    {
+                        if (strpos($user_id, 'stadium') !== false)
+                        {
+                            $session_user->set('auth', ['gygd', 'stadium']);
+                        }
+                        elseif (strpos($user_id, 'museum') !== false)
+                        {
+                            $session_user->set('auth', ['gygd', 'museum']);
+                        }
+                        return $this->response->redirect('/gygd/');
+                    }
+
                     return $this->response->redirect('/');
                 }
                 else

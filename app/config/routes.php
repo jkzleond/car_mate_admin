@@ -1444,6 +1444,7 @@ $gygd->add('/stadium/activity_users.json', array(
     'action' => 'getStadiumActivityUserList'
 ));
 
+//删除体育馆参与用户信息
 $gygd->addDelete('/stadium/activity/{activity_id:\d+}/users/{user_id:\d+}.json', array(
     'action' => 'delStadiumActivityUser'
 ));
@@ -1461,6 +1462,41 @@ $gygd->addPut('/stadium/activity/user/gain.json', array(
 //博物馆活动页面
 $gygd->addGet('/museum', array(
     'action' => 'museum'
+));
+
+//获取博物馆活动参与数据
+$gygd->add('/museum/activity_users.json', array(
+    'action' => 'getMuseumActivityUserList'
+));
+
+//获取博物馆活动摇号
+$gygd->add('/museum/activity/{draw_type:.*}/users/random/{people_num:\d+}.json', array(
+    'action' => 'getMuseumActivityRandomUser'
+));
+
+//博物馆活动用户中奖
+$gygd->addPost('/museum/activity/{draw_type:.*}/users/win.json', array(
+    'action' => 'museumActivityWinUser'
+));
+
+//获取博物馆活动奖品列表
+$gygd->add('/museum/activity/{draw_type:.*}/awards.json', array(
+    'action' => 'getMuseumActivityAwardList'
+));
+
+//删除博物馆活动用户
+$gygd->addDelete('/museum/activity/{activity_id:\d+}/users/{user_id:\d+}.json', array(
+    'action' => 'delStadiumActivityUser'
+));
+
+//更新博物馆活动
+$gygd->addPut('/museum/activity.json', array(
+    'action' => 'updateStadiumActivity',
+));
+
+//博物馆活动领取
+$gygd->addPut('/museum/activity/user/gain.json', array(
+    'action' => 'gainStadiumActivity'
 ));
 
 $router->mount($gygd);

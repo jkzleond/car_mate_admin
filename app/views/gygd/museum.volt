@@ -6,78 +6,59 @@
         cursor: pointer;
     }
 </style>
-<div class="row-fluid" id="stadium">
+<div class="row-fluid" id="museum">
     <div class="span12">
-        <h4 class="widgettitle">体育惠民一本通活动</h4>
+        <h4 class="widgettitle">博物馆记戳有奖</h4>
         <div class="widgetcontent nopadding">
-            <div class="row-fluid config-form">
-                <fieldset class="well well-samll span12">
-                    <legend><i class="iconfa-cog"></i>抽奖设置</legend>
-                    <div class="row-fluid">
-                        <div class="span2">
-                            <span class="label">抽奖份数</span>
-                            <input name="win_limit" type="text" class="input-mini" value="{{ activity.win_limit  }}">
-                            <i class="iconfa-question-sign cursor-pointer" title="-1为无限"></i>
-                        </div>
-                        <div class="span2">
-                            <span class="label">中奖率设置</span>
-                            <input name="win_rate" type="text" class="input-mini" value="{{ activity.win_rate }}">
-                        </div>
-                        <div class="span3">
-                            <span class="label">手机号规则</span>
-                            <input name="phone_rule" type="text" class="input-medium" value="{{activity.win_rule.phone}}">
-                            <i class="iconfa-question-sign cursor-pointer" title="限制开头如:132*;结尾:*4567;含有:*888*"></i>
-                        </div>
-                        <div class="span3">
-                            <span class="label">身份证规则</span>
-                            <input name="id_no_rule" type="text" class="input-medium" value="{{activity.win_rule.id_no}}">
-                            <i class="iconfa-question-sign cursor-pointer" title="限制开头如:53*;结尾:**650;含有:*999*"></i>
-                        </div>
-                        <div class="span2">
-                            <button class="save-config-btn btn btn-warning"><i class="iconfa-wrench"></i>保存</button>
-                        </div>
-                    </div>
-                </fieldset>
-            </div>
-            <div class="row-fluid filter-form">
+            <div class="row-fluid">
                 <div id="activity_user_grid_tb">
-                    <div class="row-fluid">
-                        <div class="span4" data-rel-info="idno">
-                            <span class="label">身份证号</span>
-                            <input name="id_no" type="text" class="input-medium"/>
+                    <div class="filter-form row-fluid">
+                        <div class="row-fluid">
+                            <div class="span4" data-rel-info="idno">
+                                <span class="label">约章本号</span>
+                                <input name="book_no" type="text" class="input-medium"/>
+                            </div>
+                            <div class="span4">
+                                <span class="label">真实姓名</span>
+                                <input name="user_name" type="text" class="input-small"/>
+                            </div>
+                            <div class="span4">
+                                <span class="label">电话/手机</span>
+                                <input name="phone" type="text" class="input-medium"/>
+                            </div>
                         </div>
-                        <div class="span4">
-                            <span class="label">真实姓名</span>
-                            <input name="user_name" type="text" class="input-small"/>
-                        </div>
-                        <div class="span4">
-                            <span class="label">电话/手机</span>
-                            <input name="phone" type="text" class="input-medium"/>
+                        <div class="row-fluid">
+                            <div class="span4">
+                                <span class="label">状态</span>
+                                <select name="state" class="input-small">
+                                    <option value="">-请选择状态-</option>
+                                    <option value="NO_WIN">未中奖</option>
+                                    <option value="HALF_YEAR_WIN">半年奖</option>
+                                    <option value="FULL_YEAR_WIN">全年奖</option>
+                                    <option value="NO_EXCHANGED">未领取</option>
+                                    <option value="EXCHANGED">已领取</option>
+                                </select>
+                            </div>
+                            <div class="span4">
+                                <span class="label">排序字段</span>
+                                <select name="order_by" class="input-medium">
+                                    <option value="draw_date">抽奖时间</option>
+                                    <option value="exchange_date">领取时间</option>
+                                </select>
+                            </div>
+                            <div class="span4">
+                                <button class="btn btn-primary" id="activity_user_search_btn">
+                                    <i class="iconfa-search"></i>
+                                    查找
+                                </button>
+                            </div>
                         </div>
                     </div>
                     <div class="row-fluid">
-                        <div class="span4">
-                            <span class="label">状态</span>
-                            <select name="state" class="input-small">
-                                <option value="">-请选择状态-</option>
-                                <option value="0">未中奖</option>
-                                <option value="1">中奖</option>
-                                <option value="2">领取</option>
-                                <option value="3">未领取</option>
-                            </select>
-                        </div>
-                        <div class="span4">
-                            <span class="label">排序字段</span>
-                            <select name="order_by" class="input-medium">
-                                <option value="draw_date">抽奖时间</option>
-                                <option value="exchange_date">领取时间</option>
-                            </select>
-                        </div>
-                        <div class="span4">
-                            <button class="btn btn-primary" id="activity_user_search_btn">
-                                <i class="iconfa-search"></i>
-                                查找
-                            </button>
+                        <div class="span6">
+                            <div class="btn-group">
+                                <button class="btn draw-btn"><i class="iconfa-random"></i>摇奖</button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -85,10 +66,38 @@
                 </div>
             </div>
         </div>
-        <div id="activity_user_window">
-            <iframe src="" frameborder="0" style="width: 100%; height:100%"></iframe>
+        <div class="draw-window-toolbar">
+            <div class="row-fluid">
+                <div class="span12">
+                    <span class="label">摇奖类型</span>
+                    <select name="draw_type">
+                        <option value="HALF_YEAR" selected>半年奖</option>
+                        <option value="FULL_YEAR">全年奖</option>
+                    </select>
+                </div>
+            </div>
+            <div class="row-fluid">
+                <div class="span12">
+                    <span class="label">奖品</span>
+                    <select name="award" id=""></select>
+                </div>
+            </div>
+            <div class="row-fluid">
+                <div class="span6">
+                    <span class="label">人数</span>
+                    <input type="text" name="people_num" class="input-mini">
+                </div>
+                <div class="span4">
+                    <button class="btn btn-primary random-user-btn">
+                        <i class="iconfa-random"></i>
+                        摇号
+                    </button>
+                </div>
+            </div>
         </div>
-        <div id="activity_user_order_detail_window"></div>
+        <div class="draw-window">
+            <div class="random-user-grid"></div>
+        </div>
     </div>
 </div>
 
@@ -99,16 +108,9 @@
          * 控件相关
          */
 
-        var win_rate_numbox = $('[name=win_rate]').numberspinner({
-            width: 80,
-            height: 30,
-            max: 10000,
-            suffix: '‱'
-        });
-
         //活动参与用户表格
         var user_grid = $('#activity_user_grid').datagrid({
-            url: '/gygd/stadium/activity_users.json',
+            url: '/gygd/museum/activity_users.json',
             title: '活动参与用户列表',
             iconCls: 'icon-list',
             width: '100%',
@@ -128,7 +130,7 @@
                     var delete_btn = '<button class="btn btn-danger activity-user-del-btn" title="删除" data-user_id="' + row.user_id + '" data-activity_id="' + row.activity_id + '"><i class="iconfa-trash"></i></button>';
                     var other_btn = null;
 
-                    if( row.is_win == 1 && !row.exchange_date )
+                    if( (row.half_year_win == 1 && !row.half_year_exchange_date) || (row.full_year_win == 1 && !row.full_year_exchange_date) )
                     {
                         other_btn = '<button class="btn btn-primary activity-user-gain-btn " title="领取" data-user_id="' + row.user_id + '" data-activity_id="' + row.activity_id + '"><i class="iconfa-gift" style="color:#000"></i></button>';
                     }
@@ -139,13 +141,18 @@
             columns:[[
                 {field:'user_name',title:'姓名',width:'15%',align:'center'},
                 {field:'phone', title:'手机号', width:'15%', align:'center'},
-                {field:'id_no', title:'身份证号', width:'15%', align:'center'},
-                {field:'draw_date', title:'抽奖时间', width:'15%', align:'center'},
-                {field:'exchange_date', title:'领取时间', width:'15%', align:'center'},
+                {field:'book_no', title:'约章本号', width:'15%', align:'center'},
+                {field:'half_year_exchange_date', title:'领取时间', width:'15%', align:'center', formatter: function(value, row, index){
+                    return row.half_year_exchange_date || row.full_year_exchange_date;
+                }},
                 {field:'is_win',title:'状态',width:'15%',align:'center', formatter: function(value, row, index){
-                    if (row.is_win == 1)
+                    if (row.half_year_win == 1)
                     {
-                        return (row.exchange_date ? '已领取' : '未领取');
+                        return '获半年奖[' + row.half_year_awards + ']' + (row.half_year_exchange_date ? '[已领取]' : '[未领取]');
+                    }
+                    else if (row.full_year_win == 1)
+                    {
+                        return '获全年奖[' + row.full_year_awards + ']' + (row.full_year_exchange_date ? '[已领取]' : '[未领取]');
                     }
                     else
                     {
@@ -155,44 +162,123 @@
             ]]
         });
 
+        //随机摇号用户列表
+        var random_user_grid = $('#museum .draw-window .random-user-grid').datagrid({
+            title: '摇号列表',
+            iconCls: 'icon-list',
+            width: '100%',
+            height: 280,
+            fitColumns: true,
+            singleSelect: false,
+            ctrlSelect: true,
+            nowrap: false,///设置为true，当数据长度超出列宽时将会自动截取
+            striped: true,///显示条纹
+            pagination:true,///分页
+            pageSize:10,///（每页记录数）
+            pageNumber:1,///（当前页码）
+            columns:[[
+                {field:'user_name',title:'姓名',width:'33%',align:'center'},
+                {field:'phone', title:'手机号', width:'33%', align:'center'},
+                {field:'book_no', title:'约章本号', width:'33%', align:'center'}
+            ]]
+        }); 
+
         /*   窗口    */
 
         //编辑窗口
-        /*var user_window = $('#activity_user_window').window({
-         title: '活动参与用户编辑',
-         iconCls: 'icon-edit',
-         width: 315,
-         height: 525,
-         closed: true,
-         shadow: false,
-         modal: true,
-         openAnimation: 'fade'
-         });*/
+        var draw_dialog = $('#museum .draw-window').dialog({
+            title: '摇奖',
+            iconCls: 'iconfa-random',
+            width: 315,
+            height: 525,
+            closed: true,
+            shadow: false,
+            modal: true,
+            openAnimation: 'fade',
+            toolbar: '#museum .draw-window-toolbar',
+            buttons: [
+                {
+                    text: '确定',
+                    handler: function(event){
+                        event.preventDefault();
+                        var draw_type = $('.draw-window-toolbar [name="draw_type"]').val();
+                        var draw_type_name = draw_type == 'HALF_YEAR' ? '半年奖' : '全年奖';
+                        var award_id = award_combobox.combobox('getValue');
+                        var award_name = award_combobox.combobox('getText');
+                        var win_users = random_user_grid.datagrid('getData').rows;
+                        if (!win_users || win_users.length == 0)
+                        {
+                            $.messager.alert('警告', '没有摇出获奖用户, 请先点击摇号按钮');
+                            return false;
+                        }
+                        $.messager.confirm('确定结果', '该操作无法撤回, 请确认以上' + win_users.length + '名用户获得' + draw_type_name + award_name, function(is_ok){
+                            if (!is_ok) return;
+                            $.ajax({
+                                url: '/gygd/museum/activity/' + draw_type +'/users/win.json',
+                                method: 'POST',
+                                data: {
+                                    award_id: award_id,
+                                    users: win_users
+                                },
+                                global: true
+                            }).done(function(resp){
+                                if (resp.success)
+                                {
+                                    $.messager.show({
+                                        title: '系统消息',
+                                        msg: '摇奖成功'
+                                    });
+                                    random_user_grid.datagrid('reload');
+                                }
+                                else
+                                {
+                                    $.messager.show({
+                                        title: '系统消息',
+                                        msg: '摇奖失败'
+                                    });
+                                }
+                            });
+                        });
+                    }
+                },
+                {
+                    text: '取消',
+                    handler: function(event){
+                        draw_dialog.dialog('close');
+                        return false
+                    }
+                }
+            ]
+         });
 
+        //奖品选择框
+        var award_combobox = $('.draw-window-toolbar [name="award"]').combobox({
+            url: '/gygd/museum/activity/HALF_YEAR/awards.json',
+            method: 'GET',
+            valueField: 'id',
+            textField: 'name',
+            editable: false,
+            loadFilter: function(resp){
+                if (resp.success)
+                {
+                    award_combobox.combobox('setValue', resp.rows[0].id);
+                    return resp.rows;
+                }
+                return null;
+            }
+        });
+
+        //人数
+        var people_numberbox = $('.draw-window-toolbar [name="people_num"]').numberbox({
+            min: 1,
+            value: 1,
+        });
 
         /**
          * 事件相关
          */
 
-        var config_form = $('#stadium .config-form');
-
-        //抽奖配置保存按钮点击事件
-        $('.save-config-btn').click(function(event){
-            var win_limit = config_form.find('[name=win_limit]').val();
-            var phone_rule = config_form.find('[name=phone_rule]').val();
-            var id_no_rule = config_form.find('[name=id_no_rule]').val();
-            var win_rate = win_rate_numbox.numberspinner('getValue');
-            save_config({
-                win_limit: win_limit,
-                win_rate: win_rate,
-                win_rule: {
-                    phone: phone_rule,
-                    id_no: id_no_rule
-                }
-            })
-        });
-
-        var filter_form = $('#stadium .filter-form');
+        var filter_form = $('#museum .filter-form');
         //查找按钮点击事件
         $('#activity_user_search_btn').click(function(event){
             var criteria = {};
@@ -201,34 +287,34 @@
                 var value = $(n).val();
                 criteria[field_name] = value;
             });
-//            var old_option = user_grid.datagrid('options');
-//            old_option.queryParams = {criteria: criteria};
-            //重新配置选项后加载数据,为了改变的columns option 能够生效
-//            user_grid.datagrid(old_option);
             user_grid.datagrid('reload', {criteria: criteria});
         });
 
-        //全选/全不选按钮点击事件
-        $('#activity_user_select_all_btn').click(function(evetn){
-            var is_select_all = $(this).data('is_select_all');
-            if(is_select_all)
-            {
-                user_grid.datagrid('unselectAll');
-                //记录全选状态
-                $(this).data('is_select_all', false);
-            }
-            else
-            {
-                user_grid.datagrid('selectAll');
-                //记录全选状态
-                $(this).data('is_select_all', true);
-            }
+        $('.draw-btn').click(function(event){
+            draw_dialog.dialog('center').dialog('open');
         });
 
-        //批量领取
-        $('#activity_user_batch_gain_btn').click(function(event){
-            var url = '/activityUserGain';
-            batch_process('领取', url);
+        $('.draw-window-toolbar [name="draw_type"]').change(function(event){
+            var draw_type = $(this).val();
+            var url = '/gygd/museum/activity/' + draw_type + '/awards.json';
+            award_combobox.combobox('reload', url);
+            random_user_grid.datagrid('loadData', []);
+        });
+
+        //摇号按钮点击事件
+        $('.random-user-btn').click(function(event){
+            var draw_type = $('.draw-window-toolbar [name="draw_type"]').val();
+            var people_num = people_numberbox.numberbox('getValue');
+            $.ajax({
+                url: '/gygd/museum/activity/' + draw_type +'/users/random/' + people_num +'.json',
+                method: 'GET',
+                global: true
+            }).done(function(resp){
+                if (resp.success)
+                {
+                    random_user_grid.datagrid('loadData', resp.list);
+                }
+            });
         });
 
         //用户领取按钮
@@ -320,7 +406,7 @@
         function save_config(data)
         {
             $.ajax({
-                url: '/gygd/stadium/activity.json',
+                url: '/gygd/museum/activity.json',
                 method: 'PUT',
                 data: {data: data},
                 global: true
@@ -342,7 +428,7 @@
                 if (is_ok)
                 {
                     $.ajax({
-                        url: '/gygd/stadium/activity/user/gain.json',
+                        url: '/gygd/museum/activity/user/gain.json',
                         method: 'PUT',
                         data: {data: data},
                         global: true
@@ -383,7 +469,7 @@
                 if (is_ok)
                 {
                     $.ajax({
-                        url: '/gygd/stadium/activity/' + activity_id +'/users/' + user_id + '.json',
+                        url: '/gygd/museum/activity/' + activity_id +'/users/' + user_id + '.json',
                         method: 'DELETE',
                         global: true
                     }).done(function(resp){
@@ -413,8 +499,12 @@
 
         //页面离开事件
         this.on_leave = function(){
+            //销毁combobox
+            award_combobox.combobox('destroy');
+
             //销毁窗口
             $('#activity_user_winodw').window('destroy');
+            draw_dialog.window('destroy');
 
             //清除动态绑定事件
             $(document).off('click', '.activity-user-edit-btn');

@@ -105,14 +105,147 @@ class GygdController extends ControllerBase
         $criteria = $this->request->getPost('criteria');
         $page_num = $this->request->getPost('page');
         $page_size = $this->request->getPost('rows');
-        $users = Gygd::getStadiumActivityUserList($criteria, $page_num, $page_size);
-        $total = Gygd::getStadiumActivityUserCount($criteria);
+        $users = Gygd::getMuseumActivityUserList($criteria, $page_num, $page_size);
+        $total = Gygd::getMuseumActivityUserCount($criteria);
 
-        return array(
+        $this->view->setVar('data', array(
             'success'=> true,
             'total' => $total,
             'count' => count($users),
-            'list' => $users,
-        );
+            'rows' => $users,
+        ));
+    }
+
+    /**
+     * 删除博物馆活动参与用户
+     * @param $activity_id
+     * @param $user_id
+     */
+    public function delMuseumActivityUserAction($activity_id, $user_id)
+    {
+        $success = Gygd::deleteStadiumActivityUser($activity_id, $user_id);
+        $this->view->setVar('data', array(
+            'success' => $success
+        ));
+    }
+
+    /**
+     * 博物馆活动领取
+     */
+    public function gainMuseumActivityAction()
+    {
+        $data = $this->request->getPut('data');
+        $activity_id = $data['activity_id'];
+        $user_id = $data['user_id'];
+        $success = Gygd::gainStadiumActivity($activity_id, $user_id);
+
+        $this->view->setVar('data', array(
+            'success' => $success
+        ));
+    }
+
+    /**
+     * 获取博物馆活动奖品列表
+     * @param  $draw_type
+     */
+    public function getMuseumActivityAwardListAction($draw_type='HALF_YEAR')
+    {
+        $activity_id = 2;
+        if ($draw_type == 'FULL_YEAR')
+        {
+            $activity_id = 3;
+        }
+        $award_list = Gygd::getMuseumActivityAwardList($activity_id);
+        $this->view->setVar('data', array(
+            'success' => true,
+            'rows' => $award_list,
+            'total' => count($award_list),
+            'count' => count($award_list)
+        ));
+    }
+
+    /**
+     * 博物馆活动随机摇号
+     * @param  string $draw_type
+     * @param  int $people_num
+     */
+    public function getMuseumActivityRandomUserAction($draw_type='HALF_YEAR', $people_num=2)
+    {
+        $activity_user_list = Gygd::getMuseumActivityUserList(array(
+            'state' => 'NO_WIN'
+        ));
+
+        //随机种子
+        $success = shuffle($activity_user_list);
+
+        $random_user_list = array_slice($activity_user_list, 0, $people_num);
+
+        $this->view->setVar('data', array(
+            'success' => $success,
+            'list' => $random_user_list
+        ));
+    }
+
+    /**
+     * 博物馆活动用户中奖
+     * @param  string $draw_type
+     */
+    public function museumActivityWinUserAction($draw_type='HALF_YEAR')
+    {
+        $award_id = $this->request->getPost('award_id');
+        $users = $this->request->getPost('users');
+        $success = true;
+        $this->db->begin();
+        try
+        {
+            if ($draw_type == 'FULL_YEAR')
+            {
+                $activity_id = 3;
+
+                $del_activity_user_success = Gygd::deleteActivityUser($activity_id, $users);
+
+                if (!$del_activity_user_success)
+                {
+                    throw new Exception('delete activity user failed');
+                }
+
+                $add_activity_user_success = Gygd::addActivityUser($activity_id, $users, true);
+                if (!$add_activity_user_success)
+                {
+                    throw new Exception('add activity user failed');
+                }
+            }
+            else
+            {
+                $activity_id = 2;
+                $update_activity_user_success = Gygd::updateActivityUsers($users, array('is_win' => true));
+                if (!$update_activity_user_success)
+                {
+                    throw new Exception('update activity user failed');
+                }
+            }
+            $del_award_user_success = Gygd::deleteAwardToUser($award_id, $users);
+            if (!$del_award_user_success)
+            {
+                throw new Exception('delete activity user failed');
+            }
+            $add_award_user_success = Gygd::addAwardToUser($award_id, $users);
+            if (!$add_award_user_success)
+            {
+                throw new Exception('add award user failed');
+            }
+            $success = $this->db->commit();
+        }
+        catch(Exception $e)
+        {
+            $success = false;
+            $msg = $e->getMessage();
+            $this->db->rollBack();
+        }
+
+        $this->view->setVar('data', array(
+            'success' => $success,
+            'msg' => !empty($msg) ? $msg : null
+        ));
     }
 }

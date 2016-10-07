@@ -260,7 +260,7 @@
         {% if 'stadium' in auth %}
             CarMate.page.load('/gygd/stadium');
         {% elseif 'museum' in auth %}
-            CarMate.page.load('/gygd/stadium');
+            CarMate.page.load('/gygd/museum');
         {% endif %}
 
         /**

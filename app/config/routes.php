@@ -1444,6 +1444,11 @@ $gygd->add('/stadium/activity_users.json', array(
     'action' => 'getStadiumActivityUserList'
 ));
 
+//获取体育馆活动用户数据
+$gygd->addGet('/stadium/activity_users.csv', array(
+    'action' => 'exportStadiumActivityUserData'
+));
+
 //删除体育馆参与用户信息
 $gygd->addDelete('/stadium/activity/{activity_id:\d+}/users/{user_id:\d+}.json', array(
     'action' => 'delStadiumActivityUser'

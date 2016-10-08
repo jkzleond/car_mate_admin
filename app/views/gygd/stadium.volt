@@ -39,8 +39,8 @@
                     </div>
                 </fieldset>
             </div>
-            <div class="row-fluid filter-form">
-                <div id="activity_user_grid_tb">
+            <div class="row-fluid">
+                <div id="activity_user_grid_tb" class="filter-form">
                     <div class="row-fluid">
                         <div class="span4" data-rel-info="idno">
                             <span class="label">身份证号</span>
@@ -78,6 +78,13 @@
                                 <i class="iconfa-search"></i>
                                 查找
                             </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="row-fluid">
+                    <div class="span6">
+                        <div class="btn-group">
+                            <button class="btn export-btn"><i class="iconfa-download"></i>导出数据</button>
                         </div>
                     </div>
                 </div>
@@ -215,6 +222,20 @@
             user_grid.datagrid('reload', {criteria: criteria});
         });
 
+        //导出数据按钮点击事件
+        $('#stadium .export-btn').click(function(event){
+            var url = '/gygd/stadium/activity_users.csv';
+            var criteria = {};
+            filter_form.find('[name]').each(function(i, n){
+                var field_name = $(n).attr('name');
+                var value = $(n).val();
+                criteria[field_name] = value;
+            });
+            var criteria_json = JSON.stringify(criteria);
+            url += '?criteria=' + criteria_json;
+            window.open(url, '体育馆抽奖活动参与用户数据下载');
+        });
+
         //全选/全不选按钮点击事件
         $('#activity_user_select_all_btn').click(function(evetn){
             var is_select_all = $(this).data('is_select_all');
@@ -262,6 +283,18 @@
         /**
          * 函数相关
          */
+
+        function export_data(data, callback)
+        {
+            $.ajax({
+                url: '',
+                data: data,
+                method: 'get',
+                global: true
+            }).done(function(resp){
+
+            });
+        }
 
         //批量处理
         function batch_process(op, url)

@@ -90,6 +90,36 @@ class GygdController extends ControllerBase
     }
 
     /**
+     * 导出体育馆用户参与数据(csv)
+     */
+    public function exportStadiumActivityUserDataAction()
+    {
+        $this->view->disable();
+        $criteria_json = $this->request->get('criteria');
+        $criteria = json_decode($criteria_json, true);
+        $activity_users = Gygd::getStadiumActivityUserList($criteria);
+        $this->response->setHeader('Content-type', 'application/octet-stream');
+        $this->response->setHeader('Accept-Ranges', 'bytes');
+        $this->response->setHeader('Content-Disposition', '体育馆活动参与用户数据.csv');
+        //输出头部
+        echo "手机号, 身份证, 抽奖时间, 状态\r\n";
+        foreach ($activity_users as $activity_user)
+        {
+            $state = '未中奖';
+            if ($activity_user['is_win'] == 1 and empty($activity_user['exchange_date']))
+            {
+                $state = '中奖';
+            }
+            elseif (!empty($activity_user['exchange_date']))
+            {
+                $state = '已领取';
+            }
+
+            echo $activity_user['phone'].', '.$activity_user['id_no'].', '.$activity_user['draw_date'].', '.$state."\r\n";
+        }
+    }
+
+    /**
      * 博物馆活动页面
      */
     public function museumAction()

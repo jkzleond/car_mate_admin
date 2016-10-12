@@ -1073,6 +1073,43 @@ $move_car->addGet('/car_owner/{car_owner_source:.*}/{car_owner_id:\d+}/call_reco
 $router->mount($move_car);
 
 /**
+ * 修理厂业务
+ */
+
+$garage = new \Phalcon\Mvc\Router\Group(array(
+    'controller' => 'garage'
+));
+
+$garage->setPrefix('/garage');
+
+//修理厂数据管理页面
+$garage->addGet('/manage', array(
+    'action' => 'manage'
+));
+
+//获取修理厂数据列表
+$garage->add('/list.json', array(
+    'action' => 'getGarageList'
+));
+
+//添加修理厂
+$garage->addPost('/garage.json', array(
+    'action' => 'addGarage'
+));
+
+//删除修理厂
+$garage->addDelete('/garage/{garage_id:\d+}.json', array(
+    'action' => 'delGarage'
+));
+
+//更新修理厂
+$garage->addPut('/garage/{garage:_id:\d+}.json', array(
+    'action' => 'updateGarage'
+));
+
+$router->mount($garage);
+
+/**
  * 公告
  */
 

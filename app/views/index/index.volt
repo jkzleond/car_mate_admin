@@ -259,6 +259,14 @@
                     </ul>
                 </li>
                 {% endif %}
+                {% if 'dealList' in auth %}
+                <li class="dropdown"><a href=""><span class="iconfa-wrench"></span>修理厂数据</a>
+                    <ul>
+                        <li><a href="/garage/manage">修理厂管理</a></li>
+                        <li><a href="/garage/merchantMng">商家管理</a></li>
+                    </ul>
+                </li>
+                {% endif %}
                 <li class="dropdown"><a href=""><span  class="iconfa-signal"></span>系统</a>
                     <ul>
                         {% if 'welAdv' in auth %}

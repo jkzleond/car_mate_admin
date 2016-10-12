@@ -388,7 +388,7 @@ class Mssql extends \Phalcon\Db\Dialect //implements \Phalcon\Db\DialectInterfac
      * @param \Phalcon\Db\ColumnInterface column
      * @return string
      */
-    public function getColumnDefinition($column)
+    public function getColumnDefinition(\Phalcon\Db\ColumnInterface $column)
     {
         $columnSql;
         $size;

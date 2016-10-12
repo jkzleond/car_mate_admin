@@ -438,7 +438,7 @@ class Mssql extends \Phalcon\Db\Dialect //implements \Phalcon\Db\DialectInterfac
         return $columnSql;
     }
 
-    public function addColumn($tableName, $schemaName, $column)
+    public function addColumn($tableName, $schemaName, \Phalcon\Db\ColumnInterface $column)
     {
         $afterPosition;
         $sql;

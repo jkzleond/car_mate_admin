@@ -36,7 +36,7 @@ class AuthFilter extends Phalcon\Mvc\User\Plugin
             return false;
         }
 
-        if (in_array('gygd', $auth) && strpos($url, '/gygd') !== 0 && $url != '/login' && $url != '/validatecode')
+        if (!empty($auth) && in_array('gygd', $auth) && strpos($url, '/gygd') !== 0 && $url != '/login' && $url != '/validatecode')
         {
             if($this->request->isAjax())
             {

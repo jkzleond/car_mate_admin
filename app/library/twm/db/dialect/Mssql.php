@@ -1,6 +1,8 @@
 <?php
 namespace Twm\Db\Dialect;
 
+use \Phalcon\Db\ColumnInterface;
+
 class Mssql extends \Phalcon\Db\Dialect //implements \Phalcon\Db\DialectInterface
 {
 
@@ -471,7 +473,7 @@ class Mssql extends \Phalcon\Db\Dialect //implements \Phalcon\Db\DialectInterfac
         }
         return $sql;
     }
-    public function modifyColumn($tableName, $schemaName, $column)
+    public function modifyColumn($tableName, $schemaName, ColumnInterface $column, ColumnInterface $currentColumn=null)
     {
         $sql;
 

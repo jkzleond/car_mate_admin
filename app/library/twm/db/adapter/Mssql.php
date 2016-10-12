@@ -199,7 +199,7 @@ class Mssql extends AdapterPdo implements EventsAwareInterface, AdapterInterface
         return $columns;
     }
 
-    public function connect($descriptor = null)
+    public function connect(array $descriptor = null)
     {
         $this->_pdo = new \PDO(
             "{$descriptor['pdoType']}:host={$descriptor['host']};dbname={$descriptor['dbname']};charset={$descriptor['charset']}",
@@ -286,7 +286,7 @@ class Mssql extends AdapterPdo implements EventsAwareInterface, AdapterInterface
 
 
     //insert miss parameters, need to do this
-    public function executePrepared($statement, $placeholders, $dataTypes)
+    public function executePrepared(\PdoStatement $statement, array $placeholders, $dataTypes)
     {
         //return $this->_pdo->prepare($statement->queryString, $placeholders);//not working
 
@@ -347,7 +347,7 @@ class Mssql extends AdapterPdo implements EventsAwareInterface, AdapterInterface
         return $statement;
     }
 
-    public function insert($table, $values, $fields = null, $dataTypes = null)
+    public function insert($table, array $values, $fields = null, $dataTypes = null)
     {
         $placeholders;
         $insertValues;

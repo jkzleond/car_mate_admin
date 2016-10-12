@@ -57,7 +57,7 @@ class Mssql extends \Phalcon\Db\Dialect //implements \Phalcon\Db\DialectInterfac
         }
     }
 
-    public function select($definition)
+    public function select(array $definition)
     {
 
         $tables;

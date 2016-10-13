@@ -659,7 +659,7 @@ class Mssql extends \Phalcon\Db\Dialect //implements \Phalcon\Db\DialectInterfac
      * @return string
      * @throws \Phalcon\Db\Exception
      */
-    public function createView($viewName, $definition, $schemaName=null)
+    public function createView($viewName, array $definition, $schemaName=null)
     {
         $view;
         $viewSql;

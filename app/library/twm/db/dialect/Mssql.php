@@ -765,7 +765,7 @@ class Mssql extends \Phalcon\Db\Dialect //implements \Phalcon\Db\DialectInterfac
 
     
        public function addForeignKey($tableName, $schemaName, ReferenceInterface $reference){}
-       public function dropForeignKey($tableName, $schemaName, ReferenceInterface $referenceName){}
+       public function dropForeignKey($tableName, $schemaName, $referenceName){}
 
        public function createTable($tableName, $schemaName, array $definition){}
        public function dropTable($tableName, $schemaName){}

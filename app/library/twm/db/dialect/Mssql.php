@@ -3,6 +3,7 @@ namespace Twm\Db\Dialect;
 
 use \Phalcon\Db\ColumnInterface;
 use \Phalcon\Db\IndexInterface;
+use \Phalcon\Db\ReferenceInterface;
 
 class Mssql extends \Phalcon\Db\Dialect //implements \Phalcon\Db\DialectInterface
 {
@@ -763,10 +764,10 @@ class Mssql extends \Phalcon\Db\Dialect //implements \Phalcon\Db\DialectInterfac
     }
 
     
-       public function addForeignKey($tableName, $schemaName, $reference){}
-       public function dropForeignKey($tableName, $schemaName, $referenceName){}
+       public function addForeignKey($tableName, $schemaName, ReferenceInterface $reference){}
+       public function dropForeignKey($tableName, $schemaName, ReferenceInterface $referenceName){}
 
-       public function createTable($tableName, $schemaName, $definition){}
+       public function createTable($tableName, $schemaName, array $definition){}
        public function dropTable($tableName, $schemaName){}
 
 

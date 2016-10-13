@@ -2,6 +2,7 @@
 namespace Twm\Db\Dialect;
 
 use \Phalcon\Db\ColumnInterface;
+use \Phalcon\Db\IndexInterface;
 
 class Mssql extends \Phalcon\Db\Dialect //implements \Phalcon\Db\DialectInterface
 {
@@ -551,7 +552,7 @@ class Mssql extends \Phalcon\Db\Dialect //implements \Phalcon\Db\DialectInterfac
         return $sql ;
     }
 
-    public function addPrimaryKey($tableName, $schemaName,$index)
+    public function addPrimaryKey($tableName, $schemaName, IndexInterface $index)
     {
         $sql;
         if (!is_object($index)) {

@@ -517,7 +517,7 @@ class Mssql extends \Phalcon\Db\Dialect //implements \Phalcon\Db\DialectInterfac
      CREATE UNIQUE NONCLUSTERED INDEX (indexname)
      ON dbo.YourTableName(columns to include)
      */
-    public function addIndex($tableName, $schemaName,  $index)
+    public function addIndex($tableName, $schemaName, \Phalcon\Db\IndexInterface $index)
     {
         $sql;
         if (!is_object($index)) {

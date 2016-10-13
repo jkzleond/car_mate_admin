@@ -1,16 +1,17 @@
 import pexpect
+import sys
 
 git_user = 'jkzleond'
 git_pwd = 'jk19831123'
 ssh_pwd = 'palmlink)*&!kms'
 target_dir = '/disk2/var/www/html/php/car_mate_admin'
 
-child = pexpect.spawn('git add .')
-child.expect('$')
-child.sendline('git commit -m "commit"')
+child = pexpect.spawn('git add .', echo=True)
+# child.expect('$')
+# child.sendline('git commit -m "commit"')
 child.expect('$')
 child.sendline('git push')
-child.expect('Username ')
+# child.expect(':')
 # child.sendline(git_usr)
 # child.expect('Password')
 # child.sendline(git_pwd)

@@ -3,13 +3,13 @@
 return new \Phalcon\Config(array(
     'database' => array(
         'adapter'     => 'Twm\Db\Adapter\Pdo\Mssql',
-        'host'        => '116.55.248.76:31433',
         'username'    => 'sa_iamis',
         'password'    => 'pl0871iamis',
-        'dbname'      => 'IAMisDB',
-        'pdoType'     => 'dblib',
-        'dialectClass' => 'Twm\Db\Dialect\Mssql',
-        'charset' => 'UTF-8'
+        'driver'      => 'FreeTDS',
+        'servername'  => 'mssql',
+        'database'      => 'IAMisDB',
+        'pdoType'     => 'odbc',
+        'dialectClass' => 'Twm\Db\Dialect\Mssql'
     ),
     'application' => array(
         'controllersDir' => __DIR__ . '/../../app/controllers/',

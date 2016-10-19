@@ -21,6 +21,32 @@ class ActivityController extends ControllerBase
     }
 
     /**
+     * 获取指定ID活动的图片数据
+     * @param $id
+     */
+    public function activityPicDataAction($id)
+    {
+        $pic = Activity::getActivityPic($id);
+        $this->view->setVar('data', array(
+            'success' => true,
+            'data' => $pic
+        ));
+    }
+
+    /**
+     * 获取指定ID活动的内容
+     * @param $id
+     */
+    public function activityContentAction($id)
+    {
+        $content = Activity::getActivityContent($id);
+        $this->view->setVar('data', array(
+            'success' => true,
+            'data' => $content
+        ));
+    }
+
+    /**
      * 活动管理页面
      */
     public function activityListAction()
@@ -43,12 +69,16 @@ class ActivityController extends ControllerBase
         $activity_list = Activity::getActivityList($page, $page_size);
 
         $activity_total = Activity::getActivityCount();
-
+        //echo $activity_total;
+        //print_r($activity_list);
+        //echo json_encode($activity_list);
+        //print_r($activity_list);
         $this->view->setVar('data', array(
             'total' => $activity_total,
             'count' => count($activity_list),
             'rows' => $activity_list
         ));
+
     }
 
     /**

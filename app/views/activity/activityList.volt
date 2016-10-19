@@ -710,24 +710,9 @@
                     }
                 }},
                 {field:'url',title:'相关链接',width:'20%',align:'center'},
-                {field:'createDate',title:'创建时间',width:'9%',align:'center', formatter: function(value, row, index){
-                    if(!value) return '';
-                    var time = value.replace(/\s+/g, '/');
-                    time = time.replace(/:\d+(AM|PM)/, ' $1');
-                    return CarMate.utils.date('Y-m-d H:i:s', time);
-                }},
-                {field:'startDate',title:'开始时间',width:'9%',align:'center', formatter: function(value, row, index){
-                    if(!value) return '';
-                    var time = value.replace(/\s+/g, '/');
-                    time = time.replace(/:\d+(AM|PM)/, ' $1');
-                    return CarMate.utils.date('Y-m-d H:i:s', time);
-                }},
-                {field:'endDate',title:'结束时间',width:'9%',align:'center', formatter: function(value, row, index){
-                    if(!value) return '';
-                    var time = value.replace(/\s+/g, '/');
-                    time = time.replace(/:\d+(AM|PM)/, ' $1');
-                    return CarMate.utils.date('Y-m-d H:i:s', time);
-                }},
+                {field:'createDate',title:'创建时间',width:'9%',align:'center'},
+                {field:'startDate',title:'开始时间',width:'9%',align:'center'},
+                {field:'endDate',title:'结束时间',width:'9%',align:'center'},
                 {field:'state',title:'当前状态',width:'6%',align:'center', formatter: function(value, row, index){
                     if(value == 1)
                     {
@@ -778,16 +763,8 @@
                         return '未付款';
                     }
                 }},
-                {field:'createTime', title:'创建时间', width:'10%', align:'center', formatter: function(value, row, index){
-                    if(!value) return '';
-                    var date_conv = CarMate.utils.date.mssqlToJs(value);
-                    return CarMate.utils.date('Y-m-d H:i:s', date_conv);
-                }},
-                {field:'payTime', title:'支付时间', width:'10%', align:'center', formatter: function(value, row, index){
-                    if(!value) return '';
-                    var date_conv = CarMate.utils.date.mssqlToJs(value);
-                    return CarMate.utils.date('Y-m-d H:i:s', date_conv);
-                }}
+                {field:'createTime', title:'创建时间', width:'10%', align:'center'},
+                {field:'payTime', title:'支付时间', width:'10%', align:'center'}
             ]]
         });
 
@@ -956,8 +933,23 @@
             $('#activity_cu_form [name="type_id"]').change();
 
             $('#activity_pic_file').val('');
-            $('#activity_img').attr('src', 'data:image/png;base64,' + row.picData).show();
-            editor.setData(row.contents); //$('#activity_cu_form [name="contents"]').val(row.contents);
+
+            $.ajax({
+                url: '/activity/' + row.id + '/pic_data.json',
+                method: 'GET'
+            }).done(function(resp){
+                if (!resp.success) return;
+                $('#activity_img').attr('src', 'data:image/png;base64,' + resp.content).show();
+            });
+
+            $.ajax({
+                url: '/activity/' + row.id + '/content.json',
+                method: 'GET'
+            }).done(function(resp){
+                if (!resp.success) return;
+                editor.setData(resp.data); //$('#activity_cu_form [name="contents"]').val(row.contents);
+            });
+
 
             $('#activity_cu_form [name="trip_line"]').text(row.tripLine || '');
 

@@ -35,7 +35,7 @@ class Activity extends ModelEx
           group by aid
         )
 
-        select a.id,a.name,place,ISNULL(url,0) url,a.createDate,startDate,endDate,
+        select a.id,a.name, a.picData, a.contents, place,ISNULL(url,0) url,a.createDate,startDate,endDate,
 		autoStart,a.state,isnull(u.num,0) num,isnull(u.gainNum,0) gainNum, u.payNum,
 		[option],needCheckIn,t.name as typeName, t.id as typeId, a.awardStart, a.awardEnd, a.awardState,
 		a.infos, a.[option], a.needPay, a.needNotice, a.deposit, a.payTypes,
@@ -90,7 +90,7 @@ SQL;
           group by aid
         )
 
-		select rownum,a.id,a.name,a.picData,a.contents,place,ISNULL(url,0) url,a.createDate,startDate,endDate,
+		select rownum,a.id,a.name, place,ISNULL(url,0) url,a.createDate,startDate,endDate,
 		signStartDate, signEndDate, tripLine, autoStart, a.state, isnull(u.num,0) num, isnull(u.gainNum,0) gainNum, a.viewNum,
 		[option],needCheckIn,t.name as typeName, t.id as typeId, a.awardStart, a.awardEnd, a.awardState, a.is_period,
 		a.infos, a.[option], a.needPay, a.needNotice, a.deposit, a.payTypes, a.groupColumn,
@@ -108,10 +108,45 @@ SQL;
 		left join AS_CTE s on s.aid = a.id
 		where ISNULL(a.abandon, 0) != 1 %s
 SQL;
-
         $sql = sprintf($sql, $page_condition);
 
         return self::nativeQuery($sql, $bind);
+    }
+
+    /**
+     * 获取制定ID活动信息
+     * @param $activity_id
+     * @return object
+     */
+    public static function getActivityById2($activity_id)
+    {
+        $sql = <<<SQL
+        WITH ACT_CTE AS
+        (
+          SELECT top 1 *
+          FROM Activity
+          WHERE ISNULL(abandon, 0) != 1 and [type] = 2
+        ),
+        AS_CTE as
+        (
+          select aid, Max([name]) as name, Max(optionList) as optionList,
+		  Max(shortNames) as shortNames, Max(depositList) as depositList, Max(createTime) as createTime
+          from ActivitySelect
+          group by aid
+        )
+
+		select a.id, a.name, a.picData, a.contents, place,ISNULL(url,0) url,a.createDate,startDate,endDate,
+		autoStart,a.state,
+		[option],needCheckIn,t.name as typeName, t.id as typeId, a.awardStart, a.awardEnd, a.awardState,
+		a.infos, a.[option], a.needPay, a.needNotice, a.deposit, a.payTypes, a.groupColumn,
+		s.name as sname, s.optionList, s.shortNames, s.depositList
+		from ACT_CTE a
+		left join ActivityType t on t.id = a.type
+		left join AS_CTE s on s.aid = a.id
+		where ISNULL(a.abandon, 0) != 1 and a.id = :activity_id
+SQL;
+        $bind = array('activity_id' => $activity_id);
+        return self::fetchOne($sql, $bind, null, Db::FETCH_ASSOC);
     }
 
     /**
@@ -168,6 +203,32 @@ SQL;
         $sql = sprintf($sql, $page_condition);
 
         return self::nativeQuery($sql, $bind);
+    }
+
+    /**
+     * 获取活动图片
+     * @param $activity_id
+     * @return mixed
+     */
+    public static function getActivityPic($activity_id)
+    {
+        $sql = 'select picData from Activity where id = :activity_id';
+        $bind = array('activity_id' => $activity_id);
+        $result = self::fetchOne($sql, $bind, null, Db::FETCH_NUM);
+        return !empty($result) ? $result[0] : null;
+    }
+
+    /**
+     * 获取活动图片
+     * @param $activity_id
+     * @return mixed
+     */
+    public static function getActivityContent($activity_id)
+    {
+        $sql = 'select contents from Activity where id = :activity_id';
+        $bind = array('activity_id' => $activity_id);
+        $result = self::fetchOne($sql, $bind, null, Db::FETCH_NUM);
+        return !empty($result) ? $result[0] : null;
     }
 
     /**

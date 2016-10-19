@@ -1,11 +1,12 @@
 <?php
 namespace Twm\Db\Adapter\Pdo;
 
-use Phalcon;
-use Phalcon\Db\Column;
-use Phalcon\Db\Adapter\Pdo as AdapterPdo;
-use Phalcon\Events\EventsAwareInterface;
-use Phalcon\Db\AdapterInterface;
+use \Phalcon;
+use \Phalcon\Db;
+use \Phalcon\Db\Column;
+use \Phalcon\Db\Adapter\Pdo as AdapterPdo;
+use \Phalcon\Events\EventsAwareInterface;
+use \Phalcon\Db\AdapterInterface;
 
 class Mssql extends AdapterPdo implements EventsAwareInterface, AdapterInterface
 {
@@ -16,6 +17,7 @@ class Mssql extends AdapterPdo implements EventsAwareInterface, AdapterInterface
     public function __construct( array $descriptor)
     {
         $this->connect($descriptor);
+        parent::__construct($descriptor);
     }
 
     /**
@@ -201,10 +203,24 @@ class Mssql extends AdapterPdo implements EventsAwareInterface, AdapterInterface
 
     public function connect(array $descriptor = null)
     {
-        $this->_pdo = new \PDO(
-            "{$descriptor['pdoType']}:host={$descriptor['host']};dbname={$descriptor['dbname']};charset={$descriptor['charset']}",
-            $descriptor['username'],
-            $descriptor['password'],
+        $dsn_setting = $descriptor;
+        $pdoType = $dsn_setting['pdoType'];
+        $username = $dsn_setting['username'];
+        $password = $dsn_setting['password'];
+        unset($dsn_setting['pdoType']);
+        unset($dsn_setting['username']);
+        unset($dsn_setting['password']);
+        unset($dsn_setting['dialectClass']);
+        $DSN = "$pdoType:";
+        foreach ($dsn_setting as $key => $value)
+        {
+            $DSN .= $key.'='.$value.';';
+        }
+        $DSN = rtrim($DSN, ';');
+        //$DSN .= 'MultipleActiveResultSets=1';
+        $this->_pdo = new \PDO($DSN,
+            $username,
+            $password,
             array(
                 \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
                 \PDO::ATTR_STRINGIFY_FETCHES => true,
@@ -222,36 +238,36 @@ class Mssql extends AdapterPdo implements EventsAwareInterface, AdapterInterface
 
         $this->execute('SET QUOTED_IDENTIFIER ON');
 
-        $this->_dialect = new \Twm\Db\Dialect\Mssql();
+        //$this->_dialect = new \Twm\Db\Dialect\Mssql();
     }
 
-    public function query($sql, $bindParams = null, $bindTypes = null)
+    public function query($sqlStatement, $bindParams = null, $bindTypes = null)
     {
-        if (is_string($sql)) {
+        if (is_string($sqlStatement)) {
             //check sql server keyword
-            if (!strpos($sql, '[rowcount]')) {
-                $sql = str_replace('rowcount', '[rowcount]', $sql);	//sql server keywords
+            if (!strpos($sqlStatement, '[rowcount]')) {
+                $sqlStatement = str_replace('rowcount', '[rowcount]', $sqlStatement);	//sql server keywords
             }
 
             //case 1. select count(query builder)
             $countString = 'SELECT COUNT(*)';
-            if (strpos($sql, $countString)) {
+            if (strpos($sqlStatement, $countString)) {
                   //$sql = str_replace('"', '', $sql);
-                  return parent::query($sql, $bindParams, $bindTypes);
+                  return parent::query($sqlStatement, $bindParams, $bindTypes);
             }
 
 
             //case 2. subquery need alais name (model find)
             $countString = 'SELECT COUNT(*) "numrows"';
-            if (strpos($sql, $countString) !== false) {
-                $sql .= ' dt ';
+            if (strpos($sqlStatement, $countString) !== false) {
+                $sqlStatement .= ' dt ';
 
                 //subquery need TOP
-                if (strpos($sql, 'TOP') === false) {
-                    if (strpos($sql, 'ORDER') !== false) {
+                if (strpos($sqlStatement, 'TOP') === false) {
+                    if (strpos($sqlStatement, 'ORDER') !== false) {
                         $offset = count($countString);
-                        $pos = strpos($sql, 'SELECT', $offset) + 7; //'SELECT ';
-                        $sql = substr($sql, 0, $pos) .  'TOP 100 PERCENT '. substr($sql, $pos);
+                        $pos = strpos($sqlStatement, 'SELECT', $offset) + 7; //'SELECT ';
+                        $sqlStatement = substr($sqlStatement, 0, $pos) .  'TOP 100 PERCENT '. substr($sqlStatement, $pos);
                     }
                 }
             }
@@ -261,9 +277,59 @@ class Mssql extends AdapterPdo implements EventsAwareInterface, AdapterInterface
         }
 
 
+        // if (strpos($sqlStatement, '= 2') and !strpos($sqlStatement, 'COUNT(*)'))
+        // {
+        //     echo $sqlStatement.PHP_EOL;
+        //     // print_r($bindParams);
+        //     // print_r($bindTypes);
+        //     $result = parent::query($sqlStatement, $bindParams, $bindTypes);
+        //     print_r($result->numRows());
+        //     print_r($result->fetchArray());
+        //     return $result;
+        //     //return array('1' => '1', '2' => '2');
+        //     //exit;
+        // }
 
-        $result =  parent::query($sql, $bindParams, $bindTypes);
+        // //override parent query method
 
+        // $eventsManager = $this->_eventsManager;
+
+        // /**
+        //  * Execute the beforeQuery event if an EventsManager is available
+        //  */
+        // if ( is_object($eventsManager) ) {
+        //     $this->_sqlStatement = $sqlStatement;
+        //     $this->_sqlVariables = $bindParams;
+        //     $this->_sqlBindTypes = $bindTypes;
+        //     if ( $eventsManager->fire("db:beforeQuery", $this) === false ) {
+        //         return false;
+        //     }
+        // }
+
+        // $pdo = $this->_pdo;
+        // if ( is_array($bindParams) ) {
+        //     $statement = $pdo->prepare($sqlStatement);
+        //     if ( is_object($statement) ) {
+        //         $statement = $this->executePrepared($statement, $bindParams, $bindTypes);
+        //     }
+        // } else {
+        //     $statement = $pdo->query($sqlStatement);
+        // }
+
+        // /**
+        //  * Execute the afterQuery event if an EventsManager is available
+        //  */
+        // if ( is_object($statement) ) {
+        //     if ( is_object($eventsManager) ) {
+        //         $eventsManager->fire("db:afterQuery", $this);
+        //     }
+        //     return new ResultPdo($this, $statement, $sqlStatement, $bindParams, $bindTypes);
+        // }
+
+        // return $statement;
+
+        $result = parent::query($sqlStatement, $bindParams, $bindTypes);
+        $result = new \Palm\Phalcon\Ext\Db\Result\PdoWrapper($result);
         return $result;
     }
 
@@ -284,68 +350,119 @@ class Mssql extends AdapterPdo implements EventsAwareInterface, AdapterInterface
         return $dialect->limit($sqlQuery, $number);
     }
 
+//    public function execute($sqlStatement, $bindParams=null, $bindTypes=null)
+//	{
+//
+//		/**
+//         * Execute the beforeQuery event if an EventsManager is available
+//         */
+//		$eventsManager = $this->_eventsManager;
+//		if ( is_object($eventsManager) )
+//		{
+//			$this->_sqlStatement = $sqlStatement;
+//            $this->_sqlVariables = $bindParams;
+//            $this->_sqlBindTypes = $bindTypes;
+//			if ( $eventsManager->fire("db:beforeQuery", $this) === false ) {
+//				return false;
+//			}
+//        }
+//
+///**
+// * Initialize affectedRows to 0
+// */
+//        $affectedRows = 0;
+//
+//        $pdo = $this->_pdo;
+//        if ( is_array($bindParams) ) {
+//            $statement = $pdo->prepare($sqlStatement);
+//            if ( is_object($statement) ) {
+//                $newStatement = $this->executePrepared($statement, $bindParams, $bindTypes);
+//                $affectedRows = $newStatement->rowCount();
+//            }
+//            } else {
+//                $affectedRows = $pdo->exec($sqlStatement);
+//            }
+//
+//            /**
+//             * Execute the afterQuery event if an EventsManager is available
+//             */
+//            if ( is_int($affectedRows) ) {
+//                $this->_affectedRows = affectedRows;
+//                if ( is_object($eventsManager) ) {
+//                    $eventsManager->fire("db:afterQuery", $this);
+//                }
+//            }
+//
+//            return true;
+//	}
+
+
 
     //insert miss parameters, need to do this
-    public function executePrepared(\PdoStatement $statement, array $placeholders, $dataTypes)
-    {
-        //return $this->_pdo->prepare($statement->queryString, $placeholders);//not working
+    // public function executePrepared(\PdoStatement $statement, array $placeholders, $dataTypes)
+    // {
+    //     //return $this->_pdo->prepare($statement->queryString, $placeholders);//not working
 
-        if (!is_array($placeholders)) {
-            throw new \Phalcon\Db\Exception("Placeholders must be an array");
-        }
+    //     if (!is_array($placeholders)) {
+    //         throw new \Phalcon\Db\Exception("Placeholders must be an array");
+    //     }
 
-        foreach ($placeholders as $wildcard => $value) {
-            $parameter = '';
+    //     // print_r($placeholders);
+    //     // print_r($dataTypes);
+    //     // exit;
 
-            if (is_int($wildcard)) {
-                $parameter = $wildcard + 1;
-            } else {
-                if (is_string($wildcard)) {
-                    $parameter = $wildcard;
-                } else {
-                    throw new \Phalcon\Db\Exception("Invalid bind parameter");
-                }
-            }
+    //     foreach ($placeholders as $wildcard => $value) {
+    //         $parameter = '';
 
-            if (is_array($dataTypes) && !empty($dataTypes)) {
-                if (!isset($dataTypes[$wildcard])) {
-                    throw new \Phalcon\Db\Exception("Invalid bind type parameter");
-                }
-                $type = $dataTypes[$wildcard];
+    //         if (is_int($wildcard)) {
+    //             $parameter = $wildcard + 1;
+    //         } else {
+    //             if (is_string($wildcard)) {
+    //                 $parameter = $wildcard;
+    //             } else {
+    //                 throw new \Phalcon\Db\Exception("Invalid bind parameter");
+    //             }
+    //         }
 
-                /**
-                 * The bind type is double so we try to get the double value
-                 */
-                $castValue;
-                if ($type == \Phalcon\Db\Column::BIND_PARAM_DECIMAL) {
-                    $castValue = doubleval($value);
-                    $type = \Phalcon\Db\Column::BIND_SKIP;
-                } else {
-                    $castValue = $value;
-                }
+    //         if (is_array($dataTypes) && !empty($dataTypes)) {
+    //             if (!isset($dataTypes[$wildcard])) {
+    //                 throw new \Phalcon\Db\Exception("Invalid bind type parameter");
+    //             }
+    //             $type = $dataTypes[$wildcard];
 
-                /**
-                 * 1024 is ignore the bind type
-                 */
-                if ($type == \Phalcon\Db\Column::BIND_SKIP) {
-                    $statement->bindParam($parameter, $castValue);
-                    $statement->bindValue($parameter, $castValue);
-                } else {
-                    $statement->bindParam($parameter, $castValue, $type);
-                    $statement->bindParam($parameter, $castValue, $type);
-                    $statement->bindValue($parameter, $castValue, $type);
-                }
+    //             /**
+    //              * The bind type is double so we try to get the double value
+    //              */
+    //             $castValue;
+    //             if ($type == \Phalcon\Db\Column::BIND_PARAM_DECIMAL) {
+    //                 $castValue = doubleval($value);
+    //                 $type = \Phalcon\Db\Column::BIND_SKIP;
+    //             } else {
+    //                 $castValue = $value;
+    //             }
 
-            } else {
-                $statement->bindParam($parameter, $value);		//TODO: works for model, but not pdo - all column with the latest parameter value
-                $statement->bindValue($parameter, $value);	//works for pdo , but not model
-            }
-        }
+    //             /**
+    //              * 1024 is ignore the bind type
+    //              */
+    //             if ($type == \Phalcon\Db\Column::BIND_SKIP) {
+    //                 $statement->bindParam($parameter, $castValue);
+    //                 $statement->bindValue($parameter, $castValue);
+    //             } else {
+    //                 $statement->bindParam($parameter, $castValue, $type);
+    //                 $statement->bindParam($parameter, $castValue, $type);
+    //                 $statement->bindValue($parameter, $castValue, $type);
+    //             }
 
-        //echo PHP_EOL . $statement->queryString . PHP_EOL;
-        $statement->execute();
-        return $statement;
-    }
+    //         } else {
+    //             $statement->bindParam($parameter, $value);		//TODO: works for model, but not pdo - all column with the latest parameter value
+    //             $statement->bindValue($parameter, $value);	//works for pdo , but not model
+    //         }
+    //     }
+
+    //     //echo PHP_EOL . $statement->queryString . PHP_EOL;
+    //     $statement->execute();
+    //     return $statement;
+    // }
 
     public function insert($table, array $values, $fields = null, $dataTypes = null)
     {
@@ -583,6 +700,21 @@ class Mssql extends AdapterPdo implements EventsAwareInterface, AdapterInterface
          */
         return $this->execute($sql, $placeholders, $dataTypes);
     }
+
+    public function fetchOne($sqlQuery, $fetchMode = Db::FETCH_ASSOC, $bindParams=null, $bindTypes=null)
+	{
+
+		$result = $this->query($sqlQuery, $bindParams, $bindTypes);
+		if ( is_object($result) ) {
+            if ( is_null($fetchMode) ) {
+                $result->setFetchMode($fetchMode);
+			}
+			$data = $result->fetch();
+            $result->getInternalResult()->closeCursor();
+            return $data;
+		}
+		return array();
+	}
 
     /**
      * Lists table indexes

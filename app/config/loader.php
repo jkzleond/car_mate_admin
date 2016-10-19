@@ -20,7 +20,9 @@ $loader->registerNamespaces(
     array(
         'Twm\Db\Adapter\Pdo' => __DIR__.'/../library/twm/db/adapter',
         'Twm\Db\Dialect' => __DIR__.'/../library/twm/db/dialect',
-        'Palm\Utils' => $config->application->libraryDir.'palm/utils'
+        'Palm\Utils' => $config->application->libraryDir.'palm/utils',
+        'Palm\Phalcon' => $config->application->libraryDir.'palm/phalcon',
+        //'Palm\Phalcon\Ext\Mvc\Model' => $config->application->libraryDir.'palm/phalcon/ext/mvc/model'
     )
 );
 

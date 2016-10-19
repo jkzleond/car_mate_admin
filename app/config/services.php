@@ -79,15 +79,25 @@ $di->set('view', function () use ($config, $di) {
  * Database connection is created based in the parameters defined in the configuration file
  */
 $di->set('db', function () use ($config) {
-    return new DbAdapter(array(
-        'host' => $config->database->host,
+    $pdo_class = $config->database->adapter;
+    return new $pdo_class(array(
+        'pdoType' => $config->database->pdoType,
+        'DRIVER' => $config->database->driver,
+        'SERVERNAME' => $config->database->servername,
+        'DATABASE' => $config->database->database,
         'username' => $config->database->username,
         'password' => $config->database->password,
-        'dbname' => $config->database->dbname,
-        'charset' => 'UTF-8',
-        'pdoType' => $config->database->pdoType,
         'dialectClass' => $config->database->dialectClass,
     ));
+});
+
+/**
+ * override phalcon query with custom query
+ */
+$di->setShared('modelsManager', function () use ($di) {
+    $models_manager = new Palm\Phalcon\Ext\Mvc\Model\Manager();
+    $models_manager->setDI($di);
+    return $models_manager;
 });
 
 /**

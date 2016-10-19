@@ -105,7 +105,7 @@ SQL;
 		l.id,
 		l.title,
 		l.des,
-		l.contents,
+		--l.contents,
 		l.publishTime,
 		l.cityId,
 		l.provinceId,
@@ -196,6 +196,19 @@ SQL;
         $sql = 'delete from LocalFavourPic where id = :id';
 
         self::nativeQuery($sql, array('id' => $id));
+    }
+
+    /**
+     * 获取本地惠内容
+     * @param $id
+     * @return null
+     */
+    public static function getLocalFavourContent($id)
+    {
+        $sql = 'select contents from LocalFavour where id = :id';
+        $bind = array('id' => $id);
+        $result = self::fetchOne($sql, $bind, null, Db::FETCH_NUM);
+        return !empty($result) ? $result[0] : null;
     }
 
     /**

@@ -478,6 +478,11 @@ $local_favour->addDelete('/localFavour/{id:\d+}.json', array(
     'action' => 'delLocalFavour'
 ));
 
+//获取本地惠内容
+$local_favour->addGet('/localFavour/{id:\d+}/content.txt', array(
+    'action' => 'getLocalFavourContent'
+));
+
 //获取本地惠图片
 $local_favour->add('/localFavourPic/{id:\d+}', array(
     'action' => 'getLocalFavourPic'
@@ -614,6 +619,7 @@ $activity->add('/activityList.json', array(
     'action' => 'getActivityList'
 ));
 
+
 //添加活动
 $activity->addPost('/activity.json', array(
     'action' => 'addActivity'
@@ -627,6 +633,16 @@ $activity->addDelete('/activity/{id:\d+}.json', array(
 //更新活动
 $activity->addPut('/activity.json', array(
     'action' => 'updateActivity'
+));
+
+//获取指定ID活动的图片数据(base64)
+$activity->addGet('/activity/{id:\d+}/pic_data.json', array(
+    'action' => 'activityPicData'
+));
+
+//获取指定ID活动的内容
+$activity->addGet('/activity/{id:\d+}/content.json', array(
+    'action' => 'activityContent'
 ));
 
 //活动详情页面
@@ -1088,13 +1104,19 @@ $garage->addGet('/manage', array(
 ));
 
 //获取修理厂数据列表
-$garage->add('/list.json', array(
+$garage->add('/garages.json', array(
     'action' => 'getGarageList'
 ));
+
 
 //添加修理厂
 $garage->addPost('/garage.json', array(
     'action' => 'addGarage'
+));
+
+//获取指定ID修理厂信息
+$garage->addGet('/garage/{garage_id:\d+}.json', array(
+    'action' => 'getGarage'
 ));
 
 //删除修理厂
@@ -1103,9 +1125,35 @@ $garage->addDelete('/garage/{garage_id:\d+}.json', array(
 ));
 
 //更新修理厂
-$garage->addPut('/garage/{garage:_id:\d+}.json', array(
+$garage->addPut('/garage/{garage_id:\d+}.json', array(
     'action' => 'updateGarage'
 ));
+
+//商家管理页面
+$garage->addGet('/merchantMng', array(
+    'action' => 'merchantManage'
+));
+
+//获取商家数据列表
+$garage->add('/merchant/list.json', array(
+    'action' => 'getMerchantList'
+));
+
+//添加修理厂商家
+$garage->addPost('/merchant.json', array(
+    'action' => 'addMerchant'
+));
+
+//删除修理厂商家
+$garage->addDelete('/merchant/{mc_id:\d+}.json', array(
+    'action' => 'delMerchant'
+));
+
+//修改修理厂商家
+$garage->addPut('/merchant/{mc_id:\d+}.json', array(
+    'action' => 'updateMerchant'
+));
+
 
 $router->mount($garage);
 
@@ -1417,6 +1465,10 @@ $common = new \Phalcon\Mvc\Router\Group(array(
 
 //上传
 $common->addPost('/upload.json', array(
+    'action' => 'upload'
+));
+
+$common->addPost('/upload/{sub_dir}.json', array(
     'action' => 'upload'
 ));
 

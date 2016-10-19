@@ -541,7 +541,14 @@
             }
 
             //写入ckeditor内容
-            editor.setData(local_favour.contents);
+            $.ajax({
+                url: '/localFavour/' + local_favour.id + '/content.txt',
+                method: 'GET',
+                dataType: 'text',
+                global: true
+            }).done(function(data){
+                editor.setData(data);
+            });
             //获取临时上传的文件名
             $('#local_favour_push_form [name=tmp_name]').val('');
 

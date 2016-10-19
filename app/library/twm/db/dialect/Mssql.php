@@ -63,7 +63,6 @@ class Mssql extends \Phalcon\Db\Dialect //implements \Phalcon\Db\DialectInterfac
 
     public function select(array $definition)
     {
-
         $tables;
         $columns;
         $escapeChar;
@@ -327,15 +326,15 @@ class Mssql extends \Phalcon\Db\Dialect //implements \Phalcon\Db\DialectInterfac
         if (isset($definition['limit'])) {
             $limitValue = $definition["limit"];
             if (is_array($limitValue)) {
-		
                 $number = $limitValue["number"];
-            	if (is_array($number))	//phalcon > 1.3 
-			$number = $number['value'];
 
-		$offset = $limitValue['offset'];
-                if (isset($offset)) {
-            	    if (is_array($offset)) 
-		        $offset = $offset['value'];
+                if (is_array($number))	//phalcon > 1.3 
+                $number = $number['value'];
+
+                $offset = isset($limitValue['offset']) ? $limitValue['offset'] : null;
+                if (!is_null($offset)) {
+                    if (is_array($offset)) 
+                    $offset = $offset['value'];
                     $sql = $this->limit($sql, '100 PERCENT');
                     $startIndex = $offset + 1;//index start from 1
                     $endIndex = $startIndex + $number - 1;
@@ -376,7 +375,9 @@ class Mssql extends \Phalcon\Db\Dialect //implements \Phalcon\Db\DialectInterfac
                 $sql = $this->limit($sql, $number);
             }
         }
-
+        //$sql = 'select * from Garage';
+        // echo $sql;
+        // exit;
         return $sql;
     }
 

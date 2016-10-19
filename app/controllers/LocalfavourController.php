@@ -101,6 +101,17 @@ class LocalfavourController extends ControllerBase
     }
 
     /**
+     * 获取本地惠内容
+     * @param $id
+     */
+    public function getLocalFavourContentAction($id)
+    {
+        $this->view->disable();
+        $content = LocalFavour::getLocalFavourContent($id);
+        echo $content;
+    }
+
+    /**
      * 上传临时图片(本地惠发布中选择的图片,但还未发布)
      */
     public function uploadTempPicAction()

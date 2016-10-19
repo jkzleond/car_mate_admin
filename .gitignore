@@ -5,6 +5,7 @@ public/ckfinder/**
 public/upload/**
 public/uploads/**
 public/images/**
+public/js/ckfinder/**
 *.sublime-project
 *.sublime-workspace
 .idea/**

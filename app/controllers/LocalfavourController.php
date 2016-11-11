@@ -277,6 +277,7 @@ class LocalfavourController extends ControllerBase
         );
         $adv_list = LocalFavour::getLocalFavourAdvList($adv_criteria, $page_num, $page_size);
         $adv_total = LocalFavour::getLocalFavourAdvCount($adv_criteria);
+
         $this->view->setVar('data', array(
             'total' => $adv_total,
             'count' => count($adv_list),

@@ -661,7 +661,7 @@ SQL;
      * @param $user_id
      * @return bool
      */
-    public function gainStadiumActivity($activity_id, $user_id)
+    public static function gainStadiumActivity($activity_id, $user_id)
     {
         $sql = <<<SQL
         update GYGD_ActivityToUser set exchange_date = getdate()

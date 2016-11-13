@@ -276,6 +276,10 @@ class LocalfavourController extends ControllerBase
             'province_id' => $province_id
         );
         $adv_list = LocalFavour::getLocalFavourAdvList($adv_criteria, $page_num, $page_size);
+        foreach($adv_list as &$adv)
+        {
+            $adv['contents'] = preg_replace('@[^\x{4e00}-\x{9fa5}a-zA-Z0-9\s,\.<>\/\?？\\\|;\':\"；‘：“~!\@#$%^&\*\(\)\-=_\+[\]\{\}\`，。！￥%]@u', '', $adv['contents']);
+        }
         $adv_total = LocalFavour::getLocalFavourAdvCount($adv_criteria);
 
         $this->view->setVar('data', array(

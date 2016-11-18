@@ -126,6 +126,12 @@
                     <img class="img" style="display:none;width: 99%">
                 </div>
             </div>
+            <div class="row-fluid">
+                <div class="span12">
+                    <span class="label">描述</span>
+                    <textarea name="des" class="row-fluid"></textarea>
+                </div>
+            </div>
         </div>
         <div class="garage_address_window">
             <iframe id="mapPage" width="100%" height="95%" frameborder=0
@@ -258,6 +264,7 @@
                         });
                         garage.thumbnail = $('.garage_cu_window [name=thumbnail]').val();
                         garage.img = $('.garage_cu_window [name=img]').val();
+                        garage.des = $('.garage_cu_window [name=des]').val();
                         //验证
                         var messages = [];
                         if (!garage.mc_id)

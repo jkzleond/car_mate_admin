@@ -54,6 +54,15 @@ class GarageController extends ControllerBase
     public function addGarageAction()
     {
         $data = $this->request->getPost('data');
+        $location = $data['lat'].','.$data['lng'];
+        $map_data_json = file_get_contents('http://apis.map.qq.com/ws/geocoder/v1/?location='.$location.'&key=LFBBZ-RFJHP-67ID5-LMXLQ-T6HMF-TWB5P');
+        $map_data = json_decode($map_data_json, true);
+
+        if (!empty($map_data['result']['ad_info']['adcode']))
+        {
+            $data['ad_code'] = $map_data['result']['ad_info']['adcode'];
+        }
+
         $success = Garage::addGarage($data);
         $this->view->setVar('data', array(
             'success' => $success
@@ -79,6 +88,15 @@ class GarageController extends ControllerBase
     public function updateGarageAction($garage_id)
     {
         $data = $this->request->getPut('data');
+        $location = $data['lat'].','.$data['lng'];
+        $map_data_json = file_get_contents('http://apis.map.qq.com/ws/geocoder/v1/?location='.$location.'&key=LFBBZ-RFJHP-67ID5-LMXLQ-T6HMF-TWB5P');
+        $map_data = json_decode($map_data_json, true);
+
+        if (!empty($map_data['result']['ad_info']['adcode']))
+        {
+            $data['ad_code'] = $map_data['result']['ad_info']['adcode'];
+        }
+
         $success = Garage::updateGarage($garage_id, $data);
         $this->view->setVar('data', array(
             'success' => $success

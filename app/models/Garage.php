@@ -247,6 +247,13 @@ SQL;
                 $add_garage_bind['lng'] = $crt->lng;
             }
 
+            if ($crt->ad_code)
+            {
+                $garage_field_str .= 'ad_code, ';
+                $garage_value_str .= ':ad_code, ';
+                $add_garage_bind['ad_code'] = $crt->ad_code;
+            }
+
             if ($crt->tel)
             {
                 $garage_field_str .= 'tel, ';
@@ -273,6 +280,13 @@ SQL;
                 $garage_field_str .= 'img, ';
                 $garage_value_str .= ':img, ';
                 $add_garage_bind['img'] = $crt->img;
+            }
+
+            if ($crt->des)
+            {
+                $garage_field_str .= 'des, ';
+                $garage_value_str .= ':des, ';
+                $add_garage_bind['des'] = $crt->des;
             }
 
             if (!empty($garage_field_str))
@@ -392,6 +406,12 @@ SQL;
             $bind['lng'] = $crt->lng;
         }
 
+        if ($crt->ad_code)
+        {
+            $field_str .= 'ad_code = :ad_code, ';
+            $bind['ad_code'] = $crt->ad_code;
+        }
+
         if ($crt->tel)
         {
             $field_str .= 'tel = :tel, ';
@@ -408,6 +428,12 @@ SQL;
         {
             $field_str .= 'img = :img, ';
             $bind['img'] = $crt->img;
+        }
+
+        if ($crt->des)
+        {
+            $field_str .= 'des = :des, ';
+            $bind['des'] = $crt->des;
         }
 
         if (!empty($field_str))

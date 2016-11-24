@@ -128,20 +128,22 @@
             frozenColumns: [[
                 {field:'id',title:'操作',width:'15%',align:'center', formatter: function(value, row, index){
                     var delete_btn = '<button class="btn btn-danger activity-user-del-btn" title="删除" data-user_id="' + row.user_id + '" data-activity_id="' + row.activity_id + '"><i class="iconfa-trash"></i></button>';
-                    var other_btn = null;
+                    var edit_btn = '<button class="btn btn-warning activity-user-edit-btn" title="编辑" data-user_id="' + row.user_id + '"><i class="iconfa-edit"></i></button>';
+                    var other_btn = '';
 
                     if( (row.half_year_win == 1 && !row.half_year_exchange_date) || (row.full_year_win == 1 && !row.full_year_exchange_date) )
                     {
                         other_btn = '<button class="btn btn-primary activity-user-gain-btn " title="领取" data-user_id="' + row.user_id + '" data-activity_id="' + row.activity_id + '"><i class="iconfa-gift" style="color:#000"></i></button>';
                     }
 
-                    return '<div class="btn-group">' + delete_btn + other_btn + '</div>';
+                    return '<div class="btn-group">' + delete_btn + edit_btn + other_btn + '</div>';
                 }}
             ]],
             columns:[[
                 {field:'user_name',title:'姓名',width:'15%',align:'center'},
                 {field:'phone', title:'手机号', width:'15%', align:'center'},
                 {field:'book_no', title:'约章本号', width:'15%', align:'center'},
+                {field:'mark_num', title:'集戳数', width:'15%', align:'center'},
                 {field:'half_year_exchange_date', title:'领取时间', width:'15%', align:'center', formatter: function(value, row, index){
                     return row.half_year_exchange_date || row.full_year_exchange_date;
                 }},
@@ -304,9 +306,10 @@
         //摇号按钮点击事件
         $('.random-user-btn').click(function(event){
             var draw_type = $('.draw-window-toolbar [name="draw_type"]').val();
+            var award_id = award_combobox.combobox('getValue');
             var people_num = people_numberbox.numberbox('getValue');
             $.ajax({
-                url: '/gygd/museum/activity/' + draw_type +'/users/random/' + people_num +'.json',
+                url: '/gygd/museum/activity/' + draw_type + '/award/' + award_id + '/users/random/' + people_num +'.json',
                 method: 'GET',
                 global: true
             }).done(function(resp){
@@ -335,6 +338,28 @@
             var activity_id = $(this).attr('data-activity_id');
             del(activity_id, user_id, function(){
                 user_grid.datagrid('reload');
+            });
+        });
+
+        //编辑参与用户信息
+        $(document).on('click', '.activity-user-edit-btn', function(event){
+            var user_id = $(this).attr('data-user_id');
+            var number_pattern = /^\d+$/;
+            $.messager.prompt('录入集戳数', '请输入用户的集戳数', function(result){
+                if (result)
+                {
+                    if (!number_pattern.test(result))
+                    {
+                        $.messager.alert('非法输入', '请输入数字');
+                    }
+                    else
+                    {
+                        var data = {mark_num: result};
+                        update(user_id, data, function(){
+                            user_grid.datagrid('reload');
+                        });
+                    }
+                }
             });
         });
 
@@ -492,6 +517,41 @@
                                 msg: '删除该参与用户信息失败'
                             });
                         }
+                    });
+                }
+            });
+        }
+
+        /**
+         * 编辑参与用户信息
+         * @param user_id
+         * @param callback
+         */
+        function update(user_id, data, callback)
+        {
+            $.ajax({
+                url: '/gygd/users/' + user_id + '.json',
+                method: 'PUT',
+                data: {data: data},
+                global: true
+            }).done(function(resp){
+                if (resp.success)
+                {
+                    $.messager.show({
+                        title: '系统消息',
+                        msg: '编辑参与用户信息成功'
+                    });
+
+                    if (typeof callback == 'function')
+                    {
+                        callback();
+                    }
+                }
+                else
+                {
+                    $.messager.show({
+                        title: '系统消息',
+                        msg: '编辑参与用户信息失败'
                     });
                 }
             });

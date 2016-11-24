@@ -1522,6 +1522,10 @@ $gygd->addGet('/', array(
     'action' => 'index'
 ));
 
+//编辑用户
+$gygd->addPut('/users/{user_id:\d+}.json', array(
+    'action' => 'updateUser'
+));
 
 //体育馆活动页面
 $gygd->addGet('/stadium', array(
@@ -1564,7 +1568,7 @@ $gygd->add('/museum/activity_users.json', array(
 ));
 
 //获取博物馆活动摇号
-$gygd->add('/museum/activity/{draw_type:.*}/users/random/{people_num:\d+}.json', array(
+$gygd->add('/museum/activity/{draw_type:.*}/award/{award_id:\d+}/users/random/{people_num:\d+}.json', array(
     'action' => 'getMuseumActivityRandomUser'
 ));
 

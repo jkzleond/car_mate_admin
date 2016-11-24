@@ -197,13 +197,31 @@ class GygdController extends ControllerBase
     /**
      * 博物馆活动随机摇号
      * @param  string $draw_type
+     * @param  int $award_id
      * @param  int $people_num
      */
-    public function getMuseumActivityRandomUserAction($draw_type='HALF_YEAR', $people_num=2)
+    public function getMuseumActivityRandomUserAction($draw_type='HALF_YEAR', $award_id=1,$people_num=2)
     {
-        $activity_user_list = Gygd::getMuseumActivityUserList(array(
-            'state' => 'NO_WIN'
-        ));
+
+        $criteria = array('state' => 'NO_WIN');
+
+        if ($draw_type == 'FULL_YEAR')
+        {
+            if ($award_id == 4)
+            {
+                $criteria['mark_num'] = array('>=5', '<=9');
+            }
+            elseif ($award_id == 5)
+            {
+                $criteria['mark_num'] = array('>=10', '<=14');
+            }
+            elseif ($award_id == 6)
+            {
+                $criteria['mark_num'] = 15;
+            }
+        }
+
+        $activity_user_list = Gygd::getMuseumActivityUserList($criteria);
 
         //随机种子
         $success = shuffle($activity_user_list);
@@ -276,6 +294,20 @@ class GygdController extends ControllerBase
         $this->view->setVar('data', array(
             'success' => $success,
             'msg' => !empty($msg) ? $msg : null
+        ));
+    }
+
+    /**
+     * 更新用户信息
+     * @param $user_id
+     */
+    public function updateUserAction($user_id)
+    {
+        $data = $this->request->getPut('data');
+        $success = Gygd::updateUser($user_id, $data);
+
+        $this->view->setVar('data', array(
+            'success' => $success
         ));
     }
 }

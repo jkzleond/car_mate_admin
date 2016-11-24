@@ -305,6 +305,26 @@ SQL;
             $cte_condition_arr[] = '(au_step1.exchange_date is not null or au_step2.exchange_date is not null)';
         }
 
+        if ($crt->mark_num)
+        {
+            $mark_num = $crt->mark_num;
+            if (is_array($mark_num))
+            {
+                $mark_num_condition_str = '';
+                foreach ($mark_num as $condition_item)
+                {
+                    $mark_num_condition_str .= 'mark_num'.$condition_item.' and ';
+                }
+                $mark_num_condition_str = rtrim($mark_num_condition_str, ' and ');
+                $cte_condition_arr[] = $mark_num_condition_str;
+            }
+            else
+            {
+                $cte_condition_arr[] = 'mark_num = :mark_num';
+                $bind['mark_num'] = $mark_num;
+            }
+        }
+
         $order_by = 'order by au_step1.draw_date desc';
         if ($crt->order_by)
         {
@@ -336,6 +356,7 @@ SQL;
           u.phone,
           u.id_no,
           u.book_no,
+          u.mark_num,
           isnull(au_step2.activity_id, au_step1.activity_id) as activity_id, 
           au_step1.user_id as user_id,
           au_step1.is_win as half_year_win,
@@ -754,6 +775,38 @@ SQL;
         $sql = <<<SQL
         delete from GYGD_AwardToUser $condition_str
 SQL;
+        return self::nativeExecute($sql, $bind);
+    }
+
+    /**
+     * 更新指定ID用户的信息
+     * @param $user_id
+     * @param $data
+     * @return bool
+     */
+    public static function updateUser($user_id, $data)
+    {
+        $crt = new Criteria($data);
+        $field_str  = '';
+        $bind = array('user_id' => $user_id);
+
+        if ($crt->mark_num)
+        {
+            $field_str .= 'mark_num = :mark_num, ';
+            $bind['mark_num'] = $crt->mark_num;
+        }
+
+        if (!empty($field_str))
+        {
+            $field_str = rtrim($field_str, ', ');
+        }
+        else
+        {
+            return false;
+        }
+
+        $sql = "update GYGD_User set $field_str where id = :user_id";
+
         return self::nativeExecute($sql, $bind);
     }
 }

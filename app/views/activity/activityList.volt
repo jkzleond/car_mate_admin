@@ -939,7 +939,7 @@
                 method: 'GET'
             }).done(function(resp){
                 if (!resp.success) return;
-                $('#activity_img').attr('src', 'data:image/png;base64,' + resp.content).show();
+                $('#activity_img').attr('src', 'data:image/png;base64,' + resp.data).show();
             });
 
             $.ajax({

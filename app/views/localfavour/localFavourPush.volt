@@ -192,12 +192,7 @@
                 }},
                 {field:'title',title:'标题',width:15,align:'center'},
                 {field:'des',title:'简介',width:15,align:'center'},
-                {field:'publishTime',title:'发布日期',width:15,align:'center', formatter: function(value, row, index){
-                    if(!value) return '';
-                    var time = value.replace(/\s+/g, '/');
-                    time = time.replace(/:\d+(AM|PM)/, ' $1');
-                    return CarMate.utils.date('Y-m-d H:i:s', time);
-                }},
+                {field:'publishTime',title:'发布日期',width:15,align:'center'},
                 {field:'isState',title:'发布状态',width:'6%',align:'center', formatter: function(value, row, index){
                     if(!value) return '';
                     if(value == '1')

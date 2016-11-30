@@ -139,6 +139,10 @@ class LocalfavourController extends ControllerBase
         $page_num = $this->request->getPost('page');
 
         $local_favour_list = LocalFavour::getLocalFavourList($province_id, $page_num, $page_size);
+        foreach($local_favour_list as &$local_favour)
+        {
+            $local_favour['des'] = preg_replace('@[^\x{4e00}-\x{9fa5}a-zA-Z0-9\s,\.<>\/\?？\\\|;\':\"；‘：“~!\@#$%^&\*\(\)\-=_\+[\]\{\}\`，。！￥%]@u', '', $local_favour['des']);
+        }
 
         $local_favour_total = LocalFavour::getLocalFavourCount();
 

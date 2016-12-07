@@ -43,6 +43,11 @@
                 <div class="illegal-info-text">{{ order.license_no }}</div>
                 <input type="hidden" name="license_no" class="illegal-info-input illegal-driver-info">
             </td>
+            <th>证芯编号</th>
+            <td class="illegal-editable">
+                <div class="illegal-info-text">{{ order.paper_id }}</div>
+                <input type="hidden" name="paper_id" class="illegal-info-input illegal-driver-info">
+            </td>
             <th>档案号</th>
             <td class="illegal-editable">
                 <div class="illegal-info-text">{{ order.archive_no }}</div>
@@ -143,7 +148,7 @@
             $('#illegal_order_detail_table .illegal-editable').dblclick(function(event){
                 var $info_text = $(this).find('.illegal-info-text');
                 var info_text_width = $info_text.width();
-                var info_text_height = $info_text.height();
+                var info_text_height = $info_text.height() || 20;
                 var container_width = $(this).innerWidth();
                 var container_height = $(this).innerHeight();
 

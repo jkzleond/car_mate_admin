@@ -134,6 +134,12 @@ SQL;
 			$bind['license_no'] = $crt->license_no;
 		}
 
+		if($crt->paper_id)
+        {
+            $field_str .= 'paper_id = :paper_id, ';
+            $bind['paper_id'] = $crt->paper_id;
+        }
+
 		if($crt->archive_no)
 		{
 			$field_str .= 'archieve_no = :archive_no, ';

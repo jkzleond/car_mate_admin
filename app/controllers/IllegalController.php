@@ -65,6 +65,20 @@ class IllegalController extends ControllerBase
     }
 
     /**
+     * 订单更新
+     * @param $order_id
+     */
+    public function updateOrderAction($order_id)
+    {
+        $data = $this->request->getPut('data');
+        $success = Order::updateOrder($order_id, $data);
+
+        $this->view->setVar('data', array(
+            'success' => $success
+        ));
+    }
+
+    /**
      * 订单退款
      * @param  $order_id
      */

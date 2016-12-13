@@ -984,6 +984,10 @@ $illegal->addPut('/orderProcess/{order_id:\d+}.json', array(
     'action' => 'orderProcess'
 ));
 
+$illegal->addPut('/orderInfo/{order_id:\d+}.json', array(
+    'action' => 'updateOrder'
+));
+
 //违章代缴-退款
 $illegal->addGet('/refund/{order_id:\d+}/{refund_fee:\d+\.\d{2}}', array(
     'action' => 'orderRefund'

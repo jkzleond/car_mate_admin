@@ -9,6 +9,11 @@
 </style>
 <div class="row-fluid">
     <table class="table" style="margin-bottom:0px;" id="illegal_order_detail_table">
+        <tr class="hidden">
+            <td>
+                <input type="hidden" name="order_id" value="{{ order.id }}">
+            </td>
+        </tr>
         <tr>
             <th colspan="2">订单号</th>
             <td colspan="2">{{ order.order_no }}</td>
@@ -53,6 +58,8 @@
                 <div class="illegal-info-text">{{ order.archive_no }}</div>
                 <input type="hidden" name="archive_no" class="illegal-info-input illegal-driver-info">
             </td>
+        </tr>
+        <tr>
             <th>车牌号</th>
             <td>
                 <div>{{ order.hphm }}</div>
@@ -63,6 +70,13 @@
                 <div class="illegal-info-text">{{ order.engine_no }}</div>
                 <input type="hidden" name="engine_no" class="illegal-info-input illegal-car-info">
                 <input type="hidden" name="old_engine_no" value="{{ order.engine_no }}">
+            </td>
+        </tr>
+        <tr>
+            <th>备注</th>
+            <td colspan="6" class="illegal-editable">
+                <div class="illegal-info-text">{{ order.des }}</div>
+                <input type="hidden" name="des" class="illegal-info-input illegal-order-info">
             </td>
         </tr>
         <tr>
@@ -207,6 +221,13 @@
                         request_data.criteria['hphm'] = $('#illegal_order_detail_table [name="hphm"]').val();
                         request_data.criteria['engine_no'] = $('#illegal_order_detail_table [name="old_engine_no"]').val();
                     }
+                }
+                else if($(this).hasClass('illegal-order-info'))
+                {
+                    update_target_str = '订单信息';
+                    request_url = '/illegal/orderInfo/' + $('#illegal_order_detail_table [name="order_id"]').val() + '.json';
+                    request_data.data = {};
+                    request_data.data[key] = value;
                 }
 
                 var $this = $(this);

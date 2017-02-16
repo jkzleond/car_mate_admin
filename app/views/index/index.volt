@@ -181,6 +181,9 @@
                         {% if 'totalStatistics' in auth%}
                         <li><a href="/statistics/moveCarStatistics">挪车业务统计</a></li>
                         {% endif %}
+                        {% if 'totalStatistics' in auth%}
+                        <li><a href="/statistics/usedCarStatistics">二手车估价统计</a></li>
+                        {% endif %}
                     </ul>
                 </li>
                 <li class="dropdown"><a href=""><span class="iconfa-briefcase"></span> 保险系统</a>
@@ -264,6 +267,13 @@
                     <ul>
                         <li><a href="/garage/manage">修理厂管理</a></li>
                         <li><a href="/garage/merchantMng">商家管理</a></li>
+                    </ul>
+                </li>
+                {% endif %}
+                {% if 'dealList' in auth %}
+                <li class="dropdown"><a href=""><span class="iconfa-bar-chart"></span>二手车估价</a>
+                    <ul>
+                        <li><a href="/used_car/eval_price_record_manage">估价请求</a></li>
                     </ul>
                 </li>
                 {% endif %}

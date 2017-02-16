@@ -250,7 +250,19 @@ $statistics->addGet('/moveCarStatistics', array(
 
 //调用挪车业务统计存储过程
 $statistics->add('/move_car/{proc_name:.*}.json', array(
-    'action' => 'callMoveCarStatisticsProc'
+    'action' => 'callStatisticsStoreProc'
+));
+
+/* 二手车估价统计 */
+
+//二手车估价统计页面
+$statistics->add('/used_car', array(
+    'action' => 'usedCarStatistics'
+));
+
+//调用二手车估价统计存储过程
+$statistics->add('/used_car/{proc_name:.*}.json', array(
+    'action' => 'callStatisticsStoreProc'
 ));
 
 $router->mount($statistics);
@@ -1160,6 +1172,53 @@ $garage->addPut('/merchant/{mc_id:\d+}.json', array(
 
 
 $router->mount($garage);
+
+/**
+ * 二手车估价
+ */
+
+$used_car = new \Phalcon\Mvc\Router\Group(array(
+    'controller' => 'usedcar'
+));
+
+$used_car->setPrefix('/used_car');
+
+//估价记录管理页面
+$used_car->addGet('/eval_price_record_manage', array(
+    'action' => 'evalPriceRecordManage'
+));
+
+//获取估价记录数据列表
+$used_car->addPost('/eval_price_record.json', array(
+    'action' => 'getEvalPriceRecordList'
+));
+
+//更新估价记录
+$used_car->addPut('/eval_price_record/{record_id:\d+}.json', array(
+    'action' => 'updateEvalPriceRecord'
+));
+
+//估价记录详细页面
+$used_car->addGet('/eval_price_record_detail/{record_id:\d+}', array(
+    'action' => 'evalPriceRecordDetail'
+));
+
+//车辆出售信息管理页面
+$used_car->addGet('/sell_info_manage', array(
+    'action' => 'sellInfoManage'
+));
+
+//获取车辆信息数据列表
+$used_car->addGet('/sell_info.json', array(
+    'action' => 'getSellInfoList'
+));
+
+//删除车辆出售信息
+$used_car->addDelete('/sell_info/{sell_info_id:\d+}', array(
+    'action' => 'delSellInfo'
+));
+
+$router->mount($used_car);
 
 /**
  * 公告

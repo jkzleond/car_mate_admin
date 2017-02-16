@@ -434,11 +434,19 @@ class StatisticsController extends ControllerBase
         ));
     }
 
+    public function usedCarStatisticsAction()
+    {
+        $this->view->setVars(array(
+            'start_date' => date('Y-m-d', strtotime('-1 year')),
+            'end_date' => date('Y-m-d')
+        ));
+    }
+
     /**
      * 调用统计存储过程
      * @param $proc_name
      */
-    public function callMoveCarStatisticsProcAction($proc_name)
+    public function callStatisticsStoreProcAction($proc_name)
     {
         $data = $this->request->getJsonRawBody(true);
         $result = Statistics::callProc($proc_name, $data);

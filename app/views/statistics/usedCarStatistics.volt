@@ -42,7 +42,7 @@
                     <th>15<=x<20万</th>
                     <th>20<=x<25万</th>
                     <th>25<=x<30万</th>
-                    <th>x<=30万</th>
+                    <th>x>=30万</th>
                 </tr>
                 <tr id="used_car_price_count_value_container" style="font-size: 24px; font-weight: bold;"></tr>
 

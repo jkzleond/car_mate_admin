@@ -26,6 +26,11 @@ class TalkinfoController extends ControllerBase
     	$criteria = $this->request->getPost('criteria');
     	$order_by = $this->request->getPost('order', null, 'publishTime').' desc';
     	$talk_list = Talk::getTalkList($criteria, $page_num, $page_size, $order_by);
+        foreach ($talk_list as &$talk)
+        {
+            $talk['contents'] = preg_replace('@[^\x{4e00}-\x{9fa5}a-zA-Z0-9\s,\.<>\/\?？\\\|;\':\"；‘：“~!\@#$%^&\*\(\)\-=_\+[\]\{\}\`，。！￥%]@u', '', $talk['contents']);
+        }
+
     	$talk_total = Talk::getTalkCount($criteria);
 
     	$this->view->setVar('data', array(

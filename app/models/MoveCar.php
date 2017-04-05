@@ -317,12 +317,12 @@ SQL;
         $sql = <<<SQL
         select
           caller, called,
-          convert(varchar(20), caller_start_time, 20) as start_time,
-          convert(varchar(20), caller_end_time , 20) as end_time,
-          caller_duration as duration,
-          (ceiling((caller_duration + called_duration) / 60.00) * 0.12) as bill,
+          convert(varchar(20), start_time, 20) as start_time,
+          convert(varchar(20), end_time , 20) as end_time,
+          last_time as duration,
+          fee as bill,
           case
-            when called_duration > 0 then
+            when bye_type >=2 then
               1
             else
               0

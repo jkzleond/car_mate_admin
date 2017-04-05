@@ -117,9 +117,9 @@
                         <td>{{ call_record['bill'] }}</td>
                         <td>
                             {% if call_record['is_link'] == 1 %}
-                                接通
+                                <span class="label label-success">接通</span>
                             {% else %}
-                                未接通
+                                <span class="label label-important">未接通</span>
                             {% endif %}
                         </td>
                     </tr>

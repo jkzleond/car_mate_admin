@@ -436,7 +436,7 @@
                     {
                         return data_str;
                     }
-                    else if(data_object.total)
+                    else if(data_object.total && data_object.total <= 1000000)
                     {
                         data_object.total = Math.round(data_object.total*7.5);
                     }
